@@ -5,7 +5,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="http://www.yourname.com/child/"/>
-  <updated>2017-07-01T02:39:40.079Z</updated>
+  <updated>2017-07-01T06:24:50.394Z</updated>
   <id>http://www.yourname.com/child/</id>
   
   <author>
@@ -14,6 +14,48 @@
   </author>
   
   <generator uri="http://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>hexo博客折腾小记</title>
+    <link href="http://www.yourname.com/child/2017/07/01/hexo%E5%8D%9A%E5%AE%A2%E6%8A%98%E8%85%BE%E8%AE%B0/"/>
+    <id>http://www.yourname.com/child/2017/07/01/hexo博客折腾记/</id>
+    <published>2017-07-01T05:29:07.000Z</published>
+    <updated>2017-07-01T06:24:50.394Z</updated>
+    
+    <content type="html"><![CDATA[<h3 id="缘起"><a href="#缘起" class="headerlink" title="缘起"></a>缘起</h3><p>​一直想要有一个自己的个人独立博客网站，可以是直接用自己名字例如—“zhuchengxue.com”,但之前了解到一些知识想要架网站至少需要：</p>
+<ol>
+<li>一个域名，需要购买；</li>
+<li>一个主机服务器空间，来存放自己的网站；</li>
+<li>网站框架</li>
+<li>前端</li>
+<li>数据库</li>
+<li>版本控制</li>
+<li>……</li>
+</ol>
+<p>我折腾过3，因为之前也有一个网站叫做“wordpress”，也能够实现这个功能，但没有深入了解，机缘巧合，最近再玩linux系统，纯命令行的操作大大滴改变我对系统的认知，真正从一个菜鸟开始折腾，到现在基本也可以在linux系统存活，期间知道了vim，subline text等编辑器，知道git后，发现这个真是一个神器，但是学习曲线也是非常高，也就是在摸索git 的时候发现可以用hexo这个静态博客托管github这种形式建立自己的独立博客，在花点小钱在万网买了个域名，搞定。</p>
+<h3 id="踩过的坑得到的一点教训"><a href="#踩过的坑得到的一点教训" class="headerlink" title="踩过的坑得到的一点教训"></a>踩过的坑得到的一点教训</h3><p>这个网络教程一大堆，重复写怎么“造轮子”，这明显很没效率。但有几个需要提醒：</p>
+<ol>
+<li>虽然是傻瓜的教程，但按照步骤下来可能哪里就不对了；就像之前设置goagent的一样；</li>
+<li>node.js不要选择最新版本的，容易出毛病，我选的是4.2.3；</li>
+<li>换一台电脑的时候，如果站点和主题设置太多了，会有很多的问题；比如空格很重要</li>
+<li>有时候网站没有更改，很可能是没有清楚缓冲<br> hexo clean</li>
+<li>可以同时托管到国内的代码托管网站比如coding；</li>
+<li>设置网站亦或是主题最好是看官方的文档，不明白的地方在问google，效率应该会高很多；</li>
+<li>一般遇到的问题，网络其实已经早就有答案了，关键是看我们怎么快速找到它，然后把它理解了。</li>
+<li>出错代码直接google很快就可以找到答案了</li>
+<li>国内域名需要实名，自己斟酌。<h3 id="互联网是非常的方便"><a href="#互联网是非常的方便" class="headerlink" title="互联网是非常的方便"></a>互联网是非常的方便</h3>互联网真的是一个非常好的东西，google解决了好多以前需要搜寻好久的问题。但是，虽然有很多的教程，但这些教材只是告诉你步骤，而为什么这样子却很少提及。</li>
+</ol>
+<p>这个博客花费了我接近一周的时间……为了能够让自己相对来说更高效一些，进而学习一些技巧，与花费的时间相比到底值不值得各人心中都有一杆称。</p>
+]]></content>
+    
+    <summary type="html">
+    
+      &lt;h3 id=&quot;缘起&quot;&gt;&lt;a href=&quot;#缘起&quot; class=&quot;headerlink&quot; title=&quot;缘起&quot;&gt;&lt;/a&gt;缘起&lt;/h3&gt;&lt;p&gt;​一直想要有一个自己的个人独立博客网站，可以是直接用自己名字例如—“zhuchengxue.com”,但之前了解到一些知识想要架网站至少需要
+    
+    </summary>
+    
+    
+  </entry>
   
   <entry>
     <title>三观之世界观</title>
@@ -96,7 +138,7 @@
     <link href="http://www.yourname.com/child/2017/06/27/%E4%BA%BA%E7%94%9F%E8%A7%A3%E5%86%B3%E6%96%B9%E6%A1%88/"/>
     <id>http://www.yourname.com/child/2017/06/27/人生解决方案/</id>
     <published>2017-06-27T01:03:34.000Z</published>
-    <updated>2017-06-30T04:03:22.000Z</updated>
+    <updated>2017-07-01T05:34:38.545Z</updated>
     
     <content type="html"><![CDATA[<blockquote class="blockquote-center"><p>​少年听雨歌楼上，红烛昏罗帐。壮年听雨客舟中，江阔云低，断雁叫西风。而今听雨僧庐下，鬓已星星也。悲欢离合总无情，一任阶前、点滴到天明。—蒋捷</p>
 </blockquote>
@@ -118,7 +160,7 @@
 <blockquote>
 <p>我看见这一代最杰出的头脑毁于疯狂，挨着饿歇斯底里浑身赤裸</p>
 </blockquote>
-<p><em>究竟是为什么会有这种想法呢？</em><br>美剧《真探》有个解释，主角拉斯特说过：</p>
+<h3 id="究竟是为什么会有这种想法呢？"><a href="#究竟是为什么会有这种想法呢？" class="headerlink" title="究竟是为什么会有这种想法呢？"></a>究竟是为什么会有这种想法呢？</h3><p>美剧《真探》有个解释，主角拉斯特说过：</p>
 <blockquote>
 <p>I think human consciousness was a tragic misstep in evolution.We becam too self-aware.Nature created an aspect of nature &gt;separate from itself.We are creatures that should not exist by natural law.<br>我觉得人类的自我意识，是进化过程中一个不幸的失误。我们变得太有自我意识了，大自然创造了从它自身分离出的另一面，根据自然法则，&gt;&gt;我们这种生物不该存在。</p>
 </blockquote>
@@ -129,8 +171,7 @@
 <p>我以前就是这么想的，然后经常让自己处在这种非常低落的情绪当中。</p>
 <p>后来不断的长大，慢慢意识到自己会这么想，终究还是自己认知格局太小了。</p>
 <p>我们重新捋捋</p>
-<p><em>什么是人生观？</em></p>
-<p>维基百科对人生观的定义如下：</p>
+<h3 id="什么是人生观？"><a href="#什么是人生观？" class="headerlink" title="什么是人生观？"></a>什么是人生观？</h3><p>维基百科对人生观的定义如下：</p>
 <blockquote>
 <p>人生观，是人对于人生的价值、意义和个人立身处世的态度的一种看法或见解。</p>
 </blockquote>
@@ -365,7 +406,7 @@
     <link href="http://www.yourname.com/child/2017/06/21/%E6%B5%85%E8%B0%88%E7%9C%8B%E5%9B%BE%E8%AF%86%E7%89%87/"/>
     <id>http://www.yourname.com/child/2017/06/21/浅谈看图识片/</id>
     <published>2017-06-21T07:58:45.000Z</published>
-    <updated>2017-06-22T01:30:52.000Z</updated>
+    <updated>2017-07-01T05:34:43.781Z</updated>
     
     <content type="html"><![CDATA[<p>如何通过截图，或动态图寻找片源、演员抑或“番号”？<br>先思考一个问题：</p>
 <blockquote>
@@ -373,8 +414,7 @@
 </blockquote>
 <p>它一定有个源头，然后通过不同的节点，不断的分流，最终到达我们的荧幕前，一张图在网络上流传，一定有源头，而最开始的源头不难想到的无非就2种：</p>
 <p>1.用户上传：包括厂家电影类的海报、摄影作品、封面这个资源终究有限；<br>2.用户自己制作：包括电脑截图、自制gif图，这个充斥在互联网大部分论坛、微博的地方、个人网站等地方。</p>
-<p>工具</p>
-<p>1、万能的google之图片搜索，要无墙版本；<br>2、一些图片搜索引擎：不限于各种搜索引擎的识图（bing、百度识图、搜狗识图、yandex、360、Tineye、SauceNAD、IQDB等) gif搜索引擎（GIPHY、gif喵、soogif）但这些对于我来说并没有啥用；<br>3、搜索的思维：</p>
+<h3 id="工具"><a href="#工具" class="headerlink" title="工具"></a>工具</h3><p>1、万能的google之图片搜索，要无墙版本；<br>2、一些图片搜索引擎：不限于各种搜索引擎的识图（bing、百度识图、搜狗识图、yandex、360、Tineye、SauceNAD、IQDB等) gif搜索引擎（GIPHY、gif喵、soogif）但这些对于我来说并没有啥用；<br>3、搜索的思维：</p>
 <blockquote>
 <p>3.1 找到所要找的图片量最大的地方（要找内涵图就要去404的网站），</p>
 <p>3.2 多使用google以图搜图（chrome同时按住s和右键可直接搜索）；</p>
@@ -383,8 +423,7 @@
 <p>3.5 找老司机求助；</p>
 <p>3.6 有些就是找不到的，趁早放弃。</p>
 </blockquote>
-<p>一、静态图</p>
-<p>搜索结果有四种：</p>
+<h3 id="一、静态图"><a href="#一、静态图" class="headerlink" title="一、静态图"></a>一、静态图</h3><p>搜索结果有四种：</p>
 <ol>
 <li><p>是能搜到图片网站或番号网站对该片的介绍，这时可根据网站给出的番号信息搜片。</p>
 </li>
@@ -395,8 +434,7 @@
 <li><p>是网上根本就没有该截图信息。这种情况可能是求助者自己对视频截的图，也可能是其他原因。但不论怎样，没有任何信息就想找到出处，我只能说“随缘吧”！</p>
 </li>
 </ol>
-<p>二、动态图</p>
-<p>此类情况相对更多，难度同样也不小。搜索结果一般有三种：</p>
+<h3 id="二、动态图"><a href="#二、动态图" class="headerlink" title="二、动态图"></a>二、动态图</h3><p>此类情况相对更多，难度同样也不小。搜索结果一般有三种：</p>
 <ol>
 <li>是有人求助过并得到解答。</li>
 </ol>
@@ -409,9 +447,9 @@
 <p>总之，没有搜到任何信息，就没有找到出处的可能，所以遇到这种情况，放弃吧！</p>
 <p>看图识车牌除了需要技巧，最关键的可能是平时的积累，而这，除了一直看之外，只好接受无能为力了。</p>
 <p>打完收工，呼······</p>
-<p>当冥想的日子飞翔</p>
-<p>喧嚣的日子把我们唤去</p>
-<p>且在此给他留下些微的痕迹！</p>
+<blockquote>
+<p>当冥想的日子飞翔<br>喧嚣的日子把我们唤去<br>且在此给他留下些微的痕迹！</p>
+</blockquote>
 ]]></content>
     
     <summary type="html">

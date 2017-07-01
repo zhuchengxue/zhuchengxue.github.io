@@ -2,16 +2,30 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   
   <url>
-    <loc>http://www.yourname.com/child/2017/07/01/%E4%B8%89%E8%A7%82%E4%B9%8B%E4%B8%96%E7%95%8C%E8%A7%82/</loc>
+    <loc>http://www.yourname.com/child/2017/07/01/hexo%E5%8D%9A%E5%AE%A2%E6%8A%98%E8%85%BE%E8%AE%B0/</loc>
     
-    <lastmod>2017-07-01T02:39:40.079Z</lastmod>
+    <lastmod>2017-07-01T06:24:50.394Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>http://www.yourname.com/child/2017/06/21/%E6%B5%85%E8%B0%88%E7%9C%8B%E5%9B%BE%E8%AF%86%E7%89%87/</loc>
+    
+    <lastmod>2017-07-01T05:34:43.781Z</lastmod>
     
   </url>
   
   <url>
     <loc>http://www.yourname.com/child/2017/06/27/%E4%BA%BA%E7%94%9F%E8%A7%A3%E5%86%B3%E6%96%B9%E6%A1%88/</loc>
     
-    <lastmod>2017-06-30T04:03:22.000Z</lastmod>
+    <lastmod>2017-07-01T05:34:38.545Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>http://www.yourname.com/child/2017/07/01/%E4%B8%89%E8%A7%82%E4%B9%8B%E4%B8%96%E7%95%8C%E8%A7%82/</loc>
+    
+    <lastmod>2017-07-01T02:39:40.079Z</lastmod>
     
   </url>
   
@@ -40,13 +54,6 @@
     <loc>http://www.yourname.com/child/2017/06/21/Chrome%E4%B8%8D%E5%AE%8C%E5%85%A8%E6%8C%87%E5%8D%97/</loc>
     
     <lastmod>2017-06-22T01:30:54.000Z</lastmod>
-    
-  </url>
-  
-  <url>
-    <loc>http://www.yourname.com/child/2017/06/21/%E6%B5%85%E8%B0%88%E7%9C%8B%E5%9B%BE%E8%AF%86%E7%89%87/</loc>
-    
-    <lastmod>2017-06-22T01:30:52.000Z</lastmod>
     
   </url>
   
