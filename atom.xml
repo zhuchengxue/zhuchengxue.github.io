@@ -5,7 +5,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="http://www.yourname.com/child/"/>
-  <updated>2017-07-08T07:52:59.328Z</updated>
+  <updated>2017-07-08T07:55:08.424Z</updated>
   <id>http://www.yourname.com/child/</id>
   
   <author>
@@ -20,10 +20,9 @@
     <link href="http://www.yourname.com/child/2017/07/08/%E9%A1%B9%E7%9B%AE%E7%AE%A1%E7%90%86%E5%AD%A6%E4%B9%A0/"/>
     <id>http://www.yourname.com/child/2017/07/08/项目管理学习/</id>
     <published>2017-07-08T07:49:32.000Z</published>
-    <updated>2017-07-08T07:52:59.328Z</updated>
+    <updated>2017-07-08T07:55:08.424Z</updated>
     
-    <content type="html"><![CDATA[<h1 id="项目管理梳理"><a href="#项目管理梳理" class="headerlink" title="项目管理梳理"></a>项目管理梳理</h1><p>[TOC]</p>
-<h2 id="一、企业痼疾"><a href="#一、企业痼疾" class="headerlink" title="一、企业痼疾"></a>一、企业痼疾</h2><p>一开始先列举了中小企业普遍存在的一些“痼疾”现象，比如“老大难”、“公司不大，皮球不小”、“部门墙”，</p>
+    <content type="html"><![CDATA[<h2 id="一、企业痼疾"><a href="#一、企业痼疾" class="headerlink" title="一、企业痼疾"></a>一、企业痼疾</h2><p>一开始先列举了中小企业普遍存在的一些“痼疾”现象，比如“老大难”、“公司不大，皮球不小”、“部门墙”，</p>
 <p>接着指出发生这些现象的问题所在：</p>
 <ol>
 <li>人才短缺</li>
@@ -361,8 +360,7 @@
     
     <summary type="html">
     
-      &lt;h1 id=&quot;项目管理梳理&quot;&gt;&lt;a href=&quot;#项目管理梳理&quot; class=&quot;headerlink&quot; title=&quot;项目管理梳理&quot;&gt;&lt;/a&gt;项目管理梳理&lt;/h1&gt;&lt;p&gt;[TOC]&lt;/p&gt;
-&lt;h2 id=&quot;一、企业痼疾&quot;&gt;&lt;a href=&quot;#一、企业痼疾&quot; class=&quot;hea
+      &lt;h2 id=&quot;一、企业痼疾&quot;&gt;&lt;a href=&quot;#一、企业痼疾&quot; class=&quot;headerlink&quot; title=&quot;一、企业痼疾&quot;&gt;&lt;/a&gt;一、企业痼疾&lt;/h2&gt;&lt;p&gt;一开始先列举了中小企业普遍存在的一些“痼疾”现象，比如“老大难”、“公司不大，皮球不小”、“部门墙”，&lt;/p
     
     </summary>
     
