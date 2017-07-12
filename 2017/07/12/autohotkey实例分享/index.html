@@ -102,7 +102,7 @@
 <meta property="og:url" content="http://www.yourname.com/child/2017/07/12/autohotkey实例分享/index.html">
 <meta property="og:site_name" content="学语思">
 <meta property="og:description" content="引言经常从网络或者pdf等文件中搜集资料的小伙伴一定有一个需求，如何才能更快的复制黏贴，原来的复制黏贴流程是这样的：  在阅读的时候发现一个很好的句子，复制，打开记事本或者word，黏贴，在重新打开网页或电子书阅读，一次还好，两次呢、三次……烦躁从心里开始蔓延。  人这种物种就是有不断的追求懒，没有最懒，只有更懒。分享一个最近掌握的新技能，利用autohotkey实现一键收集资料，生活从此变美好。">
-<meta property="og:updated_time" content="2017-07-12T11:56:45.246Z">
+<meta property="og:updated_time" content="2017-07-12T12:01:32.745Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="autohotkey实例分享">
 <meta name="twitter:description" content="引言经常从网络或者pdf等文件中搜集资料的小伙伴一定有一个需求，如何才能更快的复制黏贴，原来的复制黏贴流程是这样的：  在阅读的时候发现一个很好的句子，复制，打开记事本或者word，黏贴，在重新打开网页或电子书阅读，一次还好，两次呢、三次……烦躁从心里开始蔓延。  人这种物种就是有不断的追求懒，没有最懒，只有更懒。分享一个最近掌握的新技能，利用autohotkey实现一键收集资料，生活从此变美好。">
@@ -387,7 +387,7 @@
 <p>在阅读的时候发现一个很好的句子，复制，打开记事本或者word，黏贴，在重新打开网页或电子书阅读，一次还好，两次呢、三次……烦躁从心里开始蔓延。</p>
 </blockquote>
 <p>人这种物种就是有不断的追求懒，没有最懒，只有更懒。分享一个最近掌握的新技能，利用autohotkey实现一键收集资料，生活从此变美好。</p>
-<h3 id="准备工具"><a href="#准备工具" class="headerlink" title="准备工具"></a>准备工具</h3><h4 id="autohotkey"><a href="#autohotkey" class="headerlink" title="autohotkey"></a>autohotkey</h4><p>安装autohotkey：首先下载AHK，这里是他的下载页面：<a href="http://www.autohotkey.com/download/。当然你也可以直接下载不用安装的ZIP包" target="_blank" rel="external">http://www.autohotkey.com/download/。当然你也可以直接下载不用安装的ZIP包</a></p>
+<h3 id="准备工具"><a href="#准备工具" class="headerlink" title="准备工具"></a>准备工具</h3><h4 id="autohotkey"><a href="#autohotkey" class="headerlink" title="autohotkey"></a>autohotkey</h4><p>安装autohotkey：首先下载AHK，这里是他的下载页面：<a href="http://www.autohotkey.com/download/" target="_blank" rel="external">http://www.autohotkey.com/download/</a>。</p>
 <h4 id="代码"><a href="#代码" class="headerlink" title="代码"></a>代码</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div></pre></td><td class="code"><pre><div class="line">f12:: ;热键</div><div class="line">clipboard = </div><div class="line">send, ^c ;复制选中内容</div><div class="line">clipwait</div><div class="line">IfWinExist, ahk_class OpusApp</div><div class="line">&#123;</div><div class="line">WinActivate, ahk_class OpusApp ;如果存在就激活他</div><div class="line">&#125;</div><div class="line">else ;否则</div><div class="line">&#123;</div><div class="line">Run, D:\Program Files (x86)\Microsoft Office\Office12\WINWORD.exe</div><div class="line">WinWait, ahk_class OpusApp</div><div class="line">WinActivate, ahk_class OpusApp ;如果存在就激活他</div><div class="line">&#125;</div><div class="line">winwaitactive, ahk_class OpusApp</div><div class="line">send, ^v  ;粘贴</div><div class="line">return ;返回</div></pre></td></tr></table></figure>
 <p>实现的功能：</p>
 <blockquote>

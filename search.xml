@@ -3,7 +3,7 @@
   <entry>
     <title><![CDATA[autohotkey实例分享]]></title>
     <url>%2F2017%2F07%2F12%2Fautohotkey%E5%AE%9E%E4%BE%8B%E5%88%86%E4%BA%AB%2F</url>
-    <content type="text"><![CDATA[引言经常从网络或者pdf等文件中搜集资料的小伙伴一定有一个需求，如何才能更快的复制黏贴，原来的复制黏贴流程是这样的： 在阅读的时候发现一个很好的句子，复制，打开记事本或者word，黏贴，在重新打开网页或电子书阅读，一次还好，两次呢、三次……烦躁从心里开始蔓延。 人这种物种就是有不断的追求懒，没有最懒，只有更懒。分享一个最近掌握的新技能，利用autohotkey实现一键收集资料，生活从此变美好。 准备工具autohotkey安装autohotkey：首先下载AHK，这里是他的下载页面：http://www.autohotkey.com/download/。当然你也可以直接下载不用安装的ZIP包 代码1234567891011121314151617f12:: ;热键clipboard = send, ^c ;复制选中内容clipwaitIfWinExist, ahk_class OpusApp&#123;WinActivate, ahk_class OpusApp ;如果存在就激活他&#125;else ;否则&#123;Run, D:\Program Files (x86)\Microsoft Office\Office12\WINWORD.exeWinWait, ahk_class OpusAppWinActivate, ahk_class OpusApp ;如果存在就激活他&#125;winwaitactive, ahk_class OpusAppsend, ^v ;粘贴return ;返回 实现的功能： 按f12，选择的文本自动复制到word 这种feel倍爽哈！]]></content>
+    <content type="text"><![CDATA[引言经常从网络或者pdf等文件中搜集资料的小伙伴一定有一个需求，如何才能更快的复制黏贴，原来的复制黏贴流程是这样的： 在阅读的时候发现一个很好的句子，复制，打开记事本或者word，黏贴，在重新打开网页或电子书阅读，一次还好，两次呢、三次……烦躁从心里开始蔓延。 人这种物种就是有不断的追求懒，没有最懒，只有更懒。分享一个最近掌握的新技能，利用autohotkey实现一键收集资料，生活从此变美好。 准备工具autohotkey安装autohotkey：首先下载AHK，这里是他的下载页面：http://www.autohotkey.com/download/。 代码1234567891011121314151617f12:: ;热键clipboard = send, ^c ;复制选中内容clipwaitIfWinExist, ahk_class OpusApp&#123;WinActivate, ahk_class OpusApp ;如果存在就激活他&#125;else ;否则&#123;Run, D:\Program Files (x86)\Microsoft Office\Office12\WINWORD.exeWinWait, ahk_class OpusAppWinActivate, ahk_class OpusApp ;如果存在就激活他&#125;winwaitactive, ahk_class OpusAppsend, ^v ;粘贴return ;返回 实现的功能： 按f12，选择的文本自动复制到word 这种feel倍爽哈！]]></content>
       <tags>
         <tag>autohotkey</tag>
       </tags>
