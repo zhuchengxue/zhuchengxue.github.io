@@ -5,7 +5,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="http://www.yourname.com/child/"/>
-  <updated>2017-07-29T08:08:43.123Z</updated>
+  <updated>2017-07-29T09:04:16.510Z</updated>
   <id>http://www.yourname.com/child/</id>
   
   <author>
@@ -16,14 +16,13 @@
   <generator uri="http://hexo.io/">Hexo</generator>
   
   <entry>
-    <title></title>
+    <title>学点经济学</title>
     <link href="http://www.yourname.com/child/2017/07/29/%E5%AD%A6%E7%82%B9%E7%BB%8F%E6%B5%8E%E5%AD%A6/"/>
     <id>http://www.yourname.com/child/2017/07/29/学点经济学/</id>
-    <published>2017-07-29T07:56:45.466Z</published>
-    <updated>2017-07-29T08:08:43.123Z</updated>
+    <published>2017-07-28T16:00:00.000Z</published>
+    <updated>2017-07-29T09:04:16.510Z</updated>
     
-    <content type="html"><![CDATA[<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">title: 学点经济学</div><div class="line">date: 2017-07-29</div><div class="line">tags: 读书笔记</div></pre></td></tr></table></figure>
-<p>终于看完了薛兆丰的《经济学通识》，直接说结论：颠覆了一些价值观，值得一看。</p>
+    <content type="html"><![CDATA[<p>终于看完了薛兆丰的《经济学通识》，直接说结论：颠覆了一些价值观，值得一看。</p>
 <p>一个很残酷的现实是，我自己对经济学的理解其实是非常的肤浅的，看不透这个世界为什么是这样，为什么？</p>
 <p>比如珠海的房价（因为人在珠海郊区），从14年前的四五千到17年接近两万，可以涨的那么的变态，为什么15年股市明明前段时间还是牛市，过了不到一个月，熊市就来了。</p>
 <p>事后诸葛，经常感慨，如果……就…… 但潜意识我也知道，比如就现在，我就是看不懂未来房子是会继续涨，还是一买就跌，或者某只股票明后天会涨还是跌，如果我又预知未来的能力，我早就“all-in”了，就像以前老家那边的人的赌“六合彩”，他们总是觉得自己对“特码”胜券在握，因为看了那么多资料，有的是经过电脑计算，然后顺理成章的倾家荡产了，没有死的都是传奇。</p>
@@ -76,10 +75,14 @@
     
     <summary type="html">
     
-      &lt;figure class=&quot;highlight plain&quot;&gt;&lt;table&gt;&lt;tr&gt;&lt;td class=&quot;gutter&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;1&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;2&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;3&lt;/di
+      &lt;p&gt;终于看完了薛兆丰的《经济学通识》，直接说结论：颠覆了一些价值观，值得一看。&lt;/p&gt;
+&lt;p&gt;一个很残酷的现实是，我自己对经济学的理解其实是非常的肤浅的，看不透这个世界为什么是这样，为什么？&lt;/p&gt;
+&lt;p&gt;比如珠海的房价（因为人在珠海郊区），从14年前的四五千到17年接近两万，
     
     </summary>
     
+    
+      <category term="读书笔记" scheme="http://www.yourname.com/child/tags/%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0/"/>
     
   </entry>
   
