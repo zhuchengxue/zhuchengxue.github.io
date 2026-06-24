@@ -1,0 +1,38 @@
+---
+import BaseLayout from './BaseLayout.astro';
+
+interface Props {
+  frontmatter: {
+    title: string;
+    description?: string;
+    pubDate: string | Date;
+    updatedDate?: string | Date;
+    tags?: string[];
+  };
+}
+
+const { frontmatter } = Astro.props;
+const date = new Date(frontmatter.pubDate);
+---
+
+<BaseLayout title={frontmatter.title} description={frontmatter.description}>
+  <article class="page">
+    <header class="article-header">
+      <div class="meta">
+        <time datetime={date.toISOString()}>
+          {date.toLocaleDateString('zh-CN', { year: 'numeric', month: 'long', day: 'numeric' })}
+        </time>
+      </div>
+      <h1>{frontmatter.title}</h1>
+      {frontmatter.description && <p class="summary">{frontmatter.description}</p>}
+      {frontmatter.tags?.length && (
+        <div class="tags">
+          {frontmatter.tags.map((tag) => <span class="tag">{tag}</span>)}
+        </div>
+      )}
+    </header>
+    <div class="article-body">
+      <slot />
+    </div>
+  </article>
+</BaseLayout>

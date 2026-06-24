@@ -1,0 +1,34 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { SITE } from '../config';
+
+const base = import.meta.env.BASE_URL.replace(/\/$/, '');
+const modules = import.meta.glob('../content/posts/*.md', { eager: true });
+const posts = Object.entries(modules)
+  .map(([path, post]: [string, any]) => ({
+    slug: path.split('/').pop()!.replace(/\.md$/, ''),
+    ...post.frontmatter
+  }))
+  .filter((post) => !post.draft)
+  .sort((a, b) => new Date(b.pubDate).valueOf() - new Date(a.pubDate).valueOf());
+---
+
+<BaseLayout>
+  <section class="hero">
+    <h1>{SITE.title}</h1>
+    <p>{SITE.description}</p>
+  </section>
+  <section class="page" style="padding-top: 0">
+    <ul class="post-list">
+      {posts.map((post) => (
+        <li>
+          <div class="meta">
+            {new Date(post.pubDate).toLocaleDateString('zh-CN')}
+          </div>
+          <h2><a href={`${base}/posts/${post.slug}/`}>{post.title}</a></h2>
+          {post.description && <div class="summary">{post.description}</div>}
+        </li>
+      ))}
+    </ul>
+  </section>
+</BaseLayout>

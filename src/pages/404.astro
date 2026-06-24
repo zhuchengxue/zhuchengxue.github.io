@@ -1,0 +1,14 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+
+const base = import.meta.env.BASE_URL.replace(/\/$/, '');
+---
+
+<BaseLayout title="页面未找到">
+  <section class="page article-body">
+    <p class="meta">404</p>
+    <h1>这里暂时没有内容</h1>
+    <p>链接可能已经改变，也可能只是拐错了一个弯。</p>
+    <p><a href={`${base}/`}>返回文章首页</a></p>
+  </section>
+</BaseLayout>
