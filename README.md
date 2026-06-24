@@ -49,6 +49,8 @@ npm run build
 - 仓库名为 `用户名.github.io`：发布到 `https://用户名.github.io/`
 - 其他仓库名：发布到 `https://用户名.github.io/仓库名/`
 
+仓库路径只会在 GitHub Actions 构建时启用，因此本地 `npm run dev` 和 `npm run preview` 始终使用根路径，不需要手工修改配置。
+
 ## 公众号分发
 
 博客和公众号共用同一份 Markdown 原稿。博客通过 GitHub 自动发布；公众号暂时通过 Markdown Nice 或 Doocs MD 排版后手动复制，维护成本最低，也最稳定。
