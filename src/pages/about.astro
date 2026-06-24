@@ -5,8 +5,13 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 <BaseLayout title="关于">
   <article class="page article-body">
     <h1>关于我</h1>
-    <p>你好，这里是我的个人博客。</p>
-    <p>我会在这里沉淀微信公众号文章，以及那些值得长期保留的思考、阅读和实践记录。</p>
-    <p>请在 <code>src/pages/about.astro</code> 中把这段文字替换成你的个人介绍。</p>
+    <img class="avatar" src={`${import.meta.env.BASE_URL}uploads/avatar.jpg`} alt="zhuchengxue 的头像" />
+    <blockquote>
+      夫君子之行，静以修身，俭以养德。非淡泊无以明志，非宁静无以致远。
+      夫学须静也，才须学也，非学无以广才，非志无以成学。
+    </blockquote>
+    <p>后世有只朱看到后，很有感慨，所以就有了这个博客。</p>
+    <p>这里保存微信公众号文章，以及那些值得长期留下的思考、阅读和实践记录。</p>
+    <p><a href={`${import.meta.env.BASE_URL}archives/`}>浏览 2017–2020 年旧文归档</a></p>
   </article>
 </BaseLayout>

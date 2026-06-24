@@ -1,6 +1,6 @@
 export const SITE = {
-  title: '我的个人博客',
-  description: '记录思考、阅读与实践。',
+  title: '学语思',
+  description: '非学无以广才，非志无以成学。',
   author: 'zhuchengxue',
   language: 'zh-CN'
 };
