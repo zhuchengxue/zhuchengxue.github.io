@@ -20,14 +20,22 @@ npm run build
 ## 写文章
 
 1. 用 Obsidian 打开本仓库目录。
-2. 将 `templates/article.md` 复制到 `src/content/posts/`。
-3. 文件名建议使用 `YYYY-MM-DD-英文或拼音标题.md`。
+2. 在终端运行 `npm run new -- "文章标题" ying-wen-huo-pin-yin`。
+3. 新文章会自动创建到 `src/content/posts/`，文件名为 `YYYY-MM-DD-短名.md`。
 4. 图片放到 `public/images/文章名/`，正文中使用 `../../images/文章名/图片.webp`。
 5. 写作时保持 `draft: true`；发布时改为 `draft: false`。
 
 站点名称、作者和简介在 `src/config.ts` 中修改，个人介绍在 `src/pages/about.astro` 中修改。
 
 使用 `../../images/` 是为了同时兼容本地预览、用户主页仓库和带仓库名前缀的 GitHub Pages。
+
+发布前运行：
+
+```bash
+npm run build
+```
+
+构建会先检查每篇文章的标题、摘要、日期、标签、草稿状态和文件名，避免格式错误的文章被发布。
 
 ## 发布到 GitHub Pages
 
