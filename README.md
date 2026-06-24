@@ -4,6 +4,8 @@
 
 本仓库同时保留原 Hexo 博客的 2017–2020 年静态文章与归档。旧文章继续使用原 URL，新文章统一写入 `src/content/posts/`。
 
+网站的 `/articles/` 页面会自动合并新旧文章，并提供无需后端的即时标题搜索。
+
 ## 本地使用
 
 ```bash
@@ -30,6 +32,12 @@ npm run build
 站点名称、作者和简介在 `src/config.ts` 中修改，个人介绍在 `src/pages/about.astro` 中修改。
 
 使用 `../../images/` 是为了同时兼容本地预览、用户主页仓库和带仓库名前缀的 GitHub Pages。
+
+分享图源文件是 `public/og-default.svg`，网站实际使用兼容性更好的 `public/og-default.png`。修改 SVG 后可重新生成 PNG：
+
+```bash
+node -e "import('sharp').then(({default:sharp})=>sharp('public/og-default.svg').png().toFile('public/og-default.png'))"
+```
 
 发布前运行：
 

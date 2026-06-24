@@ -1,14 +1,8 @@
 import { SITE } from '../config';
+import { getNewPosts } from '../lib/posts';
 
 export async function GET(context: { site?: URL }) {
-  const modules = import.meta.glob('../content/posts/*.md', { eager: true });
-  const posts = Object.entries(modules)
-    .map(([path, post]: [string, any]) => ({
-      slug: path.split('/').pop()!.replace(/\.md$/, ''),
-      ...post.frontmatter
-    }))
-    .filter((post) => !post.draft)
-    .sort((a, b) => new Date(b.pubDate).valueOf() - new Date(a.pubDate).valueOf());
+  const posts = getNewPosts();
 
   const origin = context.site?.toString().replace(/\/$/, '') ?? 'http://localhost:4321';
   const base = import.meta.env.BASE_URL.replace(/\/$/, '');
@@ -25,9 +19,9 @@ export async function GET(context: { site?: URL }) {
     <item>
       <title>${escapeXml(post.title)}</title>
       <description>${escapeXml(post.description ?? '')}</description>
-      <link>${origin}${base}/posts/${post.slug}/</link>
-      <guid>${origin}${base}/posts/${post.slug}/</guid>
-      <pubDate>${new Date(post.pubDate).toUTCString()}</pubDate>
+      <link>${origin}${base}${post.href}</link>
+      <guid>${origin}${base}${post.href}</guid>
+      <pubDate>${post.pubDate.toUTCString()}</pubDate>
     </item>`).join('');
 
   return new Response(

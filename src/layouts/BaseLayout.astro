@@ -5,15 +5,29 @@ import { SITE } from '../config';
 interface Props {
   title?: string;
   description?: string;
+  image?: string;
+  type?: 'website' | 'article';
+  noindex?: boolean;
 }
 
 const {
   title = SITE.title,
-  description = SITE.description
+  description = SITE.description,
+  image = SITE.socialImage,
+  type = 'website',
+  noindex = false
 } = Astro.props;
 const pageTitle = title === SITE.title ? title : `${title}｜${SITE.title}`;
 const base = import.meta.env.BASE_URL.replace(/\/$/, '');
 const canonicalURL = new URL(Astro.url.pathname, Astro.site);
+const imageURL = new URL(`${base}${image}`, Astro.site);
+const currentPath = Astro.url.pathname;
+const navItems = [
+  { href: `${base}/`, label: '首页' },
+  { href: `${base}/articles/`, label: '全部文章' },
+  { href: `${base}/about/`, label: '关于' },
+  { href: `${base}/rss.xml`, label: 'RSS' }
+];
 ---
 
 <!doctype html>
@@ -24,29 +38,45 @@ const canonicalURL = new URL(Astro.url.pathname, Astro.site);
     <meta name="generator" content={Astro.generator} />
     <meta name="description" content={description} />
     <meta name="theme-color" content="#276749" />
+    {noindex && <meta name="robots" content="noindex, follow" />}
     <meta property="og:title" content={pageTitle} />
     <meta property="og:description" content={description} />
-    <meta property="og:type" content="website" />
+    <meta property="og:type" content={type} />
     <meta property="og:locale" content="zh_CN" />
     <meta property="og:url" content={canonicalURL} />
+    <meta property="og:image" content={imageURL} />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content={`${SITE.title}：${SITE.description}`} />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={pageTitle} />
+    <meta name="twitter:description" content={description} />
+    <meta name="twitter:image" content={imageURL} />
+    <meta name="twitter:image:alt" content={`${SITE.title}：${SITE.description}`} />
     <link rel="canonical" href={canonicalURL} />
     <link rel="icon" href={`${base}/favicon.svg`} type="image/svg+xml" />
     <link rel="alternate" type="application/rss+xml" title={SITE.title} href={`${base}/rss.xml`} />
     <title>{pageTitle}</title>
+    <slot name="head" />
   </head>
   <body>
+    <a class="skip-link" href="#main-content">跳到正文</a>
     <header>
       <nav class="shell nav" aria-label="主导航">
         <a class="brand" href={`${base}/`}>{SITE.title}</a>
         <div class="nav-links">
-          <a href={`${base}/`}>文章</a>
-          <a href={`${base}/archives/`}>旧文归档</a>
-          <a href={`${base}/about/`}>关于</a>
-          <a href={`${base}/rss.xml`}>RSS</a>
+          {navItems.map((item) => (
+            <a
+              href={item.href}
+              aria-current={currentPath === item.href || (item.href !== `${base}/` && currentPath.startsWith(item.href)) ? 'page' : undefined}
+            >
+              {item.label}
+            </a>
+          ))}
         </div>
       </nav>
     </header>
-    <main>
+    <main id="main-content">
       <slot />
     </main>
     <footer>

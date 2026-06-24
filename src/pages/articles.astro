@@ -1,0 +1,68 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { getAllPosts } from '../lib/posts';
+
+const base = import.meta.env.BASE_URL.replace(/\/$/, '');
+const posts = getAllPosts();
+---
+
+<BaseLayout title="全部文章" description={`浏览和搜索学语思的 ${posts.length} 篇文章。`}>
+  <section class="page archive-page">
+    <header class="page-header">
+      <p class="eyebrow">CONTENT ARCHIVE</p>
+      <h1>全部文章</h1>
+      <p class="summary">新旧文章汇于一处，共 {posts.length} 篇。</p>
+    </header>
+
+    <label class="search-box">
+      <span class="sr-only">搜索文章</span>
+      <input id="article-search" type="search" placeholder="搜索标题、摘要或标签…" autocomplete="off" />
+    </label>
+
+    <p id="search-status" class="meta" aria-live="polite"></p>
+
+    <ol class="archive-list" id="article-list">
+      {posts.map((post) => (
+        <li
+          data-search={[
+            post.title,
+            post.description,
+            ...post.tags
+          ].filter(Boolean).join(' ').toLocaleLowerCase('zh-CN')}
+        >
+          <time datetime={post.pubDate.toISOString()}>
+            {post.pubDate.toLocaleDateString('zh-CN', { year: 'numeric', month: '2-digit', day: '2-digit' })}
+          </time>
+          <div>
+            <a href={`${base}${post.href}`}>{post.title}</a>
+            {post.legacy && <span class="legacy-badge">旧文</span>}
+            {post.description && <p>{post.description}</p>}
+          </div>
+        </li>
+      ))}
+    </ol>
+
+    <noscript><p class="meta">启用 JavaScript 后可在本页即时搜索；文章链接不受影响。</p></noscript>
+  </section>
+</BaseLayout>
+
+<script>
+  const input = document.querySelector<HTMLInputElement>('#article-search');
+  const items = Array.from(document.querySelectorAll<HTMLElement>('#article-list > li'));
+  const status = document.querySelector<HTMLElement>('#search-status');
+
+  input?.addEventListener('input', () => {
+    const query = input.value.trim().toLocaleLowerCase('zh-CN');
+    let visible = 0;
+
+    for (const item of items) {
+      const matches = !query || item.dataset.search?.includes(query);
+      item.hidden = !matches;
+      if (matches) visible++;
+    }
+
+    if (status) {
+      status.textContent = query ? `找到 ${visible} 篇文章` : '';
+    }
+  });
+</script>

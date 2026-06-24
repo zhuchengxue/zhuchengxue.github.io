@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630">
+  <rect width="1200" height="630" fill="#f8f7f3"/>
+  <circle cx="1040" cy="120" r="260" fill="#276749" opacity=".08"/>
+  <circle cx="110" cy="590" r="210" fill="#276749" opacity=".06"/>
+  <text x="100" y="270" fill="#24231f" font-family="serif" font-size="118" font-weight="700">学语思</text>
+  <rect x="100" y="322" width="88" height="7" rx="3.5" fill="#276749"/>
+  <text x="100" y="405" fill="#6c6a62" font-family="serif" font-size="42">非学无以广才，非志无以成学。</text>
+  <text x="100" y="530" fill="#276749" font-family="sans-serif" font-size="28">ZHUCHENGXUE.GITHUB.IO</text>
+</svg>

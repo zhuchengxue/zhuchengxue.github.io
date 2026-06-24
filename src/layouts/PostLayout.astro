@@ -8,20 +8,51 @@ interface Props {
     pubDate: string | Date;
     updatedDate?: string | Date;
     tags?: string[];
+    cover?: string;
   };
 }
 
 const { frontmatter } = Astro.props;
 const date = new Date(frontmatter.pubDate);
+const updatedDate = frontmatter.updatedDate ? new Date(frontmatter.updatedDate) : undefined;
+const canonicalURL = new URL(Astro.url.pathname, Astro.site);
+const structuredData = {
+  '@context': 'https://schema.org',
+  '@type': 'BlogPosting',
+  headline: frontmatter.title,
+  description: frontmatter.description,
+  datePublished: date.toISOString(),
+  dateModified: (updatedDate ?? date).toISOString(),
+  author: {
+    '@type': 'Person',
+    name: 'zhuchengxue'
+  },
+  mainEntityOfPage: canonicalURL.toString()
+};
 ---
 
-<BaseLayout title={frontmatter.title} description={frontmatter.description}>
+<BaseLayout
+  title={frontmatter.title}
+  description={frontmatter.description}
+  image={frontmatter.cover || undefined}
+  type="article"
+>
+  <Fragment slot="head">
+    <script is:inline type="application/ld+json" set:html={JSON.stringify(structuredData)} />
+  </Fragment>
   <article class="page">
     <header class="article-header">
       <div class="meta">
         <time datetime={date.toISOString()}>
           {date.toLocaleDateString('zh-CN', { year: 'numeric', month: 'long', day: 'numeric' })}
         </time>
+        {updatedDate && (
+          <span>
+            · 更新于 <time datetime={updatedDate.toISOString()}>
+              {updatedDate.toLocaleDateString('zh-CN')}
+            </time>
+          </span>
+        )}
       </div>
       <h1>{frontmatter.title}</h1>
       {frontmatter.description && <p class="summary">{frontmatter.description}</p>}
@@ -34,5 +65,8 @@ const date = new Date(frontmatter.pubDate);
     <div class="article-body">
       <slot />
     </div>
+    <footer class="article-footer">
+      <a href={`${import.meta.env.BASE_URL}articles/`}>← 返回全部文章</a>
+    </footer>
   </article>
 </BaseLayout>
