@@ -9,6 +9,11 @@ const dryRun = args.includes('--dry-run');
 const articleArgument = args.find((arg) => arg !== '--dry-run');
 
 if (!articleArgument) {
+  if (process.env.npm_command === 'ci' || process.env.npm_command === 'install') {
+    console.log('跳过 npm 安装阶段的 prepare 生命周期；整理文章请运行 npm run prepare -- "src/content/posts/文章.md"。');
+    process.exit(0);
+  }
+
   console.error('用法：npm run prepare -- "src/content/posts/文章.md" [--dry-run]');
   process.exit(1);
 }
