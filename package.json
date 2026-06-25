@@ -10,6 +10,7 @@
     "publish": "node scripts/publish-post.mjs",
     "wechat": "node scripts/generate-wechat.mjs",
     "import:wechat": "node scripts/import-wechat.mjs",
+    "mirror": "node scripts/deploy-mirror.mjs",
     "check:content": "node scripts/check-content.mjs",
     "check:build": "node scripts/check-built-site.mjs",
     "audit": "node scripts/audit-goal.mjs",

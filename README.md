@@ -261,3 +261,29 @@ PUBLIC_UMAMI_WEBSITE_ID=网站 ID
 1. 绑定自定义域名，让未来切换托管平台更容易。
 2. 使用 Cloudflare Pages、Vercel 或 Netlify 作为同仓库镜像。
 3. 国内必须更稳时，再考虑 Gitee Pages、静态对象存储或服务器同步，但这通常会增加备案、费用或维护成本。
+
+仓库已经提供一个手动镜像发布脚本。先确保主站构建通过：
+
+```bash
+npm run build
+```
+
+再配置目标仓库并预检：
+
+```bash
+MIRROR_REPO=https://gitee.com/用户名/仓库名.git MIRROR_BRANCH=pages npm run mirror -- --dry-run
+```
+
+确认后发布：
+
+```bash
+MIRROR_REPO=https://gitee.com/用户名/仓库名.git MIRROR_BRANCH=pages npm run mirror
+```
+
+脚本会把 `dist/` 推送到镜像仓库指定分支，并自动写入 `.nojekyll`。如果镜像也绑定域名，可以额外设置：
+
+```text
+MIRROR_DOMAIN=mirror.example.com
+```
+
+这个脚本默认不会在 GitHub Actions 中运行，也不会保存任何镜像平台 token。这样主博客仍然是零常驻资源；只有你明确需要镜像时，才手动同步一次。

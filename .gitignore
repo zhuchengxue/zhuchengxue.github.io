@@ -11,5 +11,6 @@ public/images/inbox/*
 exports/
 imports/wechat/*
 !imports/wechat/.gitkeep
+.mirror-worktree/
 Thumbs.db
 *.log

@@ -26,6 +26,7 @@ const packageJson = JSON.parse(readFileSync(resolve('package.json'), 'utf8'));
 for (const script of ['new', 'prepare', 'publish', 'wechat', 'import:wechat', 'build', 'audit']) {
   if (!packageJson.scripts?.[script]) failures.push(`package.json: 缺少 npm script ${script}`);
 }
+if (!packageJson.scripts?.mirror) failures.push('package.json: 缺少 npm script mirror');
 
 for (const [path, label] of [
   ['src/pages/index.astro', '首页'],
@@ -49,6 +50,7 @@ for (const [path, label] of [
   ['scripts/publish-post.mjs', '一键发布脚本'],
   ['scripts/generate-wechat.mjs', '公众号分发脚本'],
   ['scripts/import-wechat.mjs', '旧公众号导入脚本'],
+  ['scripts/deploy-mirror.mjs', '镜像发布脚本'],
   ['imports/wechat/.gitkeep', '旧公众号导入目录'],
   ['.env.example', '环境变量模板']
 ]) {
@@ -66,6 +68,7 @@ mustInclude('.github/workflows/deploy.yml', 'SITE_URL', '独立域名 URL');
 mustInclude('scripts/generate-wechat.mjs', 'content_source_url', '公众号原文链接');
 mustInclude('scripts/generate-wechat.mjs', 'exports/wechat', '公众号输出目录');
 mustInclude('scripts/import-wechat.mjs', 'draft: true', '旧公众号导入为草稿');
+mustInclude('scripts/deploy-mirror.mjs', 'MIRROR_REPO', '国内访问镜像发布');
 mustInclude('README.md', '国内访问镜像', '国内访问镜像说明');
 
 if (existsSync(resolve('dist/index.html'))) {
