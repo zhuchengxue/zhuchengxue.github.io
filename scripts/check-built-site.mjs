@@ -74,8 +74,11 @@ const searchIndex = resolve('dist/search.json');
 if (!existsSync(searchIndex)) {
   failures.push('/search.json: 全文搜索索引未生成');
 } else {
-  const search = readFileSync(searchIndex, 'utf8');
-  if (!search.includes('自定义词组') || !search.includes('印象笔记')) {
+  const search = JSON.parse(readFileSync(searchIndex, 'utf8'));
+  if (search.length !== 71) {
+    failures.push(`/search.json: 搜索索引数量不正确，当前 ${search.length} 篇`);
+  }
+  if (!search.some((post) => `${post.title} ${post.description} ${post.tags?.join(' ')} ${post.text}`.includes('Chrome'))) {
     failures.push('/search.json: 搜索索引未包含预期正文关键词');
   }
 }

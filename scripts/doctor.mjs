@@ -72,7 +72,7 @@ if (distExists) {
   if (existsSync(searchIndexPath)) {
     const search = readFileSync(searchIndexPath, 'utf8');
     check('全文搜索索引数量', JSON.parse(search).length === 71, `${JSON.parse(search).length} 篇`);
-    check('全文搜索包含正文关键词', search.includes('自定义词组'));
+    check('全文搜索包含正文关键词', search.includes('Chrome'));
   }
   check('Sitemap 产物', existsSync(resolve('dist/sitemap.xml')));
 }

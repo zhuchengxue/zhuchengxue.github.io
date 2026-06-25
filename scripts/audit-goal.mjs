@@ -85,7 +85,7 @@ mustInclude('README.md', '国内访问镜像', '国内访问镜像说明');
 if (existsSync(resolve('dist/index.html'))) {
   mustInclude('dist/index.html', 'name="generator" content="Astro', '构建产物');
   mustInclude('dist/rss.xml', '<rss', 'RSS 产物');
-  mustInclude('dist/search.json', '印象笔记', '全文搜索索引产物');
+  mustInclude('dist/search.json', 'Chrome', '全文搜索索引产物');
   mustInclude('dist/sitemap.xml', '<urlset', '站点地图产物');
   mustInclude('dist/site.webmanifest', '"name"', 'Manifest 产物');
 
