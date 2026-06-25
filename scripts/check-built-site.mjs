@@ -73,5 +73,20 @@ if (failures.length) {
   process.exit(1);
 }
 
+const atomFeed = resolve('dist/atom.xml');
+if (!existsSync(atomFeed) || !readFileSync(atomFeed, 'utf8').includes('<feed xmlns="http://www.w3.org/2005/Atom">')) {
+  failures.push('/atom.xml: 旧订阅地址未生成有效 Atom Feed');
+}
+
+const homePage = readFileSync(resolve('dist/index.html'), 'utf8');
+if ((homePage.match(/class="meta"/g) ?? []).length < 8) {
+  failures.push('/: 首页没有展示 8 篇最近文章');
+}
+
+const firstLegacyPage = resolve('dist', legacyPosts[0].href.slice(1), 'index.html');
+if (!readFileSync(firstLegacyPage, 'utf8').includes('aria-label="文章导航"')) {
+  failures.push(`${legacyPosts[0].href}: 缺少上一篇/下一篇导航`);
+}
+
 const bytes = statSync(resolve('dist/index.html')).size;
 console.log(`构建产物检查通过：70 篇旧文已统一渲染，首页 ${bytes} 字节`);

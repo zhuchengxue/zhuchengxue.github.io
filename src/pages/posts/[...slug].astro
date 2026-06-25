@@ -14,8 +14,9 @@ export function getStaticPaths() {
 
 const { post } = Astro.props;
 const { Content, frontmatter } = post;
+const currentHref = `/posts/${Astro.params.slug}/`;
 ---
 
-<PostLayout frontmatter={frontmatter}>
+<PostLayout frontmatter={frontmatter} currentHref={currentHref}>
   <Content />
 </PostLayout>

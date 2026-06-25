@@ -1,5 +1,6 @@
 ---
 import BaseLayout from './BaseLayout.astro';
+import { getAllPosts } from '../lib/posts';
 
 interface Props {
   frontmatter: {
@@ -10,11 +11,17 @@ interface Props {
     tags?: string[];
     cover?: string;
   };
+  currentHref: string;
 }
 
-const { frontmatter } = Astro.props;
+const { frontmatter, currentHref } = Astro.props;
 const date = new Date(frontmatter.pubDate);
 const updatedDate = frontmatter.updatedDate ? new Date(frontmatter.updatedDate) : undefined;
+const allPosts = getAllPosts();
+const currentIndex = allPosts.findIndex((post) => post.href === currentHref);
+const newerPost = currentIndex > 0 ? allPosts[currentIndex - 1] : undefined;
+const olderPost = currentIndex >= 0 ? allPosts[currentIndex + 1] : undefined;
+const base = import.meta.env.BASE_URL.replace(/\/$/, '');
 const canonicalURL = new URL(Astro.url.pathname, Astro.site);
 const structuredData = {
   '@context': 'https://schema.org',
@@ -66,7 +73,25 @@ const structuredData = {
       <slot />
     </div>
     <footer class="article-footer">
-      <a href={`${import.meta.env.BASE_URL}articles/`}>← 返回全部文章</a>
+      <nav class="post-navigation" aria-label="文章导航">
+        <div>
+          {newerPost && (
+            <>
+              <span>上一篇</span>
+              <a href={`${base}${newerPost.href}`}>{newerPost.title}</a>
+            </>
+          )}
+        </div>
+        <div class="post-navigation-next">
+          {olderPost && (
+            <>
+              <span>下一篇</span>
+              <a href={`${base}${olderPost.href}`}>{olderPost.title}</a>
+            </>
+          )}
+        </div>
+      </nav>
+      <a class="back-to-archive" href={`${base}/articles/`}>← 返回全部文章</a>
     </footer>
   </article>
 </BaseLayout>

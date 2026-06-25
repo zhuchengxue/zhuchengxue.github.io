@@ -157,6 +157,24 @@ footer {
   padding: 0 0 5rem;
 }
 
+.section-heading {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 0.5rem;
+}
+
+.section-heading h2 {
+  margin: 0;
+  font-size: 1.05rem;
+}
+
+.section-heading a {
+  color: var(--muted);
+  font-size: 0.9rem;
+}
+
 .post-list li {
   padding: 1.6rem 0;
   border-top: 1px solid var(--line);
@@ -326,6 +344,45 @@ footer {
   border-top: 1px solid var(--line);
 }
 
+.post-navigation {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 2rem;
+  margin-bottom: 2rem;
+}
+
+.post-navigation div {
+  min-width: 0;
+}
+
+.post-navigation span {
+  display: block;
+  margin-bottom: 0.25rem;
+  color: var(--muted);
+  font-family: system-ui, sans-serif;
+  font-size: 0.75rem;
+}
+
+.post-navigation a {
+  display: block;
+  font-weight: 700;
+  line-height: 1.5;
+  text-decoration: none;
+}
+
+.post-navigation a:hover {
+  color: var(--accent);
+}
+
+.post-navigation-next {
+  text-align: right;
+}
+
+.back-to-archive {
+  color: var(--muted);
+  font-size: 0.9rem;
+}
+
 .tags {
   display: flex;
   flex-wrap: wrap;
@@ -402,6 +459,11 @@ footer {
   vertical-align: 0.1em;
 }
 
+.home-legacy-badge {
+  display: inline-block;
+  margin: 0.7rem 0 0;
+}
+
 .sr-only {
   position: absolute;
   width: 1px;
@@ -446,6 +508,15 @@ footer {
   .archive-list li {
     grid-template-columns: 1fr;
     gap: 0.2rem;
+  }
+
+  .post-navigation {
+    grid-template-columns: 1fr;
+    gap: 1.2rem;
+  }
+
+  .post-navigation-next {
+    text-align: left;
   }
 }
 

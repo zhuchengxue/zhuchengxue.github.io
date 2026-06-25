@@ -31,6 +31,6 @@ const description = post.html
   description,
   pubDate: post.pubDate,
   tags: post.tags
-}}>
+}} currentHref={post.href}>
   <Fragment set:html={post.html} />
 </PostLayout>
