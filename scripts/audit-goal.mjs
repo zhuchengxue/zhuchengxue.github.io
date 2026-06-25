@@ -37,6 +37,7 @@ for (const [path, label] of [
   ['src/pages/about.astro', '关于页'],
   ['src/pages/rss.xml.ts', 'RSS'],
   ['src/pages/atom.xml.ts', 'Atom'],
+  ['src/pages/search.json.ts', '全文搜索索引'],
   ['src/pages/sitemap.xml.ts', '站点地图'],
   ['src/pages/site.webmanifest.ts', 'Manifest'],
   ['src/layouts/BaseLayout.astro', '基础布局'],
@@ -62,7 +63,7 @@ for (const [path, label] of [
 }
 
 mustInclude('src/styles/global.css', '@media (prefers-color-scheme: dark)', '深色模式');
-mustInclude('src/pages/articles.astro', 'article-search', '文章搜索');
+mustInclude('src/pages/articles.astro', 'search.json', '文章全文搜索');
 mustInclude('src/layouts/BaseLayout.astro', 'application/ld+json', '结构化数据');
 mustInclude('src/layouts/BaseLayout.astro', 'og:image', 'Open Graph');
 mustInclude('src/config.ts', 'PUBLIC_GISCUS_REPO', '可选评论');
@@ -84,6 +85,7 @@ mustInclude('README.md', '国内访问镜像', '国内访问镜像说明');
 if (existsSync(resolve('dist/index.html'))) {
   mustInclude('dist/index.html', 'name="generator" content="Astro', '构建产物');
   mustInclude('dist/rss.xml', '<rss', 'RSS 产物');
+  mustInclude('dist/search.json', '印象笔记', '全文搜索索引产物');
   mustInclude('dist/sitemap.xml', '<urlset', '站点地图产物');
   mustInclude('dist/site.webmanifest', '"name"', 'Manifest 产物');
 

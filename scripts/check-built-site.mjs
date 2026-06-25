@@ -66,6 +66,19 @@ const articlesPage = resolve('dist/articles/index.html');
 if (!existsSync(articlesPage) || !readFileSync(articlesPage, 'utf8').includes('共 71 篇')) {
   failures.push('/articles/: 统一文章页数量不正确');
 }
+if (!readFileSync(articlesPage, 'utf8').includes('/search.json')) {
+  failures.push('/articles/: 未接入全文搜索索引');
+}
+
+const searchIndex = resolve('dist/search.json');
+if (!existsSync(searchIndex)) {
+  failures.push('/search.json: 全文搜索索引未生成');
+} else {
+  const search = readFileSync(searchIndex, 'utf8');
+  if (!search.includes('自定义词组') || !search.includes('印象笔记')) {
+    failures.push('/search.json: 搜索索引未包含预期正文关键词');
+  }
+}
 
 const atomFeed = resolve('dist/atom.xml');
 if (!existsSync(atomFeed) || !readFileSync(atomFeed, 'utf8').includes('<feed xmlns="http://www.w3.org/2005/Atom">')) {
