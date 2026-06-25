@@ -23,7 +23,7 @@ function mustInclude(path, pattern, label) {
 }
 
 const packageJson = JSON.parse(readFileSync(resolve('package.json'), 'utf8'));
-for (const script of ['new', 'prepare', 'publish', 'wechat', 'wechat:draft', 'import:wechat', 'build', 'audit']) {
+for (const script of ['new', 'prepare', 'publish', 'wechat', 'wechat:draft', 'import:wechat', 'build', 'audit', 'doctor']) {
   if (!packageJson.scripts?.[script]) failures.push(`package.json: 缺少 npm script ${script}`);
 }
 if (!packageJson.scripts?.mirror) failures.push('package.json: 缺少 npm script mirror');
@@ -52,6 +52,7 @@ for (const [path, label] of [
   ['scripts/create-wechat-draft.mjs', '公众号草稿脚本'],
   ['scripts/import-wechat.mjs', '旧公众号导入脚本'],
   ['scripts/deploy-mirror.mjs', '镜像发布脚本'],
+  ['scripts/doctor.mjs', '站点诊断脚本'],
   ['imports/wechat/.gitkeep', '旧公众号导入目录'],
   ['.env.example', '环境变量模板']
 ]) {
@@ -72,6 +73,7 @@ mustInclude('scripts/create-wechat-draft.mjs', 'draft/add', '公众号草稿 API
 mustInclude('scripts/create-wechat-draft.mjs', 'WECHAT_APP_SECRET', '公众号凭据环境变量');
 mustInclude('scripts/import-wechat.mjs', 'draft: true', '旧公众号导入为草稿');
 mustInclude('scripts/deploy-mirror.mjs', 'MIRROR_REPO', '国内访问镜像发布');
+mustInclude('scripts/doctor.mjs', 'site.webmanifest', '线上站点诊断');
 mustInclude('README.md', '国内访问镜像', '国内访问镜像说明');
 
 if (existsSync(resolve('dist/index.html'))) {

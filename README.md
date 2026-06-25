@@ -135,11 +135,23 @@ npm run publish -- "文章路径" --dry-run
 npm run check:content
 npm run build
 npm run audit
+npm run doctor
 npm run preview
 ```
 
 构建会检查新旧文章、图片路径、旧文迁移完整性、订阅源、首页和最终静态产物。
 `npm run audit` 会额外审计四阶段核心交付物是否仍然存在，例如 Obsidian 配置、公众号分发、旧文导入、SEO、评论/统计配置入口和 GitHub Pages 部署配置。
+`npm run doctor` 会做维护体检：检查 Git 工作区、关键文件、构建产物、可选环境变量和默认第三方脚本状态。需要顺便检查线上主站时运行：
+
+```bash
+npm run doctor -- --online
+```
+
+如果正在改代码、尚未提交，但想先看其它诊断项，可以运行：
+
+```bash
+npm run doctor -- --allow-dirty
+```
 
 ## 主要目录
 
