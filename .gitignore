@@ -8,5 +8,8 @@ dist/
 .trash/
 public/images/inbox/*
 !public/images/inbox/.gitkeep
+exports/
+imports/wechat/*
+!imports/wechat/.gitkeep
 Thumbs.db
 *.log

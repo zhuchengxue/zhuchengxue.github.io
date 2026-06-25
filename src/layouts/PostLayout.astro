@@ -1,6 +1,7 @@
 ---
 import BaseLayout from './BaseLayout.astro';
 import { getAllPosts } from '../lib/posts';
+import { COMMENTS, SITE } from '../config';
 
 interface Props {
   frontmatter: {
@@ -23,6 +24,12 @@ const newerPost = currentIndex > 0 ? allPosts[currentIndex - 1] : undefined;
 const olderPost = currentIndex >= 0 ? allPosts[currentIndex + 1] : undefined;
 const base = import.meta.env.BASE_URL.replace(/\/$/, '');
 const canonicalURL = new URL(Astro.url.pathname, Astro.site);
+const commentsEnabled = Boolean(
+  COMMENTS.giscusRepo
+    && COMMENTS.giscusRepoId
+    && COMMENTS.giscusCategory
+    && COMMENTS.giscusCategoryId
+);
 const structuredData = {
   '@context': 'https://schema.org',
   '@type': 'BlogPosting',
@@ -32,9 +39,18 @@ const structuredData = {
   dateModified: (updatedDate ?? date).toISOString(),
   author: {
     '@type': 'Person',
-    name: 'zhuchengxue'
+    name: SITE.author
   },
-  mainEntityOfPage: canonicalURL.toString()
+  image: new URL(`${base}${frontmatter.cover || SITE.socialImage}`, Astro.site).toString(),
+  keywords: frontmatter.tags?.join(', '),
+  inLanguage: SITE.language,
+  url: canonicalURL.toString(),
+  mainEntityOfPage: canonicalURL.toString(),
+  isPartOf: {
+    '@type': 'Blog',
+    name: SITE.title,
+    url: new URL(`${base}/`, Astro.site).toString()
+  }
 };
 ---
 
@@ -43,6 +59,9 @@ const structuredData = {
   description={frontmatter.description}
   image={frontmatter.cover || undefined}
   type="article"
+  publishedTime={date.toISOString()}
+  modifiedTime={(updatedDate ?? date).toISOString()}
+  tags={frontmatter.tags}
 >
   <Fragment slot="head">
     <script is:inline type="application/ld+json" set:html={JSON.stringify(structuredData)} />
@@ -95,5 +114,27 @@ const structuredData = {
       </nav>
       <a class="back-to-archive" href={`${base}/articles/`}>← 返回全部文章</a>
     </footer>
+    {commentsEnabled && (
+      <section class="comments" aria-label="评论">
+        <h2>评论</h2>
+        <script
+          is:inline
+          src="https://giscus.app/client.js"
+          data-repo={COMMENTS.giscusRepo}
+          data-repo-id={COMMENTS.giscusRepoId}
+          data-category={COMMENTS.giscusCategory}
+          data-category-id={COMMENTS.giscusCategoryId}
+          data-mapping="pathname"
+          data-strict="0"
+          data-reactions-enabled="1"
+          data-emit-metadata="0"
+          data-input-position="top"
+          data-theme="preferred_color_scheme"
+          data-lang="zh-CN"
+          crossorigin="anonymous"
+          async
+        />
+      </section>
+    )}
   </article>
 </BaseLayout>
