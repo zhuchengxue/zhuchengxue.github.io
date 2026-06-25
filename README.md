@@ -134,10 +134,12 @@ npm run publish -- "文章路径" --dry-run
 ```bash
 npm run check:content
 npm run build
+npm run audit
 npm run preview
 ```
 
 构建会检查新旧文章、图片路径、旧文迁移完整性、订阅源、首页和最终静态产物。
+`npm run audit` 会额外审计四阶段核心交付物是否仍然存在，例如 Obsidian 配置、公众号分发、旧文导入、SEO、评论/统计配置入口和 GitHub Pages 部署配置。
 
 ## 主要目录
 
@@ -221,11 +223,14 @@ npm run import:wechat
 
 ```text
 SITE_URL=https://你的域名
+CUSTOM_DOMAIN=你的域名
 ```
 
-博客 canonical、Open Graph、结构化数据以及公众号原文和图片地址会一起切换，不需要逐文件修改。
+博客 canonical、Open Graph、结构化数据以及公众号原文和图片地址会一起切换，不需要逐文件修改。`CUSTOM_DOMAIN` 会让 GitHub Actions 在构建产物里生成 `CNAME`。
 
 如果使用 GitHub Pages 自定义域名，还需要在仓库 Settings → Pages 里绑定域名，并按 GitHub 提示配置 DNS。
+
+本地可复制 `.env.example` 作为配置参考。GitHub Pages 部署时，推荐在仓库 Settings → Secrets and variables → Actions → Variables 中配置同名变量。
 
 ## 评论和访问统计
 

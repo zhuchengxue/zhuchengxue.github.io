@@ -19,6 +19,14 @@ jobs:
     runs-on: ubuntu-latest
     env:
       ASTRO_TELEMETRY_DISABLED: 1
+      SITE_URL: ${{ vars.SITE_URL }}
+      CUSTOM_DOMAIN: ${{ vars.CUSTOM_DOMAIN }}
+      PUBLIC_GISCUS_REPO: ${{ vars.PUBLIC_GISCUS_REPO }}
+      PUBLIC_GISCUS_REPO_ID: ${{ vars.PUBLIC_GISCUS_REPO_ID }}
+      PUBLIC_GISCUS_CATEGORY: ${{ vars.PUBLIC_GISCUS_CATEGORY }}
+      PUBLIC_GISCUS_CATEGORY_ID: ${{ vars.PUBLIC_GISCUS_CATEGORY_ID }}
+      PUBLIC_UMAMI_SCRIPT: ${{ vars.PUBLIC_UMAMI_SCRIPT }}
+      PUBLIC_UMAMI_WEBSITE_ID: ${{ vars.PUBLIC_UMAMI_WEBSITE_ID }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v6
@@ -31,6 +39,9 @@ jobs:
         run: npm ci
       - name: Build site
         run: npm run build
+      - name: Write custom domain
+        if: ${{ vars.CUSTOM_DOMAIN != '' }}
+        run: printf '%s\n' "$CUSTOM_DOMAIN" > dist/CNAME
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v4
         with:
