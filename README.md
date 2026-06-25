@@ -153,7 +153,7 @@ npm run doctor -- --online
 npm run doctor -- --allow-dirty
 ```
 
-更完整的日常操作清单见 [docs/OPERATIONS.md](docs/OPERATIONS.md)。
+更完整的日常操作清单见 [docs/OPERATIONS.md](docs/OPERATIONS.md)，四阶段验收状态见 [docs/ACCEPTANCE.md](docs/ACCEPTANCE.md)。
 
 ## 主要目录
 
