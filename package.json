@@ -9,6 +9,7 @@
     "prepare": "node scripts/prepare-post.mjs",
     "publish": "node scripts/publish-post.mjs",
     "wechat": "node scripts/generate-wechat.mjs",
+    "wechat:draft": "node scripts/create-wechat-draft.mjs",
     "import:wechat": "node scripts/import-wechat.mjs",
     "mirror": "node scripts/deploy-mirror.mjs",
     "check:content": "node scripts/check-content.mjs",
