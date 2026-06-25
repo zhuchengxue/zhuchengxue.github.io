@@ -40,6 +40,7 @@ for (const path of [
   'src/pages/articles.astro',
   'src/pages/tags/index.astro',
   'src/pages/rss.xml.ts',
+  'src/pages/search.json.ts',
   'src/pages/sitemap.xml.ts',
   'scripts/generate-wechat.mjs',
   'scripts/create-wechat-draft.mjs',
@@ -66,6 +67,13 @@ if (distExists) {
   check('文章 SEO 元数据', welcome.includes('article:published_time') && welcome.includes('og:image'));
   check('Manifest 产物', existsSync(resolve('dist/site.webmanifest')));
   check('RSS 产物', existsSync(resolve('dist/rss.xml')));
+  const searchIndexPath = resolve('dist/search.json');
+  check('全文搜索索引产物', existsSync(searchIndexPath));
+  if (existsSync(searchIndexPath)) {
+    const search = readFileSync(searchIndexPath, 'utf8');
+    check('全文搜索索引数量', JSON.parse(search).length === 71, `${JSON.parse(search).length} 篇`);
+    check('全文搜索包含正文关键词', search.includes('自定义词组'));
+  }
   check('Sitemap 产物', existsSync(resolve('dist/sitemap.xml')));
 }
 
