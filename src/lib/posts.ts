@@ -1,5 +1,4 @@
-import { readFileSync, readdirSync } from 'node:fs';
-import { join, relative, resolve, sep } from 'node:path';
+import legacyPosts from '../content/legacy-posts.json';
 
 export interface PostSummary {
   title: string;
@@ -10,7 +9,18 @@ export interface PostSummary {
   legacy: boolean;
 }
 
-const PUBLIC_DIRECTORY = resolve('public');
+function htmlToText(html: string) {
+  return html
+    .replace(/<[^>]+>/g, ' ')
+    .replaceAll('&nbsp;', ' ')
+    .replaceAll('&quot;', '"')
+    .replaceAll('&#39;', "'")
+    .replaceAll('&amp;', '&')
+    .replaceAll('&lt;', '<')
+    .replaceAll('&gt;', '>')
+    .replace(/\s+/g, ' ')
+    .trim();
+}
 
 export function getNewPosts(): PostSummary[] {
   const modules = import.meta.glob('../content/posts/*.md', { eager: true });
@@ -29,48 +39,16 @@ export function getNewPosts(): PostSummary[] {
     .sort((a, b) => b.pubDate.valueOf() - a.pubDate.valueOf());
 }
 
-function readLegacyDirectory(directory: string): PostSummary[] {
-  const posts: PostSummary[] = [];
-
-  for (const entry of readdirSync(directory, { withFileTypes: true })) {
-    const fullPath = join(directory, entry.name);
-
-    if (entry.isDirectory()) {
-      posts.push(...readLegacyDirectory(fullPath));
-      continue;
-    }
-
-    if (entry.name !== 'index.html') continue;
-
-    const relativePath = relative(PUBLIC_DIRECTORY, fullPath).split(sep).join('/');
-    const match = relativePath.match(/^(\d{4})\/(\d{2})\/(\d{2})\/(.+)\/index\.html$/);
-    if (!match) continue;
-
-    const html = readFileSync(fullPath, 'utf8');
-    const rawTitle = html.match(/<title>(.*?)<\/title>/s)?.[1]?.trim() ?? match[4];
-    const title = rawTitle
-      .replace(/\s*\|\s*学语思\s*$/, '')
-      .replaceAll('&quot;', '"')
-      .replaceAll('&#39;', "'")
-      .replaceAll('&amp;', '&')
-      .replaceAll('&lt;', '<')
-      .replaceAll('&gt;', '>');
-
-    posts.push({
-      title,
-      pubDate: new Date(`${match[1]}-${match[2]}-${match[3]}T00:00:00+08:00`),
-      href: `/${relativePath.replace(/index\.html$/, '')}`,
-      tags: [],
-      legacy: true
-    });
-  }
-
-  return posts;
-}
-
 export function getLegacyPosts(): PostSummary[] {
-  return ['2017', '2018', '2020']
-    .flatMap((year) => readLegacyDirectory(resolve(PUBLIC_DIRECTORY, year)))
+  return legacyPosts
+    .map((post) => ({
+      title: post.title,
+      description: htmlToText(post.html).slice(0, 120),
+      pubDate: new Date(post.pubDate),
+      href: post.href,
+      tags: post.tags,
+      legacy: true
+    }))
     .sort((a, b) => b.pubDate.valueOf() - a.pubDate.valueOf());
 }
 

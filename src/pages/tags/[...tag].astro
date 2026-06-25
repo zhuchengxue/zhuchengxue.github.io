@@ -1,0 +1,18 @@
+---
+export function getStaticPaths() {
+  return [
+    { params: { tag: undefined } },
+    { params: { tag: 'Chrome' } },
+    { params: { tag: 'autohotkey' } },
+    { params: { tag: '健身' } },
+    { params: { tag: '学习' } },
+    { params: { tag: '思考' } },
+    { params: { tag: '效率' } },
+    { params: { tag: '新技能' } },
+    { params: { tag: '读书笔记' } },
+    { params: { tag: '随想' } }
+  ];
+}
+
+return Astro.redirect(`${import.meta.env.BASE_URL}articles/`, 301);
+---

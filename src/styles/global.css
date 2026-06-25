@@ -216,11 +216,91 @@ footer {
   line-height: 1.4;
 }
 
+.article-body h4,
+.article-body h5,
+.article-body h6 {
+  margin-top: 2em;
+  line-height: 1.45;
+}
+
+.article-body ul,
+.article-body ol {
+  padding-left: 1.4em;
+}
+
+.article-body li + li {
+  margin-top: 0.35em;
+}
+
+.article-body hr {
+  margin: 3rem 0;
+  border: 0;
+  border-top: 1px solid var(--line);
+}
+
 .article-body blockquote {
   margin: 2rem 0;
   padding-left: 1.25rem;
   border-left: 3px solid var(--accent);
   color: var(--muted);
+}
+
+.article-body table {
+  display: block;
+  width: 100%;
+  overflow-x: auto;
+  border-collapse: collapse;
+}
+
+.article-body th,
+.article-body td {
+  padding: 0.55rem 0.75rem;
+  border: 1px solid var(--line);
+  text-align: left;
+}
+
+.article-body figure {
+  margin: 2rem 0;
+}
+
+.article-body figcaption {
+  color: var(--muted);
+  font-size: 0.9rem;
+  text-align: center;
+}
+
+.article-body .highlight {
+  overflow-x: auto;
+  margin: 2rem 0;
+  border-radius: 8px;
+  background: #111;
+  color: #eee;
+}
+
+.article-body .highlight table {
+  display: table;
+  margin: 0;
+}
+
+.article-body .highlight td {
+  padding: 0;
+  border: 0;
+}
+
+.article-body .highlight .gutter {
+  padding: 1rem 0.8rem;
+  color: #777;
+  text-align: right;
+  user-select: none;
+}
+
+.article-body .highlight .code {
+  padding: 1rem;
+}
+
+.article-body .highlight pre {
+  margin: 0;
+  padding: 0;
 }
 
 .article-body code {

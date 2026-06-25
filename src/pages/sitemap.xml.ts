@@ -4,7 +4,7 @@ export function GET(context: { site?: URL }) {
   const origin = context.site?.toString().replace(/\/$/, '') ?? 'http://localhost:4321';
   const base = import.meta.env.BASE_URL.replace(/\/$/, '');
   const contentPaths = [...getNewPosts(), ...getLegacyPosts()].map((post) => post.href);
-  const paths = ['/', '/about/', '/articles/', '/archives/', ...contentPaths];
+  const paths = ['/', '/about/', '/articles/', ...contentPaths];
   const urls = paths
     .map((path) => `  <url><loc>${new URL(`${base}${path}`, `${origin}/`).toString()}</loc></url>`)
     .join('\n');

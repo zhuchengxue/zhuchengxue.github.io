@@ -1,0 +1,36 @@
+---
+import PostLayout from '../../../../layouts/PostLayout.astro';
+import legacyPosts from '../../../../content/legacy-posts.json';
+
+export function getStaticPaths() {
+  return legacyPosts.map((post) => ({
+    params: {
+      year: post.year,
+      month: post.month,
+      day: post.day,
+      slug: post.slug
+    },
+    props: { post }
+  }));
+}
+
+const { post } = Astro.props;
+const description = post.html
+  .replace(/<[^>]+>/g, ' ')
+  .replaceAll('&nbsp;', ' ')
+  .replaceAll('&quot;', '"')
+  .replaceAll('&#39;', "'")
+  .replaceAll('&amp;', '&')
+  .replace(/\s+/g, ' ')
+  .trim()
+  .slice(0, 140);
+---
+
+<PostLayout frontmatter={{
+  title: post.title,
+  description,
+  pubDate: post.pubDate,
+  tags: post.tags
+}}>
+  <Fragment set:html={post.html} />
+</PostLayout>

@@ -2,6 +2,7 @@ import { readdirSync, readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 
 const postsDirectory = resolve('src/content/posts');
+const legacyFile = resolve('src/content/legacy-posts.json');
 const files = readdirSync(postsDirectory)
   .filter((name) => name.endsWith('.md'))
   .sort();
@@ -45,4 +46,36 @@ if (failures.length) {
   process.exit(1);
 }
 
-console.log(`文章检查通过：${files.length} 篇`);
+const legacyPosts = JSON.parse(readFileSync(legacyFile, 'utf8'));
+const legacyHrefs = new Set();
+
+if (legacyPosts.length !== 70) {
+  failures.push(`旧文章应为 70 篇，当前为 ${legacyPosts.length} 篇`);
+}
+
+for (const post of legacyPosts) {
+  if (!post.title?.trim()) failures.push(`旧文章 ${post.href ?? '(未知 URL)'}: title 不能为空`);
+  if (!post.pubDate || Number.isNaN(Date.parse(post.pubDate))) {
+    failures.push(`旧文章 ${post.href ?? '(未知 URL)'}: pubDate 无效`);
+  }
+  if (!post.html?.trim()) failures.push(`旧文章 ${post.href ?? '(未知 URL)'}: 正文为空`);
+  if (!/^\/\d{4}\/\d{2}\/\d{2}\/.+\/$/.test(post.href ?? '')) {
+    failures.push(`旧文章 ${post.title ?? '(未知标题)'}: href 格式无效`);
+  }
+  if (legacyHrefs.has(post.href)) failures.push(`旧文章 URL 重复：${post.href}`);
+  legacyHrefs.add(post.href);
+  if (/<script\b|hexo-theme-next|class="post-body"|adsbygoogle/i.test(post.html)) {
+    failures.push(`旧文章 ${post.href}: 仍含 Hexo 主题或脚本内容`);
+  }
+  if (/<img[^>]+src="[a-z]:\\/i.test(post.html)) {
+    failures.push(`旧文章 ${post.href}: 仍含本机图片路径`);
+  }
+}
+
+if (failures.length) {
+  console.error('文章检查失败：');
+  failures.forEach((failure) => console.error(`- ${failure}`));
+  process.exit(1);
+}
+
+console.log(`文章检查通过：${files.length} 篇新文章，${legacyPosts.length} 篇旧文章`);
