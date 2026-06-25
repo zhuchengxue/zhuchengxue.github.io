@@ -1,4 +1,4 @@
-import { readdirSync, readFileSync } from 'node:fs';
+import { existsSync, readdirSync, readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 
 const postsDirectory = resolve('src/content/posts');
@@ -37,6 +37,22 @@ for (const file of files) {
   }
   if (!/^\d{4}-\d{2}-\d{2}-.+\.md$/.test(file)) {
     failures.push(`${file}: 文件名应为 YYYY-MM-DD-短名.md`);
+  }
+
+  const slug = file.replace(/^\d{4}-\d{2}-\d{2}-/, '').replace(/\.md$/, '');
+  if (/!\[\[/.test(source)) {
+    failures.push(`${file}: 仍有未整理的 Obsidian 图片引用，请运行 npm run prepare`);
+  }
+  for (const match of source.matchAll(/!\[[^\]]*\]\(([^)]+)\)/g)) {
+    const image = match[1].trim();
+    if (/^(?:https?:|data:)/i.test(image)) continue;
+    const expected = new RegExp(`^\\.\\.\\/\\.\\.\\/images\\/${slug.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}\\/${slug.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}-\\d{2}\\.(?:webp|svg)$`);
+    if (!expected.test(image)) {
+      failures.push(`${file}: 图片路径或命名不符合规范：${image}`);
+      continue;
+    }
+    const imagePath = resolve('public', image.replace(/^(?:\.\.\/)+/, ''));
+    if (!existsSync(imagePath)) failures.push(`${file}: 图片文件不存在：${image}`);
   }
 }
 

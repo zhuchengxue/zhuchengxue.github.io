@@ -2,6 +2,11 @@ node_modules/
 dist/
 .astro/
 .DS_Store
-.obsidian/
+.obsidian/workspace.json
+.obsidian/workspace-mobile.json
+.obsidian/cache
+.trash/
+public/images/inbox/*
+!public/images/inbox/.gitkeep
 Thumbs.db
 *.log

@@ -1,0 +1,25 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { getTags } from '../../lib/posts';
+
+const base = import.meta.env.BASE_URL.replace(/\/$/, '');
+const tags = getTags();
+---
+
+<BaseLayout title="标签" description="按主题浏览学语思的文章。">
+  <section class="page">
+    <header class="page-header">
+      <p class="eyebrow">TOPICS</p>
+      <h1>标签</h1>
+      <p class="summary">从主题进入文章，共 {tags.length} 个标签。</p>
+    </header>
+    <div class="tag-cloud">
+      {tags.map((tag) => (
+        <a href={`${base}/tags/${encodeURIComponent(tag.name)}/`}>
+          <span>{tag.name}</span>
+          <small>{tag.count}</small>
+        </a>
+      ))}
+    </div>
+  </section>
+</BaseLayout>

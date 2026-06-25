@@ -78,6 +78,15 @@ if (!existsSync(atomFeed) || !readFileSync(atomFeed, 'utf8').includes('<feed xml
   failures.push('/atom.xml: 旧订阅地址未生成有效 Atom Feed');
 }
 
+const tagIndex = resolve('dist/tags/index.html');
+const blogTag = resolve('dist/tags/博客/index.html');
+if (!existsSync(tagIndex) || !readFileSync(tagIndex, 'utf8').includes('class="tag-cloud"')) {
+  failures.push('/tags/: 标签索引未正确生成');
+}
+if (!existsSync(blogTag) || !readFileSync(blogTag, 'utf8').includes('博客开始营业')) {
+  failures.push('/tags/博客/: 标签文章列表未正确生成');
+}
+
 const homePage = readFileSync(resolve('dist/index.html'), 'utf8');
 if ((homePage.match(/class="meta"/g) ?? []).length < 8) {
   failures.push('/: 首页没有展示 8 篇最近文章');

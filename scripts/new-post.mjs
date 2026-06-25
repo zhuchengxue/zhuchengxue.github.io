@@ -27,6 +27,7 @@ const slug = (requestedSlug || title)
 const filename = `${date}-${slug}.md`;
 const postsDirectory = resolve('src/content/posts');
 const target = resolve(postsDirectory, filename);
+const imageDirectory = resolve('public/images', slug);
 const content = `---
 title: ${title}
 description: 请填写文章摘要
@@ -53,5 +54,7 @@ if (dryRun) {
 }
 
 mkdirSync(postsDirectory, { recursive: true });
+mkdirSync(imageDirectory, { recursive: true });
 writeFileSync(target, content, 'utf8');
 console.log(`已创建：${target}`);
+console.log(`图片目录：${imageDirectory}`);

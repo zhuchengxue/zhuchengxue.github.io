@@ -1,0 +1,41 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { getAllPosts, getTags } from '../../lib/posts';
+
+export function getStaticPaths() {
+  return getTags().map((tag) => ({
+    params: { tag: tag.name },
+    props: {
+      tag: tag.name,
+      posts: getAllPosts().filter((post) => post.tags.includes(tag.name))
+    }
+  }));
+}
+
+const { tag, posts } = Astro.props;
+const base = import.meta.env.BASE_URL.replace(/\/$/, '');
+---
+
+<BaseLayout title={`标签：${tag}`} description={`浏览“${tag}”主题下的 ${posts.length} 篇文章。`}>
+  <section class="page">
+    <header class="page-header">
+      <p class="eyebrow">TOPIC</p>
+      <h1>{tag}</h1>
+      <p class="summary">共 {posts.length} 篇文章。</p>
+    </header>
+    <ol class="archive-list">
+      {posts.map((post) => (
+        <li>
+          <time datetime={post.pubDate.toISOString()}>
+            {post.pubDate.toLocaleDateString('zh-CN')}
+          </time>
+          <div>
+            <a href={`${base}${post.href}`}>{post.title}</a>
+            {post.description && <p>{post.description}</p>}
+          </div>
+        </li>
+      ))}
+    </ol>
+    <p><a href={`${base}/tags/`}>← 返回全部标签</a></p>
+  </section>
+</BaseLayout>

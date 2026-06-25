@@ -1,72 +1,155 @@
-# 个人博客
+# 学语思
 
-一个轻量的中文个人博客：使用 Markdown 写作，由 Astro 生成静态页面，通过 GitHub Pages 免费托管。
+一个以 Markdown 为唯一内容源的轻量个人博客：
 
-本仓库已将原 Hexo 博客的 2017–2020 年文章迁移为结构化正文数据。旧文章继续使用原 URL，但与新文章共享同一套 Astro 页面、导航和排版。
+- Obsidian 本地写作
+- Astro 生成静态页面
+- GitHub Pages 免费托管
+- GitHub Actions 自动部署
+- 同一份文章可继续分发到微信公众号
 
-网站的 `/articles/` 页面会自动合并新旧文章，并提供无需后端的即时标题搜索。
+线上地址：<https://zhuchengxue.github.io/>
 
-首页展示最近 8 篇新旧文章；每篇文章底部会根据完整时间线自动生成上一篇和下一篇导航。RSS 使用 `/rss.xml`，旧 Hexo 订阅地址 `/atom.xml` 也会持续提供更新。
+## 当前能力
 
-## 本地使用
+- 首页、统一文章页、标签页、关于页和 404 页面
+- 深色模式与移动端排版
+- 71 篇新旧文章统一 Astro 风格
+- 全文标题搜索、上一篇/下一篇导航
+- RSS、Atom 和 sitemap
+- Open Graph 分享图与文章结构化数据
+- GitHub Pages 自动构建与发布
+- Obsidian Vault、图片整理和一键发布脚本
+
+## 首次使用
 
 ```bash
 npm install
 npm run dev
 ```
 
-浏览器打开 `http://localhost:4321`。
+浏览器打开 <http://localhost:4321>。
 
-正式构建：
+用 Obsidian 的“打开本地仓库”功能选择本仓库根目录。仓库内已包含推荐配置：
+
+- 新笔记目录：`src/content/posts`
+- 模板目录：`templates`
+- 图片收件箱：`public/images/inbox`
+- 自动更新内部链接
+
+个人工作区布局文件不会提交到 Git。
+
+## 新建文章
+
+推荐使用命令创建，文件名和图片目录会自动符合规范：
 
 ```bash
+npm run new -- "文章标题" article-slug
+```
+
+生成：
+
+```text
+src/content/posts/YYYY-MM-DD-article-slug.md
+public/images/article-slug/
+```
+
+也可以在 Obsidian 中使用 `templates/article.md`。
+
+文章元数据：
+
+```yaml
+---
+title: 文章标题
+description: 一两句话概括文章
+pubDate: 2026-06-25
+tags:
+  - 写作
+draft: true
+wechatUrl:
+cover:
+---
+```
+
+## 图片工作流
+
+在 Obsidian 中直接粘贴图片。附件会进入：
+
+```text
+public/images/inbox/
+```
+
+写完后运行：
+
+```bash
+npm run prepare -- "src/content/posts/YYYY-MM-DD-article-slug.md"
+```
+
+脚本会：
+
+1. 识别 Obsidian Wiki 图片和普通 Markdown 图片。
+2. 将普通位图旋转校正并限制为最大 1600px。
+3. 转为质量 82 的 WebP。
+4. 重命名为 `article-slug-01.webp`。
+5. 移入 `public/images/article-slug/`。
+6. 重写文章图片路径并清理收件箱原图。
+
+SVG 会原样保留并统一命名。
+
+只查看计划、不修改文件：
+
+```bash
+npm run prepare -- "文章路径" --dry-run
+```
+
+## 一键发布
+
+发布前填写真实摘要和标签，然后运行：
+
+```bash
+npm run publish -- "src/content/posts/YYYY-MM-DD-article-slug.md"
+```
+
+脚本会依次：
+
+1. 拒绝混入无关工作区改动。
+2. 自动整理文章图片。
+3. 将 `draft` 改为 `false`。
+4. 执行完整内容、类型和构建检查。
+5. 只暂存本文及本文图片。
+6. 创建 Git 提交并推送。
+7. 触发 GitHub Pages 自动部署。
+
+发布预检：
+
+```bash
+npm run publish -- "文章路径" --dry-run
+```
+
+## 手动检查
+
+```bash
+npm run check:content
 npm run build
+npm run preview
 ```
 
-## 写文章
+构建会检查新旧文章、图片路径、旧文迁移完整性、订阅源、首页和最终静态产物。
 
-1. 用 Obsidian 打开本仓库目录。
-2. 在终端运行 `npm run new -- "文章标题" ying-wen-huo-pin-yin`。
-3. 新文章会自动创建到 `src/content/posts/`，文件名为 `YYYY-MM-DD-短名.md`。
-4. 图片放到 `public/images/文章名/`，正文中使用 `../../images/文章名/图片.webp`。
-5. 写作时保持 `draft: true`；发布时改为 `draft: false`。
+## 主要目录
 
-站点名称、作者和简介在 `src/config.ts` 中修改，个人介绍在 `src/pages/about.astro` 中修改。
-
-使用 `../../images/` 是为了同时兼容本地预览、用户主页仓库和带仓库名前缀的 GitHub Pages。
-
-分享图源文件是 `public/og-default.svg`，网站实际使用兼容性更好的 `public/og-default.png`。修改 SVG 后可重新生成 PNG：
-
-```bash
-node -e "import('sharp').then(({default:sharp})=>sharp('public/og-default.svg').png().toFile('public/og-default.png'))"
+```text
+.obsidian/                 Obsidian 可共享设置
+src/content/posts/         新文章 Markdown
+src/content/legacy-posts.json
+                           迁移后的 70 篇旧文章
+public/images/inbox/       Obsidian 图片收件箱
+public/images/<slug>/      已整理文章图片
+templates/article.md       文章模板
+scripts/                   新建、整理、发布与检查脚本
+.github/workflows/         GitHub Pages 部署
 ```
-
-发布前运行：
-
-```bash
-npm run build
-```
-
-构建会先检查每篇文章的标题、摘要、日期、标签、草稿状态和文件名，避免格式错误的文章被发布。
-
-## 发布到 GitHub Pages
-
-1. 在 GitHub 创建一个仓库，然后把本项目推送上去。
-2. 打开仓库的 **Settings → Pages**。
-3. 将 **Source** 设置为 **GitHub Actions**。
-4. 推送到 `main` 或 `master` 分支后，工作流会自动构建并发布。
-
-配置会根据 GitHub 仓库名自动判断网址：
-
-- 仓库名为 `用户名.github.io`：发布到 `https://用户名.github.io/`
-- 其他仓库名：发布到 `https://用户名.github.io/仓库名/`
-
-仓库路径只会在 GitHub Actions 构建时启用，因此本地 `npm run dev` 和 `npm run preview` 始终使用根路径，不需要手工修改配置。
 
 ## 公众号分发
 
-博客和公众号共用同一份 Markdown 原稿。博客通过 GitHub 自动发布；公众号暂时通过 Markdown Nice 或 Doocs MD 排版后手动复制，维护成本最低，也最稳定。
-
-## 旧文章兼容
-
-迁移后的 70 篇旧文保存在 `src/content/legacy-posts.json`，由 Astro 在原日期 URL（例如 `/2017/06/21/Chrome不完全指南/`）生成统一风格页面。旧归档、标签和分页链接会永久跳转到 `/articles/`，因此不再需要 Hexo 主题文件。
+博客 Markdown 是主稿。下一阶段会从同一文章生成适合微信公众号编辑器的 HTML，包括图片路径处理和博客原文链接，避免维护两份正文。
