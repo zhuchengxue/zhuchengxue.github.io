@@ -48,20 +48,15 @@ const posts = getAllPosts();
 </BaseLayout>
 
 <script>
-  const input = document.querySelector<HTMLInputElement>('#article-search');
-  const items = Array.from(document.querySelectorAll<HTMLElement>('#article-list > li'));
-  const status = document.querySelector<HTMLElement>('#search-status');
-  const base = document.querySelector<HTMLBaseElement>('base')?.href ?? window.location.origin;
+  // @ts-nocheck
+  const input = document.querySelector('#article-search');
+  const items = Array.from(document.querySelectorAll('#article-list > li'));
+  const status = document.querySelector('#search-status');
+  const base = document.querySelector('base')?.href ?? window.location.origin;
   const indexURL = new URL('/search.json', base);
-  type SearchItem = {
-    title: string;
-    description?: string;
-    href: string;
-    tags: string[];
-    text: string;
-  };
-  let searchIndex: SearchItem[] | undefined;
-  const normalize = (value: string) => value.toLocaleLowerCase('zh-CN');
+
+  let searchIndex;
+  const normalize = (value) => value.toLocaleLowerCase('zh-CN');
   const loadSearchIndex = async () => {
     if (searchIndex) return searchIndex;
     const response = await fetch(indexURL);
