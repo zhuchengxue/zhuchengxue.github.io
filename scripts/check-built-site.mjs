@@ -88,6 +88,28 @@ if (!existsSync(atomFeed) || !readFileSync(atomFeed, 'utf8').includes('<feed xml
   failures.push('/atom.xml: 旧订阅地址未生成有效 Atom Feed');
 }
 
+const publishedNewPostCount = readdirSync(resolve('src/content/posts'))
+  .filter((name) => name.endsWith('.md'))
+  .map((name) => readFileSync(resolve('src/content/posts', name), 'utf8'))
+  .filter((content) => !/^draft:\s*true\s*$/m.test(content))
+  .length;
+
+const jsonFeed = resolve('dist/feed.json');
+if (!existsSync(jsonFeed)) {
+  failures.push('/feed.json: JSON Feed 未生成');
+} else {
+  const feed = JSON.parse(readFileSync(jsonFeed, 'utf8'));
+  if (feed.version !== 'https://jsonfeed.org/version/1.1') {
+    failures.push('/feed.json: JSON Feed version 不正确');
+  }
+  if (!Array.isArray(feed.items) || feed.items.length !== publishedNewPostCount) {
+    failures.push(`/feed.json: JSON Feed items 数量不正确，当前 ${Array.isArray(feed.items) ? feed.items.length : 0} 篇`);
+  }
+  if (!feed.items?.[0]?.url?.includes('/posts/2026-06-24-welcome/')) {
+    failures.push('/feed.json: JSON Feed 未包含示例新文章');
+  }
+}
+
 const welcomeOg = resolve('dist/og/posts/2026-06-24-welcome/index.svg');
 if (!existsSync(welcomeOg) || !readFileSync(welcomeOg, 'utf8').includes('博客开始营业')) {
   failures.push('/og/posts/2026-06-24-welcome/index.svg: 新文章分享图未生成');

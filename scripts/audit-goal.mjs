@@ -36,6 +36,7 @@ for (const [path, label] of [
   ['src/pages/about.astro', '关于页'],
   ['src/pages/rss.xml.ts', 'RSS'],
   ['src/pages/atom.xml.ts', 'Atom'],
+  ['src/pages/feed.json.ts', 'JSON Feed'],
   ['src/pages/sitemap.xml.ts', '站点地图'],
   ['src/pages/site.webmanifest.ts', 'Manifest'],
   ['src/layouts/BaseLayout.astro', '基础布局'],
@@ -102,6 +103,7 @@ mustInclude('README.md', '国内访问镜像', '国内访问镜像说明');
 if (existsSync(resolve('dist/index.html'))) {
   mustInclude('dist/index.html', 'name="generator" content="Astro', '构建产物');
   mustInclude('dist/rss.xml', '<rss', 'RSS 产物');
+  mustInclude('dist/feed.json', 'jsonfeed.org/version/1.1', 'JSON Feed 产物');
   mustInclude('dist/search.json', 'Chrome', '全文搜索索引产物');
   mustInclude('dist/og/posts/2026-06-24-welcome/index.svg', '博客开始营业', '文章级分享图产物');
   mustInclude('dist/sitemap.xml', '<urlset', '站点地图产物');

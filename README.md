@@ -17,7 +17,7 @@
 - 深色模式与移动端排版
 - 71 篇新旧文章统一 Astro 风格
 - 静态全文搜索、上一篇/下一篇导航
-- RSS、Atom 和 sitemap
+- RSS、Atom、JSON Feed 和 sitemap
 - 自动生成文章级 Open Graph 分享图与文章结构化数据
 - 完整文章元数据与 Web App Manifest
 - GitHub Pages 自动构建与发布
@@ -159,7 +159,7 @@ npm run preview
 npm run doctor -- --online
 ```
 
-它会检查首页、文章页、RSS、sitemap、Manifest、示例文章，以及线上 `/search.json` 是否包含 71 篇全文搜索索引。
+它会检查首页、文章页、RSS、JSON Feed、sitemap、Manifest、示例文章，以及线上 `/search.json` 是否包含 71 篇全文搜索索引。
 
 想快速查看四阶段完成度和还缺哪些外部配置，可以运行：
 

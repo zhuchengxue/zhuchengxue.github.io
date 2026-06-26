@@ -72,7 +72,7 @@ const phase1 = [
   ['Astro 博客结构', exists('astro.config.mjs') && exists('src/pages/index.astro') && exists('src/pages/articles.astro')],
   ['首页 / 文章页 / 标签页 / 关于页', exists('src/pages/index.astro') && exists('src/pages/posts/[...slug].astro') && exists('src/pages/tags/index.astro') && exists('src/pages/about.astro')],
   ['深色模式', exists('src/styles/global.css') && read('src/styles/global.css').includes('@media (prefers-color-scheme: dark)')],
-  ['RSS / Atom / Sitemap', exists('src/pages/rss.xml.ts') && exists('src/pages/atom.xml.ts') && exists('src/pages/sitemap.xml.ts')],
+  ['RSS / Atom / JSON Feed / Sitemap', exists('src/pages/rss.xml.ts') && exists('src/pages/atom.xml.ts') && exists('src/pages/feed.json.ts') && exists('src/pages/sitemap.xml.ts')],
   ['GitHub Pages 自动部署', exists('.github/workflows/deploy.yml') && read('.github/workflows/deploy.yml').includes('deploy-pages')]
 ];
 
@@ -142,6 +142,7 @@ if (online) {
     ['首页', '/', 'name="generator" content="Astro'],
     ['文章列表', '/articles/', '/search.json'],
     ['RSS', '/rss.xml', '<rss'],
+    ['JSON Feed', '/feed.json', 'jsonfeed.org/version/1.1'],
     ['Sitemap', '/sitemap.xml', '<urlset'],
     ['搜索索引', '/search.json', 'Chrome'],
     ['示例文章', '/posts/2026-06-24-welcome/', '/og/posts/2026-06-24-welcome/index.svg'],
