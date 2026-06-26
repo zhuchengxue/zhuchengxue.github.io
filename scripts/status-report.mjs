@@ -81,6 +81,7 @@ const phase2 = [
 const wechatScript = exists('scripts/generate-wechat.mjs') ? read('scripts/generate-wechat.mjs') : '';
 const phase3 = [
   ['公众号 HTML / JSON 生成', Boolean(scripts.wechat) && exists('scripts/generate-wechat.mjs')],
+  ['公众号批量导出', Boolean(scripts['wechat:all']) && exists('scripts/generate-wechat-all.mjs')],
   ['图片路径转线上绝对地址', wechatScript.includes('SITE_ORIGIN') && wechatScript.includes('publicUrl')],
   ['保留博客原文链接', wechatScript.includes('content_source_url')],
   ['可选草稿 API', Boolean(scripts['wechat:draft']) && exists('scripts/create-wechat-draft.mjs')]
@@ -149,5 +150,5 @@ if (online) {
 
 console.log('\n建议下一步：');
 console.log('  1. 日常写作：npm run new → Obsidian 编辑 → npm run ready → npm run publish');
-console.log('  2. 发公众号：博客上线后运行 npm run wechat，再复制 HTML 到公众号后台');
+console.log('  2. 发公众号：博客上线后运行 npm run wechat 或 npm run wechat:all，再复制 HTML 到公众号后台');
 console.log('  3. 需要外部服务时运行 npm run config:services 生成配置清单');

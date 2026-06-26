@@ -226,11 +226,19 @@ scripts/                   新建、整理、发布与检查脚本
 npm run wechat -- "src/content/posts/YYYY-MM-DD-article-slug.md"
 ```
 
+批量生成全部已发布新文章的公众号版本：
+
+```bash
+npm run wechat:all -- --dry-run
+npm run wechat:all
+```
+
 输出目录：
 
 ```text
 exports/wechat/YYYY-MM-DD-article-slug.html
 exports/wechat/YYYY-MM-DD-article-slug.json
+exports/wechat/index.json
 ```
 
 HTML 已使用适合公众号编辑器的内联样式，并自动：

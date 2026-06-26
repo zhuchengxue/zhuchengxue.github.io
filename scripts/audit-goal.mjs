@@ -23,7 +23,7 @@ function mustInclude(path, pattern, label) {
 }
 
 const packageJson = JSON.parse(readFileSync(resolve('package.json'), 'utf8'));
-for (const script of ['new', 'prepare', 'ready', 'publish', 'wechat', 'wechat:draft', 'import:wechat', 'mirror', 'config:services', 'services:check', 'status', 'search:index', 'og:images', 'build', 'build:ci', 'audit', 'doctor']) {
+for (const script of ['new', 'prepare', 'ready', 'publish', 'wechat', 'wechat:all', 'wechat:draft', 'import:wechat', 'mirror', 'config:services', 'services:check', 'status', 'search:index', 'og:images', 'build', 'build:ci', 'audit', 'doctor']) {
   if (!packageJson.scripts?.[script]) failures.push(`package.json: 缺少 npm script ${script}`);
 }
 
@@ -49,6 +49,7 @@ for (const [path, label] of [
   ['scripts/check-post-ready.mjs', '文章发布前体检脚本'],
   ['scripts/publish-post.mjs', '一键发布脚本'],
   ['scripts/generate-wechat.mjs', '公众号分发脚本'],
+  ['scripts/generate-wechat-all.mjs', '公众号批量分发脚本'],
   ['scripts/create-wechat-draft.mjs', '公众号草稿脚本'],
   ['scripts/import-wechat.mjs', '旧公众号导入脚本'],
   ['scripts/deploy-mirror.mjs', '镜像发布脚本'],
@@ -80,6 +81,7 @@ mustInclude('.github/workflows/deploy.yml', 'CUSTOM_DOMAIN', '独立域名 CNAME
 mustInclude('.github/workflows/deploy.yml', 'SITE_URL', '独立域名 URL');
 mustInclude('scripts/generate-wechat.mjs', 'content_source_url', '公众号原文链接');
 mustInclude('scripts/generate-wechat.mjs', 'exports/wechat', '公众号输出目录');
+mustInclude('scripts/generate-wechat-all.mjs', 'index.json', '公众号批量导出清单');
 mustInclude('scripts/create-wechat-draft.mjs', 'draft/add', '公众号草稿 API');
 mustInclude('scripts/create-wechat-draft.mjs', 'WECHAT_APP_SECRET', '公众号凭据环境变量');
 mustInclude('scripts/import-wechat.mjs', 'draft: true', '旧公众号导入为草稿');

@@ -67,11 +67,19 @@ npm run prepare -- "src/content/posts/YYYY-MM-DD-article-slug.md"
 npm run wechat -- "src/content/posts/YYYY-MM-DD-article-slug.md"
 ```
 
+批量导出全部已发布新文章：
+
+```bash
+npm run wechat:all -- --dry-run
+npm run wechat:all
+```
+
 产物在：
 
 ```text
 exports/wechat/YYYY-MM-DD-article-slug.html
 exports/wechat/YYYY-MM-DD-article-slug.json
+exports/wechat/index.json
 ```
 
 常规做法：打开 HTML，把正文复制到公众号编辑器。
