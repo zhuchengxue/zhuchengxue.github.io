@@ -69,6 +69,9 @@ if (!existsSync(articlesPage) || !readFileSync(articlesPage, 'utf8').includes('�
 if (!readFileSync(articlesPage, 'utf8').includes('/search.json')) {
   failures.push('/articles/: 未接入全文搜索索引');
 }
+if (!readFileSync(articlesPage, 'utf8').includes('URLSearchParams(window.location.search)')) {
+  failures.push('/articles/: 未支持 q 查询参数');
+}
 
 const searchIndex = resolve('dist/search.json');
 if (!existsSync(searchIndex)) {
@@ -86,6 +89,11 @@ if (!existsSync(searchIndex)) {
 const atomFeed = resolve('dist/atom.xml');
 if (!existsSync(atomFeed) || !readFileSync(atomFeed, 'utf8').includes('<feed xmlns="http://www.w3.org/2005/Atom">')) {
   failures.push('/atom.xml: 旧订阅地址未生成有效 Atom Feed');
+}
+
+const openSearch = resolve('dist/opensearch.xml');
+if (!existsSync(openSearch) || !readFileSync(openSearch, 'utf8').includes('/articles/?q={searchTerms}')) {
+  failures.push('/opensearch.xml: OpenSearch 描述文件未生成或模板不正确');
 }
 
 const publishedNewPostCount = readdirSync(resolve('src/content/posts'))

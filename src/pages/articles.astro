@@ -57,6 +57,8 @@ const posts = getAllPosts();
 
   let searchIndex;
   const normalize = (value) => value.toLocaleLowerCase('zh-CN');
+  const params = new URLSearchParams(window.location.search);
+  const initialQuery = params.get('q') ?? '';
   const loadSearchIndex = async () => {
     if (searchIndex) return searchIndex;
     const response = await fetch(indexURL);
@@ -64,7 +66,7 @@ const posts = getAllPosts();
     return searchIndex;
   };
 
-  input?.addEventListener('input', async () => {
+  const runSearch = async () => {
     const query = normalize(input.value.trim());
     let visible = 0;
     const fullTextIndex = query ? await loadSearchIndex().catch(() => undefined) : undefined;
@@ -90,5 +92,12 @@ const posts = getAllPosts();
     if (status) {
       status.textContent = query ? `找到 ${visible} 篇文章${fullTextIndex ? '（已包含正文搜索）' : ''}` : '';
     }
-  });
+  };
+
+  input?.addEventListener('input', runSearch);
+
+  if (input && initialQuery) {
+    input.value = initialQuery;
+    runSearch();
+  }
 </script>

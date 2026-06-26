@@ -61,6 +61,7 @@ for (const path of [
   'src/pages/tags/index.astro',
   'src/pages/rss.xml.ts',
   'src/pages/feed.json.ts',
+  'src/pages/opensearch.xml.ts',
   'src/pages/sitemap.xml.ts',
   'scripts/generate-wechat.mjs',
   'scripts/generate-wechat-all.mjs',
@@ -97,6 +98,7 @@ if (distExists) {
   check('Manifest 产物', existsSync(resolve('dist/site.webmanifest')));
   check('RSS 产物', existsSync(resolve('dist/rss.xml')));
   check('JSON Feed 产物', existsSync(resolve('dist/feed.json')));
+  check('OpenSearch 产物', existsSync(resolve('dist/opensearch.xml')));
   const searchIndexPath = resolve('dist/search.json');
   check('全文搜索索引产物', existsSync(searchIndexPath));
   if (existsSync(searchIndexPath)) {
@@ -122,6 +124,7 @@ if (online) {
     ['/site.webmanifest', '学语思'],
     ['/rss.xml', '<rss'],
     ['/feed.json', 'jsonfeed.org/version/1.1'],
+    ['/opensearch.xml', 'OpenSearchDescription'],
     ['/sitemap.xml', '<urlset'],
     ['/posts/2026-06-24-welcome/', '/og/posts/2026-06-24-welcome/index.svg'],
     ['/og/posts/2026-06-24-welcome/index.svg', '<svg']

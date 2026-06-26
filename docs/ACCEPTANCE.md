@@ -43,7 +43,7 @@
 | 要求 | 状态 | 证据 |
 | --- | --- | --- |
 | 独立域名 | 可选启用 | `SITE_URL`、`CUSTOM_DOMAIN`、GitHub Actions CNAME 写入、`npm run config:services -- --domain example.com` 会输出 GitHub Pages A/AAAA/CNAME 清单；需要用户拥有域名并配置 DNS |
-| 搜索 | 已完成 | `src/pages/articles.astro`、`scripts/generate-search-index.mjs`、`public/search.json` 的静态全文搜索 |
+| 搜索 | 已完成 | `src/pages/articles.astro`、`scripts/generate-search-index.mjs`、`public/search.json` 的静态全文搜索；`src/pages/opensearch.xml.ts` 提供 OpenSearch 发现 |
 | 评论 | 可选启用 | Giscus 环境变量入口、`npm run config:services` 配置清单；默认不加载第三方脚本 |
 | 访问统计 | 可选启用 | Umami 环境变量入口、`npm run config:services` 配置清单；默认不加载第三方脚本 |
 | SEO | 已完成 | canonical、结构化数据、文章时间、sitemap、robots |

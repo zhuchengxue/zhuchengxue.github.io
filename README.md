@@ -16,7 +16,7 @@
 - 首页、统一文章页、标签页、关于页和 404 页面
 - 深色模式与移动端排版
 - 71 篇新旧文章统一 Astro 风格
-- 静态全文搜索、上一篇/下一篇导航
+- 静态全文搜索、OpenSearch 站内搜索发现、上一篇/下一篇导航
 - RSS、Atom、JSON Feed 和 sitemap
 - 自动生成文章级 Open Graph 分享图与文章结构化数据
 - 完整文章元数据与 Web App Manifest
@@ -159,7 +159,7 @@ npm run preview
 npm run doctor -- --online
 ```
 
-它会检查首页、文章页、RSS、JSON Feed、sitemap、Manifest、示例文章，以及线上 `/search.json` 是否包含 71 篇全文搜索索引。
+它会检查首页、文章页、RSS、JSON Feed、OpenSearch、sitemap、Manifest、示例文章，以及线上 `/search.json` 是否包含 71 篇全文搜索索引。
 
 想快速查看四阶段完成度和还缺哪些外部配置，可以运行：
 
@@ -387,7 +387,7 @@ MIRROR_REPO=https://gitee.com/用户名/仓库名.git MIRROR_BRANCH=pages npm ru
 MIRROR_REPO=https://gitee.com/用户名/仓库名.git MIRROR_BRANCH=pages npm run mirror
 ```
 
-脚本会检查 `dist/` 关键文件，包括首页、RSS、JSON Feed、sitemap、Manifest 和搜索索引，把产物推送到镜像仓库指定分支，并自动写入 `.nojekyll`。dry-run 或加 `--report` 时会生成 `exports/mirror-report.json`，记录文件数量、体积、目标仓库和分支。如果镜像也绑定域名，可以额外设置：
+脚本会检查 `dist/` 关键文件，包括首页、RSS、JSON Feed、OpenSearch、sitemap、Manifest 和搜索索引，把产物推送到镜像仓库指定分支，并自动写入 `.nojekyll`。dry-run 或加 `--report` 时会生成 `exports/mirror-report.json`，记录文件数量、体积、目标仓库和分支。如果镜像也绑定域名，可以额外设置：
 
 ```text
 MIRROR_DOMAIN=mirror.example.com

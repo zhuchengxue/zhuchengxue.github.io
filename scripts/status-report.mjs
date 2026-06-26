@@ -96,7 +96,7 @@ const phase3 = [
 const configText = exists('src/config.ts') ? read('src/config.ts') : '';
 const baseLayout = exists('src/layouts/BaseLayout.astro') ? read('src/layouts/BaseLayout.astro') : '';
 const phase4 = [
-  ['搜索', Boolean(scripts['search:index']) && exists('scripts/generate-search-index.mjs') && (!distReady || searchCount === 71)],
+  ['搜索', Boolean(scripts['search:index']) && exists('scripts/generate-search-index.mjs') && exists('src/pages/opensearch.xml.ts') && (!distReady || searchCount === 71)],
   ['评论入口', configText.includes('PUBLIC_GISCUS_REPO')],
   ['访问统计入口', configText.includes('PUBLIC_UMAMI_SCRIPT')],
   ['SEO / Open Graph', baseLayout.includes('og:image') && exists('scripts/generate-og-images.mjs')],
@@ -143,6 +143,7 @@ if (online) {
     ['文章列表', '/articles/', '/search.json'],
     ['RSS', '/rss.xml', '<rss'],
     ['JSON Feed', '/feed.json', 'jsonfeed.org/version/1.1'],
+    ['OpenSearch', '/opensearch.xml', 'OpenSearchDescription'],
     ['Sitemap', '/sitemap.xml', '<urlset'],
     ['搜索索引', '/search.json', 'Chrome'],
     ['示例文章', '/posts/2026-06-24-welcome/', '/og/posts/2026-06-24-welcome/index.svg'],

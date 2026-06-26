@@ -13,7 +13,7 @@ const reportPath = resolve(reportDirectory, 'mirror-report.json');
 const mirrorRepo = process.env.MIRROR_REPO;
 const mirrorBranch = process.env.MIRROR_BRANCH || 'pages';
 const mirrorDomain = process.env.MIRROR_DOMAIN;
-const requiredDistFiles = ['index.html', 'rss.xml', 'feed.json', 'sitemap.xml', 'site.webmanifest', 'search.json'];
+const requiredDistFiles = ['index.html', 'rss.xml', 'feed.json', 'opensearch.xml', 'sitemap.xml', 'site.webmanifest', 'search.json'];
 
 function run(command, commandArgs, options = {}) {
   const printable = [command, ...commandArgs].join(' ');

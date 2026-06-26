@@ -85,6 +85,7 @@ const websiteStructuredData = {
     <link rel="alternate" type="application/rss+xml" title={SITE.title} href={`${base}/rss.xml`} />
     <link rel="alternate" type="application/atom+xml" title={`${SITE.title} Atom`} href={`${base}/atom.xml`} />
     <link rel="alternate" type="application/feed+json" title={`${SITE.title} JSON Feed`} href={`${base}/feed.json`} />
+    <link rel="search" type="application/opensearchdescription+xml" title={`${SITE.title} Search`} href={`${base}/opensearch.xml`} />
     <title>{pageTitle}</title>
     <script is:inline type="application/ld+json" set:html={JSON.stringify(websiteStructuredData)} />
     {analyticsEnabled && (
