@@ -37,8 +37,16 @@ jobs:
           cache: npm
       - name: Install dependencies
         run: npm ci
-      - name: Build site
-        run: npm run build
+      - name: Check content
+        run: npm run check:content
+      - name: Type check Astro files
+        run: npx astro check
+      - name: Build static site
+        run: npx astro build
+      - name: Check built site
+        run: npm run check:build
+      - name: Audit goal deliverables
+        run: npm run audit
       - name: Write custom domain
         if: ${{ vars.CUSTOM_DOMAIN != '' }}
         run: printf '%s\n' "$CUSTOM_DOMAIN" > dist/CNAME
