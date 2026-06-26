@@ -157,6 +157,14 @@ if ((homePage.match(/class="meta"/g) ?? []).length < 8) {
   failures.push('/: 首页没有展示 8 篇最近文章');
 }
 
+const builtCSS = walk(resolve('dist'))
+  .filter((file) => file.endsWith('.css'))
+  .map((file) => readFileSync(file, 'utf8'))
+  .join('\n');
+if (!builtCSS.includes('@media print') || !builtCSS.includes('article-body a[href^=http]')) {
+  failures.push('CSS: 打印友好样式未进入构建产物');
+}
+
 const firstLegacyPage = resolve('dist', legacyPosts[0].href.slice(1), 'index.html');
 if (!readFileSync(firstLegacyPage, 'utf8').includes('aria-label="文章导航"')) {
   failures.push(`${legacyPosts[0].href}: 缺少上一篇/下一篇导航`);

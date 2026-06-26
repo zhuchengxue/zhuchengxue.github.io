@@ -574,3 +574,100 @@ footer {
     scroll-behavior: auto !important;
   }
 }
+
+@media print {
+  :root {
+    color-scheme: light;
+    --bg: #ffffff;
+    --surface: #ffffff;
+    --text: #111111;
+    --muted: #555555;
+    --line: #dddddd;
+    --accent: #111111;
+  }
+
+  html {
+    scroll-behavior: auto;
+  }
+
+  body {
+    background: #ffffff;
+    color: #111111;
+    font-size: 12pt;
+    line-height: 1.7;
+  }
+
+  body > header,
+  body > footer,
+  .skip-link,
+  .search-box,
+  #search-status,
+  .comments,
+  .post-navigation,
+  .back-to-archive {
+    display: none !important;
+  }
+
+  main {
+    min-height: 0;
+  }
+
+  .hero,
+  .page {
+    width: auto;
+    max-width: none;
+    padding: 0;
+    margin: 0;
+  }
+
+  .article-header {
+    margin-bottom: 1.5rem;
+  }
+
+  .article-header h1,
+  .page-header h1 {
+    font-size: 24pt;
+    line-height: 1.25;
+  }
+
+  .article-body h2,
+  .article-body h3,
+  .article-body h4 {
+    page-break-after: avoid;
+    break-after: avoid-page;
+  }
+
+  .article-body blockquote,
+  .article-body pre,
+  .article-body table,
+  .article-body img {
+    page-break-inside: avoid;
+    break-inside: avoid;
+  }
+
+  .article-body pre,
+  .article-body .highlight {
+    white-space: pre-wrap;
+    border: 1px solid #dddddd;
+    background: #f7f7f7 !important;
+    color: #111111 !important;
+  }
+
+  .article-body a[href^="http"]::after {
+    content: " (" attr(href) ")";
+    color: #555555;
+    font-size: 0.85em;
+    word-break: break-all;
+  }
+
+  img {
+    max-height: 90vh;
+    margin: 1rem auto;
+    border-radius: 0;
+  }
+
+  .tag {
+    border-color: #dddddd;
+    color: #555555;
+  }
+}

@@ -15,7 +15,7 @@
 | 文章页 | 已完成 | `src/pages/posts/[...slug].astro`、`src/pages/[year]/[month]/[day]/[slug].astro` |
 | 标签页 | 已完成 | `src/pages/tags/index.astro`、`src/pages/tags/[tag].astro` |
 | 关于页 | 已完成 | `src/pages/about.astro` |
-| 深色模式 | 已完成 | `src/styles/global.css` 的 `prefers-color-scheme: dark` |
+| 深色模式 | 已完成 | `src/styles/global.css` 的 `prefers-color-scheme: dark`；同时包含 `@media print` 打印友好样式 |
 | RSS / Atom / JSON Feed | 已完成 | `src/pages/rss.xml.ts`、`src/pages/atom.xml.ts`、`src/pages/feed.json.ts`、`dist/rss.xml`、`dist/atom.xml`、`dist/feed.json` |
 | 站点地图 | 已完成 | `src/pages/sitemap.xml.ts`、`dist/sitemap.xml` |
 | GitHub Pages 自动部署 | 已完成 | `.github/workflows/deploy.yml`、线上站点可访问 |

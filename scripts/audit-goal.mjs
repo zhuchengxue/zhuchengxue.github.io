@@ -73,6 +73,7 @@ for (const [path, label] of [
 }
 
 mustInclude('src/styles/global.css', '@media (prefers-color-scheme: dark)', '深色模式');
+mustInclude('src/styles/global.css', '@media print', '打印友好样式');
 mustInclude('src/pages/articles.astro', 'search.json', '文章全文搜索');
 mustInclude('src/pages/articles.astro', "params.get('q')", '文章全文搜索 URL 参数');
 mustInclude('src/layouts/BaseLayout.astro', 'application/opensearchdescription+xml', 'OpenSearch 自动发现');
