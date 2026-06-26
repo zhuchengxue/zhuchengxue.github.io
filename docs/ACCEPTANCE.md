@@ -42,14 +42,14 @@
 
 | 要求 | 状态 | 证据 |
 | --- | --- | --- |
-| 独立域名 | 可选启用 | `SITE_URL`、`CUSTOM_DOMAIN`、GitHub Actions CNAME 写入；需要用户拥有域名并配置 DNS |
+| 独立域名 | 可选启用 | `SITE_URL`、`CUSTOM_DOMAIN`、GitHub Actions CNAME 写入、`npm run config:services -- --domain example.com`；需要用户拥有域名并配置 DNS |
 | 搜索 | 已完成 | `src/pages/articles.astro`、`scripts/generate-search-index.mjs`、`public/search.json` 的静态全文搜索 |
-| 评论 | 可选启用 | Giscus 环境变量入口；默认不加载第三方脚本 |
-| 访问统计 | 可选启用 | Umami 环境变量入口；默认不加载第三方脚本 |
+| 评论 | 可选启用 | Giscus 环境变量入口、`npm run config:services` 配置清单；默认不加载第三方脚本 |
+| 访问统计 | 可选启用 | Umami 环境变量入口、`npm run config:services` 配置清单；默认不加载第三方脚本 |
 | SEO | 已完成 | canonical、结构化数据、文章时间、sitemap、robots |
 | Open Graph 分享图 | 已完成 | `public/og-default.png`、`og:image` |
 | 旧公众号文章批量迁移 | 可选启用 | `scripts/import-wechat.mjs`、`imports/wechat/`；需要提供旧文章导出文件 |
-| 国内访问镜像 | 可选启用 | `scripts/deploy-mirror.mjs`、`npm run mirror`；需要目标镜像仓库和平台权限 |
+| 国内访问镜像 | 可选启用 | `scripts/deploy-mirror.mjs`、`npm run mirror`、`npm run config:services` 配置清单；需要目标镜像仓库和平台权限 |
 
 ## 一键验证命令
 

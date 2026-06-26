@@ -103,6 +103,12 @@ npm run import:wechat
 
 ## 5. 绑定独立域名
 
+先生成配置清单：
+
+```bash
+npm run config:services -- --domain example.com
+```
+
 需要两处配置：
 
 1. GitHub 仓库 Settings → Pages 绑定域名。
@@ -118,6 +124,13 @@ CUSTOM_DOMAIN=你的域名
 ## 6. 启用评论或访问统计
 
 默认关闭，页面不加载第三方脚本。
+
+先用配置助手生成 GitHub Actions Variables 清单：
+
+```bash
+npm run config:services -- --giscus-repo owner/repo --giscus-repo-id xxx --giscus-category General --giscus-category-id xxx
+npm run config:services -- --umami-script https://analytics.example.com/script.js --umami-website-id xxx
+```
 
 评论使用 Giscus，需要配置：
 
@@ -138,6 +151,12 @@ PUBLIC_UMAMI_WEBSITE_ID=
 配置完推送一次，重新部署后生效。
 
 ## 7. 同步国内或备用镜像
+
+先生成配置和验证命令：
+
+```bash
+npm run config:services -- --mirror-repo https://gitee.com/用户名/仓库名.git --mirror-branch pages --mirror-domain mirror.example.com
+```
 
 先构建：
 

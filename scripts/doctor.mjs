@@ -26,16 +26,25 @@ function envState(name) {
   return process.env[name] ? '已配置' : '未配置';
 }
 
-async function fetchText(path) {
-  const response = await fetch(`${siteURL}${path}`, {
-    signal: AbortSignal.timeout(15000)
-  });
-  const text = await response.text();
-  return { response, text };
+async function fetchText(path, { timeout = 15000, attempts = 2 } = {}) {
+  let lastError;
+  for (let attempt = 1; attempt <= attempts; attempt++) {
+    try {
+      const response = await fetch(`${siteURL}${path}`, {
+        signal: AbortSignal.timeout(timeout)
+      });
+      const text = await response.text();
+      return { response, text, attempt };
+    } catch (error) {
+      lastError = error;
+      if (attempt < attempts) await new Promise((resolveRetry) => setTimeout(resolveRetry, 1000));
+    }
+  }
+  throw lastError;
 }
 
 const packageJson = readJSON('package.json');
-for (const script of ['dev', 'new', 'prepare', 'publish', 'wechat', 'wechat:draft', 'import:wechat', 'mirror', 'build', 'build:ci', 'audit', 'doctor']) {
+for (const script of ['dev', 'new', 'prepare', 'publish', 'wechat', 'wechat:draft', 'import:wechat', 'mirror', 'config:services', 'build', 'build:ci', 'audit', 'doctor']) {
   check(`npm script: ${script}`, Boolean(packageJson.scripts?.[script]));
 }
 
@@ -53,6 +62,7 @@ for (const path of [
   'scripts/create-wechat-draft.mjs',
   'scripts/import-wechat.mjs',
   'scripts/deploy-mirror.mjs',
+  'scripts/configure-services.mjs',
   'scripts/generate-search-index.mjs'
 ]) {
   check(`关键文件: ${path}`, existsSync(resolve(path)));
@@ -113,7 +123,7 @@ if (online) {
   }
 
   try {
-    const { response, text } = await fetchText('/search.json');
+    const { response, text } = await fetchText('/search.json', { timeout: 30000, attempts: 3 });
     check('线上访问: /search.json', response.ok, `${response.status} ${response.statusText}`);
     const search = JSON.parse(text);
     check('线上全文搜索数量', Array.isArray(search) && search.length === 71, `${Array.isArray(search) ? search.length : 0} 篇`);

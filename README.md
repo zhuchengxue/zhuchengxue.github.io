@@ -23,6 +23,7 @@
 - GitHub Pages 自动构建与发布
 - Obsidian Vault、图片整理和一键发布脚本
 - 公众号 HTML/JSON 分发和旧公众号文章批量导入草稿
+- 独立域名、评论、统计、镜像的配置清单生成助手
 
 ## 首次使用
 
@@ -159,6 +160,15 @@ npm run doctor -- --online
 
 ```bash
 npm run doctor -- --allow-dirty
+```
+
+需要生成独立域名、Giscus、Umami、镜像或公众号 API 的配置清单时运行：
+
+```bash
+npm run config:services -- --domain example.com
+npm run config:services -- --giscus-repo owner/repo --giscus-repo-id xxx --giscus-category General --giscus-category-id xxx
+npm run config:services -- --umami-script https://analytics.example.com/script.js --umami-website-id xxx
+npm run config:services -- --mirror-repo https://gitee.com/用户名/仓库名.git --mirror-branch pages --mirror-domain mirror.example.com
 ```
 
 更完整的日常操作清单见 [docs/OPERATIONS.md](docs/OPERATIONS.md)，四阶段验收状态见 [docs/ACCEPTANCE.md](docs/ACCEPTANCE.md)。

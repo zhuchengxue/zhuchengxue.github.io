@@ -12,6 +12,7 @@
     "wechat:draft": "node scripts/create-wechat-draft.mjs",
     "import:wechat": "node scripts/import-wechat.mjs",
     "mirror": "node scripts/deploy-mirror.mjs",
+    "config:services": "node scripts/configure-services.mjs",
     "search:index": "node scripts/generate-search-index.mjs",
     "check:content": "node scripts/check-content.mjs",
     "check:build": "node scripts/check-built-site.mjs",
