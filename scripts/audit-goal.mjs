@@ -23,7 +23,7 @@ function mustInclude(path, pattern, label) {
 }
 
 const packageJson = JSON.parse(readFileSync(resolve('package.json'), 'utf8'));
-for (const script of ['new', 'prepare', 'publish', 'wechat', 'wechat:draft', 'import:wechat', 'build', 'audit', 'doctor']) {
+for (const script of ['new', 'prepare', 'publish', 'wechat', 'wechat:draft', 'import:wechat', 'search:index', 'build', 'audit', 'doctor']) {
   if (!packageJson.scripts?.[script]) failures.push(`package.json: 缺少 npm script ${script}`);
 }
 if (!packageJson.scripts?.mirror) failures.push('package.json: 缺少 npm script mirror');
@@ -37,7 +37,6 @@ for (const [path, label] of [
   ['src/pages/about.astro', '关于页'],
   ['src/pages/rss.xml.ts', 'RSS'],
   ['src/pages/atom.xml.ts', 'Atom'],
-  ['src/pages/search.json.ts', '全文搜索索引'],
   ['src/pages/sitemap.xml.ts', '站点地图'],
   ['src/pages/site.webmanifest.ts', 'Manifest'],
   ['src/layouts/BaseLayout.astro', '基础布局'],
@@ -53,6 +52,7 @@ for (const [path, label] of [
   ['scripts/create-wechat-draft.mjs', '公众号草稿脚本'],
   ['scripts/import-wechat.mjs', '旧公众号导入脚本'],
   ['scripts/deploy-mirror.mjs', '镜像发布脚本'],
+  ['scripts/generate-search-index.mjs', '全文搜索索引脚本'],
   ['scripts/doctor.mjs', '站点诊断脚本'],
   ['docs/OPERATIONS.md', '博客运维手册'],
   ['docs/ACCEPTANCE.md', '四阶段验收清单'],
@@ -64,6 +64,7 @@ for (const [path, label] of [
 
 mustInclude('src/styles/global.css', '@media (prefers-color-scheme: dark)', '深色模式');
 mustInclude('src/pages/articles.astro', 'search.json', '文章全文搜索');
+mustInclude('scripts/generate-search-index.mjs', 'public/search.json', '静态全文搜索索引生成');
 mustInclude('src/layouts/BaseLayout.astro', 'application/ld+json', '结构化数据');
 mustInclude('src/layouts/BaseLayout.astro', 'og:image', 'Open Graph');
 mustInclude('src/config.ts', 'PUBLIC_GISCUS_REPO', '可选评论');

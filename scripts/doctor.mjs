@@ -40,12 +40,12 @@ for (const path of [
   'src/pages/articles.astro',
   'src/pages/tags/index.astro',
   'src/pages/rss.xml.ts',
-  'src/pages/search.json.ts',
   'src/pages/sitemap.xml.ts',
   'scripts/generate-wechat.mjs',
   'scripts/create-wechat-draft.mjs',
   'scripts/import-wechat.mjs',
-  'scripts/deploy-mirror.mjs'
+  'scripts/deploy-mirror.mjs',
+  'scripts/generate-search-index.mjs'
 ]) {
   check(`关键文件: ${path}`, existsSync(resolve(path)));
 }

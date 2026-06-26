@@ -12,11 +12,12 @@
     "wechat:draft": "node scripts/create-wechat-draft.mjs",
     "import:wechat": "node scripts/import-wechat.mjs",
     "mirror": "node scripts/deploy-mirror.mjs",
+    "search:index": "node scripts/generate-search-index.mjs",
     "check:content": "node scripts/check-content.mjs",
     "check:build": "node scripts/check-built-site.mjs",
     "audit": "node scripts/audit-goal.mjs",
     "doctor": "node scripts/doctor.mjs",
-    "build": "npm run check:content && astro check && astro build && npm run check:build && npm run audit",
+    "build": "npm run check:content && npm run search:index && astro check && astro build && npm run check:build && npm run audit",
     "preview": "astro preview",
     "astro": "astro"
   },

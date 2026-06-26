@@ -39,27 +39,6 @@ export function getNewPosts(): PostSummary[] {
     .sort((a, b) => b.pubDate.valueOf() - a.pubDate.valueOf());
 }
 
-export function getNewPostContents() {
-  const modules = import.meta.glob('../content/posts/*.md', { eager: true });
-
-  return Object.entries(modules)
-    .map(([path, post]: [string, any]) => {
-      const rawContent = typeof post.rawContent === 'function' ? post.rawContent() : post.rawContent;
-      return {
-        title: post.frontmatter.title,
-        description: post.frontmatter.description,
-        pubDate: new Date(post.frontmatter.pubDate),
-        href: `/posts/${path.split('/').pop()!.replace(/\.md$/, '')}/`,
-        tags: post.frontmatter.tags ?? [],
-        legacy: false,
-        draft: post.frontmatter.draft,
-        text: String(rawContent ?? '').replace(/^---[\s\S]*?---/, '').replace(/\s+/g, ' ').trim()
-      };
-    })
-    .filter((post) => !post.draft)
-    .sort((a, b) => b.pubDate.valueOf() - a.pubDate.valueOf());
-}
-
 export function getLegacyPosts(): PostSummary[] {
   return legacyPosts
     .map((post) => ({
@@ -73,37 +52,9 @@ export function getLegacyPosts(): PostSummary[] {
     .sort((a, b) => b.pubDate.valueOf() - a.pubDate.valueOf());
 }
 
-export function getLegacyPostContents() {
-  return legacyPosts
-    .map((post) => ({
-      title: post.title,
-      description: htmlToText(post.html).slice(0, 120),
-      pubDate: new Date(post.pubDate),
-      href: post.href,
-      tags: post.tags,
-      legacy: true,
-      text: htmlToText(post.html)
-    }))
-    .sort((a, b) => b.pubDate.valueOf() - a.pubDate.valueOf());
-}
-
 export function getAllPosts(): PostSummary[] {
   return [...getNewPosts(), ...getLegacyPosts()]
     .sort((a, b) => b.pubDate.valueOf() - a.pubDate.valueOf());
-}
-
-export function getSearchIndex() {
-  return [...getNewPostContents(), ...getLegacyPostContents()]
-    .sort((a, b) => b.pubDate.valueOf() - a.pubDate.valueOf())
-    .map((post) => ({
-      title: post.title,
-      description: post.description,
-      href: post.href,
-      tags: post.tags,
-      legacy: post.legacy,
-      pubDate: post.pubDate.toISOString(),
-      text: post.text.slice(0, 12000)
-    }));
 }
 
 export function getTags() {

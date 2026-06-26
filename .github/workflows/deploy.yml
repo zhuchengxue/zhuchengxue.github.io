@@ -39,6 +39,8 @@ jobs:
         run: npm ci
       - name: Check content
         run: npm run check:content
+      - name: Generate search index
+        run: npm run search:index
       - name: Type check Astro files
         run: npx astro check
       - name: Build static site
