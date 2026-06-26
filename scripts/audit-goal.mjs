@@ -38,6 +38,7 @@ for (const [path, label] of [
   ['src/pages/atom.xml.ts', 'Atom'],
   ['src/pages/feed.json.ts', 'JSON Feed'],
   ['src/pages/opensearch.xml.ts', 'OpenSearch'],
+  ['src/pages/llms.txt.ts', 'llms.txt'],
   ['src/pages/sitemap.xml.ts', '站点地图'],
   ['src/pages/site.webmanifest.ts', 'Manifest'],
   ['src/layouts/BaseLayout.astro', '基础布局'],
@@ -74,6 +75,7 @@ mustInclude('src/styles/global.css', '@media (prefers-color-scheme: dark)', '深
 mustInclude('src/pages/articles.astro', 'search.json', '文章全文搜索');
 mustInclude('src/pages/articles.astro', "params.get('q')", '文章全文搜索 URL 参数');
 mustInclude('src/layouts/BaseLayout.astro', 'application/opensearchdescription+xml', 'OpenSearch 自动发现');
+mustInclude('src/pages/llms.txt.ts', 'Search index', '机器可读站点说明');
 mustInclude('scripts/generate-search-index.mjs', 'public/search.json', '静态全文搜索索引生成');
 mustInclude('src/layouts/BaseLayout.astro', 'application/ld+json', '结构化数据');
 mustInclude('src/layouts/BaseLayout.astro', 'og:image', 'Open Graph');
@@ -93,6 +95,7 @@ mustInclude('scripts/import-wechat.mjs', 'wechat-import-report.json', '旧公众
 mustInclude('scripts/deploy-mirror.mjs', 'MIRROR_REPO', '国内访问镜像发布');
 mustInclude('scripts/deploy-mirror.mjs', 'feed.json', '国内访问镜像 JSON Feed 完整性');
 mustInclude('scripts/deploy-mirror.mjs', 'opensearch.xml', '国内访问镜像 OpenSearch 完整性');
+mustInclude('scripts/deploy-mirror.mjs', 'llms.txt', '国内访问镜像 llms.txt 完整性');
 mustInclude('scripts/deploy-mirror.mjs', 'mirror-report.json', '国内访问镜像发布报告');
 mustInclude('scripts/configure-services.mjs', 'GitHub Actions Variables', '外部服务配置助手');
 mustInclude('scripts/check-services.mjs', '半配置状态', '外部服务配置检查');
@@ -110,6 +113,7 @@ if (existsSync(resolve('dist/index.html'))) {
   mustInclude('dist/rss.xml', '<rss', 'RSS 产物');
   mustInclude('dist/feed.json', 'jsonfeed.org/version/1.1', 'JSON Feed 产物');
   mustInclude('dist/opensearch.xml', '/articles/?q={searchTerms}', 'OpenSearch 产物');
+  mustInclude('dist/llms.txt', '## Articles (71)', 'llms.txt 产物');
   mustInclude('dist/search.json', 'Chrome', '全文搜索索引产物');
   mustInclude('dist/og/posts/2026-06-24-welcome/index.svg', '博客开始营业', '文章级分享图产物');
   mustInclude('dist/sitemap.xml', '<urlset', '站点地图产物');

@@ -99,7 +99,7 @@ const phase4 = [
   ['搜索', Boolean(scripts['search:index']) && exists('scripts/generate-search-index.mjs') && exists('src/pages/opensearch.xml.ts') && (!distReady || searchCount === 71)],
   ['评论入口', configText.includes('PUBLIC_GISCUS_REPO')],
   ['访问统计入口', configText.includes('PUBLIC_UMAMI_SCRIPT')],
-  ['SEO / Open Graph', baseLayout.includes('og:image') && exists('scripts/generate-og-images.mjs')],
+  ['SEO / Open Graph', baseLayout.includes('og:image') && exists('scripts/generate-og-images.mjs') && exists('src/pages/llms.txt.ts')],
   ['旧公众号文章迁移入口', Boolean(scripts['import:wechat']) && exists('scripts/import-wechat.mjs') && legacyCount === 70],
   ['国内访问镜像入口', Boolean(scripts.mirror) && exists('scripts/deploy-mirror.mjs')]
 ];
@@ -144,6 +144,7 @@ if (online) {
     ['RSS', '/rss.xml', '<rss'],
     ['JSON Feed', '/feed.json', 'jsonfeed.org/version/1.1'],
     ['OpenSearch', '/opensearch.xml', 'OpenSearchDescription'],
+    ['llms.txt', '/llms.txt', '## Articles (71)'],
     ['Sitemap', '/sitemap.xml', '<urlset'],
     ['搜索索引', '/search.json', 'Chrome'],
     ['示例文章', '/posts/2026-06-24-welcome/', '/og/posts/2026-06-24-welcome/index.svg'],

@@ -96,6 +96,11 @@ if (!existsSync(openSearch) || !readFileSync(openSearch, 'utf8').includes('/arti
   failures.push('/opensearch.xml: OpenSearch 描述文件未生成或模板不正确');
 }
 
+const llmsText = resolve('dist/llms.txt');
+if (!existsSync(llmsText) || !readFileSync(llmsText, 'utf8').includes('## Articles (71)')) {
+  failures.push('/llms.txt: 机器可读站点说明未生成或文章数量不正确');
+}
+
 const publishedNewPostCount = readdirSync(resolve('src/content/posts'))
   .filter((name) => name.endsWith('.md'))
   .map((name) => readFileSync(resolve('src/content/posts', name), 'utf8'))
