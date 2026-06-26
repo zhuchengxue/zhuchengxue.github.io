@@ -17,6 +17,7 @@
     "check:build": "node scripts/check-built-site.mjs",
     "audit": "node scripts/audit-goal.mjs",
     "doctor": "node scripts/doctor.mjs",
+    "build:ci": "npm run check:content && npm run search:index && astro build && npm run check:build && npm run audit",
     "build": "npm run check:content && npm run search:index && astro check && astro build && npm run check:build && npm run audit",
     "preview": "astro preview",
     "astro": "astro"
