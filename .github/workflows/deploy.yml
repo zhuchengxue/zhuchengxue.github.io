@@ -54,6 +54,8 @@ jobs:
         run: npm run check:build
       - name: Audit goal deliverables
         run: npm run audit
+      - name: Report blog status
+        run: npm run status
       - name: Write custom domain
         if: ${{ vars.CUSTOM_DOMAIN != '' }}
         run: printf '%s\n' "$CUSTOM_DOMAIN" > dist/CNAME

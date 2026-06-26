@@ -44,7 +44,7 @@ async function fetchText(path, { timeout = 15000, attempts = 2 } = {}) {
 }
 
 const packageJson = readJSON('package.json');
-for (const script of ['dev', 'new', 'prepare', 'publish', 'wechat', 'wechat:draft', 'import:wechat', 'mirror', 'config:services', 'og:images', 'build', 'build:ci', 'audit', 'doctor']) {
+for (const script of ['dev', 'new', 'prepare', 'publish', 'wechat', 'wechat:draft', 'import:wechat', 'mirror', 'config:services', 'status', 'og:images', 'build', 'build:ci', 'audit', 'doctor']) {
   check(`npm script: ${script}`, Boolean(packageJson.scripts?.[script]));
 }
 
@@ -63,6 +63,8 @@ for (const path of [
   'scripts/import-wechat.mjs',
   'scripts/deploy-mirror.mjs',
   'scripts/configure-services.mjs',
+  'scripts/status-report.mjs',
+  'scripts/run-astro.mjs',
   'scripts/generate-og-images.mjs',
   'scripts/generate-search-index.mjs'
 ]) {
@@ -112,7 +114,8 @@ if (online) {
     ['/site.webmanifest', '学语思'],
     ['/rss.xml', '<rss'],
     ['/sitemap.xml', '<urlset'],
-    ['/posts/2026-06-24-welcome/', 'article:published_time']
+    ['/posts/2026-06-24-welcome/', '/og/posts/2026-06-24-welcome/index.svg'],
+    ['/og/posts/2026-06-24-welcome/index.svg', '<svg']
   ];
 
   for (const [path, expectedText] of onlinePages) {

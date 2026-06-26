@@ -23,7 +23,7 @@ function mustInclude(path, pattern, label) {
 }
 
 const packageJson = JSON.parse(readFileSync(resolve('package.json'), 'utf8'));
-for (const script of ['new', 'prepare', 'publish', 'wechat', 'wechat:draft', 'import:wechat', 'mirror', 'config:services', 'search:index', 'og:images', 'build', 'build:ci', 'audit', 'doctor']) {
+for (const script of ['new', 'prepare', 'publish', 'wechat', 'wechat:draft', 'import:wechat', 'mirror', 'config:services', 'status', 'search:index', 'og:images', 'build', 'build:ci', 'audit', 'doctor']) {
   if (!packageJson.scripts?.[script]) failures.push(`package.json: 缺少 npm script ${script}`);
 }
 
@@ -52,6 +52,8 @@ for (const [path, label] of [
   ['scripts/import-wechat.mjs', '旧公众号导入脚本'],
   ['scripts/deploy-mirror.mjs', '镜像发布脚本'],
   ['scripts/configure-services.mjs', '外部服务配置助手'],
+  ['scripts/status-report.mjs', '博客状态报告'],
+  ['scripts/run-astro.mjs', 'Astro 命令封装'],
   ['scripts/generate-search-index.mjs', '全文搜索索引脚本'],
   ['scripts/generate-og-images.mjs', '文章级分享图脚本'],
   ['scripts/doctor.mjs', '站点诊断脚本'],
@@ -80,6 +82,8 @@ mustInclude('scripts/create-wechat-draft.mjs', 'WECHAT_APP_SECRET', '公众号�
 mustInclude('scripts/import-wechat.mjs', 'draft: true', '旧公众号导入为草稿');
 mustInclude('scripts/deploy-mirror.mjs', 'MIRROR_REPO', '国内访问镜像发布');
 mustInclude('scripts/configure-services.mjs', 'GitHub Actions Variables', '外部服务配置助手');
+mustInclude('scripts/status-report.mjs', '第四阶段：完善能力', '博客状态报告');
+mustInclude('scripts/run-astro.mjs', 'ASTRO_TELEMETRY_DISABLED', 'Astro 遥测默认关闭');
 mustInclude('scripts/doctor.mjs', 'site.webmanifest', '线上站点诊断');
 mustInclude('docs/OPERATIONS.md', 'npm run doctor -- --online', '运维手册线上诊断');
 mustInclude('docs/ACCEPTANCE.md', '第一阶段：最小可用博客', '验收清单第一阶段');

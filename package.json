@@ -4,7 +4,7 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "astro dev",
+    "dev": "node scripts/run-astro.mjs dev",
     "new": "node scripts/new-post.mjs",
     "prepare": "node scripts/prepare-post.mjs",
     "publish": "node scripts/publish-post.mjs",
@@ -13,16 +13,17 @@
     "import:wechat": "node scripts/import-wechat.mjs",
     "mirror": "node scripts/deploy-mirror.mjs",
     "config:services": "node scripts/configure-services.mjs",
+    "status": "node scripts/status-report.mjs",
     "og:images": "node scripts/generate-og-images.mjs",
     "search:index": "node scripts/generate-search-index.mjs",
     "check:content": "node scripts/check-content.mjs",
     "check:build": "node scripts/check-built-site.mjs",
     "audit": "node scripts/audit-goal.mjs",
     "doctor": "node scripts/doctor.mjs",
-    "build:ci": "npm run check:content && npm run search:index && npm run og:images && astro build && npm run check:build && npm run audit",
-    "build": "npm run check:content && npm run search:index && npm run og:images && astro check && astro build && npm run check:build && npm run audit",
-    "preview": "astro preview",
-    "astro": "astro"
+    "build:ci": "npm run check:content && npm run search:index && npm run og:images && node scripts/run-astro.mjs build && npm run check:build && npm run audit",
+    "build": "npm run check:content && npm run search:index && npm run og:images && node scripts/run-astro.mjs check && node scripts/run-astro.mjs build && npm run check:build && npm run audit",
+    "preview": "node scripts/run-astro.mjs preview",
+    "astro": "node scripts/run-astro.mjs"
   },
   "dependencies": {
     "astro": "^7.0.2"

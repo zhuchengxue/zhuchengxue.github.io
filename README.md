@@ -148,6 +148,15 @@ npm run doctor -- --online
 
 它会检查首页、文章页、RSS、sitemap、Manifest、示例文章，以及线上 `/search.json` 是否包含 71 篇全文搜索索引。
 
+想快速查看四阶段完成度和还缺哪些外部配置，可以运行：
+
+```bash
+npm run status
+npm run status -- --online
+```
+
+`npm run status` 只做只读汇总；不上传、不推送、不调用公众号或镜像平台。加 `--online` 时才会访问当前站点做线上抽检。
+
 构建会检查新旧文章、图片路径、旧文迁移完整性、订阅源、首页和最终静态产物。
 `npm run audit` 会额外审计四阶段核心交付物是否仍然存在，例如 Obsidian 配置、公众号分发、旧文导入、SEO、评论/统计配置入口和 GitHub Pages 部署配置。
 `npm run doctor` 会做维护体检：检查 Git 工作区、关键文件、构建产物、可选环境变量和默认第三方脚本状态。需要顺便检查线上主站时运行：
