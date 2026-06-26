@@ -1,15 +1,19 @@
-import { cpSync, existsSync, mkdirSync, readdirSync, rmSync, writeFileSync } from 'node:fs';
+import { cpSync, existsSync, mkdirSync, readdirSync, rmSync, statSync, writeFileSync } from 'node:fs';
 import { basename, resolve } from 'node:path';
 import { spawnSync } from 'node:child_process';
 
 const args = process.argv.slice(2);
 const dryRun = args.includes('--dry-run');
+const writeReport = args.includes('--report');
 const distDirectory = resolve('dist');
 const workspace = resolve('.');
 const mirrorDirectory = resolve('.mirror-worktree');
+const reportDirectory = resolve('exports');
+const reportPath = resolve(reportDirectory, 'mirror-report.json');
 const mirrorRepo = process.env.MIRROR_REPO;
 const mirrorBranch = process.env.MIRROR_BRANCH || 'pages';
 const mirrorDomain = process.env.MIRROR_DOMAIN;
+const requiredDistFiles = ['index.html', 'rss.xml', 'sitemap.xml', 'site.webmanifest', 'search.json'];
 
 function run(command, commandArgs, options = {}) {
   const printable = [command, ...commandArgs].join(' ');
@@ -39,6 +43,42 @@ function ensureSafeMirrorDirectory() {
   }
 }
 
+function walkDirectory(directory) {
+  const entries = [];
+  for (const entry of readdirSync(directory, { withFileTypes: true })) {
+    const fullPath = resolve(directory, entry.name);
+    if (entry.isDirectory()) {
+      entries.push(...walkDirectory(fullPath));
+    } else if (entry.isFile()) {
+      entries.push(fullPath);
+    }
+  }
+  return entries;
+}
+
+function collectDistReport() {
+  const files = walkDirectory(distDirectory);
+  const totalBytes = files.reduce((sum, file) => sum + statSync(file).size, 0);
+  const missing = requiredDistFiles.filter((file) => !existsSync(resolve(distDirectory, file)));
+  return {
+    generatedAt: new Date().toISOString(),
+    dryRun,
+    mirrorRepo,
+    mirrorBranch,
+    mirrorDomain: mirrorDomain || '',
+    dist: {
+      directory: distDirectory,
+      fileCount: files.length,
+      totalBytes,
+      requiredFiles: requiredDistFiles.map((file) => ({
+        file,
+        exists: existsSync(resolve(distDirectory, file))
+      }))
+    },
+    missingRequiredFiles: missing
+  };
+}
+
 if (!existsSync(distDirectory)) {
   console.error('缺少 dist/，请先运行 npm run build。');
   process.exit(1);
@@ -54,6 +94,20 @@ ensureSafeMirrorDirectory();
 console.log(`镜像仓库：${mirrorRepo}`);
 console.log(`镜像分支：${mirrorBranch}`);
 if (mirrorDomain) console.log(`镜像域名：${mirrorDomain}`);
+
+const report = collectDistReport();
+console.log(`镜像源文件：${report.dist.fileCount} 个，约 ${(report.dist.totalBytes / 1024).toFixed(1)} KB`);
+if (report.missingRequiredFiles.length) {
+  console.error(`dist/ 缺少关键文件：${report.missingRequiredFiles.join(', ')}`);
+  console.error('请先运行 npm run build 并确认构建通过。');
+  process.exit(1);
+}
+
+if (dryRun || writeReport) {
+  mkdirSync(reportDirectory, { recursive: true });
+  writeFileSync(reportPath, `${JSON.stringify(report, null, 2)}\n`, 'utf8');
+  console.log(`镜像发布报告：${reportPath}`);
+}
 
 if (!dryRun && existsSync(mirrorDirectory)) {
   rmSync(mirrorDirectory, { recursive: true, force: true });
@@ -100,4 +154,4 @@ if (diff.status === 0) {
 run('git', ['commit', '-m', `Deploy mirror ${new Date().toISOString()}`], { cwd: mirrorDirectory });
 run('git', ['push', 'origin', `HEAD:${mirrorBranch}`], { cwd: mirrorDirectory });
 
-console.log('镜像发布完成。');
+console.log(dryRun ? '镜像发布预检完成；未克隆、未提交、未推送。' : '镜像发布完成。');

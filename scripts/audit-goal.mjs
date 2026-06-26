@@ -87,6 +87,7 @@ mustInclude('scripts/create-wechat-draft.mjs', 'WECHAT_APP_SECRET', '公众号�
 mustInclude('scripts/import-wechat.mjs', 'draft: true', '旧公众号导入为草稿');
 mustInclude('scripts/import-wechat.mjs', 'wechat-import-report.json', '旧公众号导入报告');
 mustInclude('scripts/deploy-mirror.mjs', 'MIRROR_REPO', '国内访问镜像发布');
+mustInclude('scripts/deploy-mirror.mjs', 'mirror-report.json', '国内访问镜像发布报告');
 mustInclude('scripts/configure-services.mjs', 'GitHub Actions Variables', '外部服务配置助手');
 mustInclude('scripts/check-services.mjs', '半配置状态', '外部服务配置检查');
 mustInclude('scripts/configure-services.mjs', '185.199.108.153', '独立域名 DNS 清单');

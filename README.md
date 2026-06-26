@@ -378,6 +378,7 @@ npm run build
 
 ```bash
 MIRROR_REPO=https://gitee.com/用户名/仓库名.git MIRROR_BRANCH=pages npm run mirror -- --dry-run
+MIRROR_REPO=https://gitee.com/用户名/仓库名.git MIRROR_BRANCH=pages npm run mirror -- --dry-run --report
 ```
 
 确认后发布：
@@ -386,7 +387,7 @@ MIRROR_REPO=https://gitee.com/用户名/仓库名.git MIRROR_BRANCH=pages npm ru
 MIRROR_REPO=https://gitee.com/用户名/仓库名.git MIRROR_BRANCH=pages npm run mirror
 ```
 
-脚本会把 `dist/` 推送到镜像仓库指定分支，并自动写入 `.nojekyll`。如果镜像也绑定域名，可以额外设置：
+脚本会检查 `dist/` 关键文件，把产物推送到镜像仓库指定分支，并自动写入 `.nojekyll`。dry-run 或加 `--report` 时会生成 `exports/mirror-report.json`，记录文件数量、体积、目标仓库和分支。如果镜像也绑定域名，可以额外设置：
 
 ```text
 MIRROR_DOMAIN=mirror.example.com
