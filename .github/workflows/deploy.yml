@@ -46,6 +46,8 @@ jobs:
         run: npm run check:content
       - name: Generate search index
         run: npm run search:index
+      - name: Generate OG images
+        run: npm run og:images
       - name: Build static site
         run: npx astro build
       - name: Check built site

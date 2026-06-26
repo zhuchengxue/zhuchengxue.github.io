@@ -88,6 +88,21 @@ if (!existsSync(atomFeed) || !readFileSync(atomFeed, 'utf8').includes('<feed xml
   failures.push('/atom.xml: 旧订阅地址未生成有效 Atom Feed');
 }
 
+const welcomeOg = resolve('dist/og/posts/2026-06-24-welcome/index.svg');
+if (!existsSync(welcomeOg) || !readFileSync(welcomeOg, 'utf8').includes('博客开始营业')) {
+  failures.push('/og/posts/2026-06-24-welcome/index.svg: 新文章分享图未生成');
+}
+
+const firstLegacyOg = resolve('dist', 'og', legacyPosts[0].href.slice(1), 'index.svg');
+if (!existsSync(firstLegacyOg) || !readFileSync(firstLegacyOg, 'utf8').includes(legacyPosts[0].title)) {
+  failures.push(`${legacyPosts[0].href}: 旧文章分享图未生成`);
+}
+
+const welcomePage = resolve('dist/posts/2026-06-24-welcome/index.html');
+if (!readFileSync(welcomePage, 'utf8').includes('/og/posts/2026-06-24-welcome/index.svg')) {
+  failures.push('/posts/2026-06-24-welcome/: 未引用文章级 Open Graph 分享图');
+}
+
 const tagIndex = resolve('dist/tags/index.html');
 const blogTag = resolve('dist/tags/博客/index.html');
 if (!existsSync(tagIndex) || !readFileSync(tagIndex, 'utf8').includes('class="tag-cloud"')) {

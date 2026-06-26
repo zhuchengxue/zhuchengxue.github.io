@@ -208,6 +208,17 @@ npm run doctor -- --online
 
 如果本地正常但线上没更新，检查 GitHub Actions 是否失败。
 
+### 分享图没有更新
+
+文章级 Open Graph 分享图是构建前生成的静态 SVG。先本地重新生成并构建：
+
+```bash
+npm run og:images
+npm run build
+```
+
+如果线上仍是旧图，多半是社交平台缓存，需要等待或使用对应平台的链接刷新工具。
+
 ### `npm ci` 失败
 
 确认 `scripts/prepare-post.mjs` 没有被改回强制要求文章参数；安装阶段会跳过 npm 的 `prepare` 生命周期。

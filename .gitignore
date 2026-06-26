@@ -9,6 +9,7 @@ dist/
 public/images/inbox/*
 !public/images/inbox/.gitkeep
 public/search.json
+public/og/
 exports/
 imports/wechat/*
 !imports/wechat/.gitkeep

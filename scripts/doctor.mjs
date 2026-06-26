@@ -44,7 +44,7 @@ async function fetchText(path, { timeout = 15000, attempts = 2 } = {}) {
 }
 
 const packageJson = readJSON('package.json');
-for (const script of ['dev', 'new', 'prepare', 'publish', 'wechat', 'wechat:draft', 'import:wechat', 'mirror', 'config:services', 'build', 'build:ci', 'audit', 'doctor']) {
+for (const script of ['dev', 'new', 'prepare', 'publish', 'wechat', 'wechat:draft', 'import:wechat', 'mirror', 'config:services', 'og:images', 'build', 'build:ci', 'audit', 'doctor']) {
   check(`npm script: ${script}`, Boolean(packageJson.scripts?.[script]));
 }
 
@@ -63,6 +63,7 @@ for (const path of [
   'scripts/import-wechat.mjs',
   'scripts/deploy-mirror.mjs',
   'scripts/configure-services.mjs',
+  'scripts/generate-og-images.mjs',
   'scripts/generate-search-index.mjs'
 ]) {
   check(`关键文件: ${path}`, existsSync(resolve(path)));
@@ -83,6 +84,7 @@ if (distExists) {
   check('构建产物由 Astro 生成', home.includes('name="generator" content="Astro'));
   check('默认不加载评论/统计脚本', !/giscus\.app|umami|data-website-id/i.test(welcome));
   check('文章 SEO 元数据', welcome.includes('article:published_time') && welcome.includes('og:image'));
+  check('文章级 OG 分享图引用', welcome.includes('/og/posts/2026-06-24-welcome/index.svg'));
   check('Manifest 产物', existsSync(resolve('dist/site.webmanifest')));
   check('RSS 产物', existsSync(resolve('dist/rss.xml')));
   const searchIndexPath = resolve('dist/search.json');
@@ -93,6 +95,7 @@ if (distExists) {
     check('全文搜索包含正文关键词', search.includes('Chrome'));
   }
   check('Sitemap 产物', existsSync(resolve('dist/sitemap.xml')));
+  check('文章级 OG 分享图产物', existsSync(resolve('dist/og/posts/2026-06-24-welcome/index.svg')));
 }
 
 check('SITE_URL', true, process.env.SITE_URL || '默认 https://zhuchengxue.github.io');

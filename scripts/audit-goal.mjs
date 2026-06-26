@@ -23,7 +23,7 @@ function mustInclude(path, pattern, label) {
 }
 
 const packageJson = JSON.parse(readFileSync(resolve('package.json'), 'utf8'));
-for (const script of ['new', 'prepare', 'publish', 'wechat', 'wechat:draft', 'import:wechat', 'mirror', 'config:services', 'search:index', 'build', 'build:ci', 'audit', 'doctor']) {
+for (const script of ['new', 'prepare', 'publish', 'wechat', 'wechat:draft', 'import:wechat', 'mirror', 'config:services', 'search:index', 'og:images', 'build', 'build:ci', 'audit', 'doctor']) {
   if (!packageJson.scripts?.[script]) failures.push(`package.json: 缺少 npm script ${script}`);
 }
 
@@ -53,6 +53,7 @@ for (const [path, label] of [
   ['scripts/deploy-mirror.mjs', '镜像发布脚本'],
   ['scripts/configure-services.mjs', '外部服务配置助手'],
   ['scripts/generate-search-index.mjs', '全文搜索索引脚本'],
+  ['scripts/generate-og-images.mjs', '文章级分享图脚本'],
   ['scripts/doctor.mjs', '站点诊断脚本'],
   ['docs/OPERATIONS.md', '博客运维手册'],
   ['docs/ACCEPTANCE.md', '四阶段验收清单'],
@@ -67,6 +68,7 @@ mustInclude('src/pages/articles.astro', 'search.json', '文章全文搜索');
 mustInclude('scripts/generate-search-index.mjs', 'public/search.json', '静态全文搜索索引生成');
 mustInclude('src/layouts/BaseLayout.astro', 'application/ld+json', '结构化数据');
 mustInclude('src/layouts/BaseLayout.astro', 'og:image', 'Open Graph');
+mustInclude('src/layouts/PostLayout.astro', '/og${currentHref}index.svg', '文章级 Open Graph 分享图');
 mustInclude('src/config.ts', 'PUBLIC_GISCUS_REPO', '可选评论');
 mustInclude('src/config.ts', 'PUBLIC_UMAMI_SCRIPT', '可选统计');
 mustInclude('.github/workflows/deploy.yml', 'CUSTOM_DOMAIN', '独立域名 CNAME');
@@ -88,6 +90,7 @@ if (existsSync(resolve('dist/index.html'))) {
   mustInclude('dist/index.html', 'name="generator" content="Astro', '构建产物');
   mustInclude('dist/rss.xml', '<rss', 'RSS 产物');
   mustInclude('dist/search.json', 'Chrome', '全文搜索索引产物');
+  mustInclude('dist/og/posts/2026-06-24-welcome/index.svg', '博客开始营业', '文章级分享图产物');
   mustInclude('dist/sitemap.xml', '<urlset', '站点地图产物');
   mustInclude('dist/site.webmanifest', '"name"', 'Manifest 产物');
 

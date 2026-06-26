@@ -18,7 +18,7 @@
 - 71 篇新旧文章统一 Astro 风格
 - 静态全文搜索、上一篇/下一篇导航
 - RSS、Atom 和 sitemap
-- Open Graph 分享图与文章结构化数据
+- 自动生成文章级 Open Graph 分享图与文章结构化数据
 - 完整文章元数据与 Web App Manifest
 - GitHub Pages 自动构建与发布
 - Obsidian Vault、图片整理和一键发布脚本
