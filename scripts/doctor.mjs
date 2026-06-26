@@ -26,6 +26,14 @@ function envState(name) {
   return process.env[name] ? '已配置' : '未配置';
 }
 
+async function fetchText(path) {
+  const response = await fetch(`${siteURL}${path}`, {
+    signal: AbortSignal.timeout(15000)
+  });
+  const text = await response.text();
+  return { response, text };
+}
+
 const packageJson = readJSON('package.json');
 for (const script of ['dev', 'new', 'prepare', 'publish', 'wechat', 'wechat:draft', 'import:wechat', 'mirror', 'build', 'build:ci', 'audit', 'doctor']) {
   check(`npm script: ${script}`, Boolean(packageJson.scripts?.[script]));
@@ -85,13 +93,33 @@ check('微信公众号草稿配置', true, ['WECHAT_APP_ID', 'WECHAT_APP_SECRET'
 check('镜像配置', true, ['MIRROR_REPO', 'MIRROR_BRANCH', 'MIRROR_DOMAIN'].map((name) => `${name}:${envState(name)}`).join(' '));
 
 if (online) {
-  for (const path of ['/', '/site.webmanifest', '/rss.xml', '/sitemap.xml', '/posts/2026-06-24-welcome/']) {
+  const onlinePages = [
+    ['/', 'name="generator" content="Astro'],
+    ['/articles/', '/search.json'],
+    ['/site.webmanifest', '学语思'],
+    ['/rss.xml', '<rss'],
+    ['/sitemap.xml', '<urlset'],
+    ['/posts/2026-06-24-welcome/', 'article:published_time']
+  ];
+
+  for (const [path, expectedText] of onlinePages) {
     try {
-      const response = await fetch(`${siteURL}${path}`);
+      const { response, text } = await fetchText(path);
       check(`线上访问: ${path}`, response.ok, `${response.status} ${response.statusText}`);
+      check(`线上内容: ${path}`, response.ok && text.includes(expectedText), expectedText);
     } catch (error) {
       check(`线上访问: ${path}`, false, error.message);
     }
+  }
+
+  try {
+    const { response, text } = await fetchText('/search.json');
+    check('线上访问: /search.json', response.ok, `${response.status} ${response.statusText}`);
+    const search = JSON.parse(text);
+    check('线上全文搜索数量', Array.isArray(search) && search.length === 71, `${Array.isArray(search) ? search.length : 0} 篇`);
+    check('线上全文搜索包含正文关键词', text.includes('Chrome'));
+  } catch (error) {
+    check('线上访问: /search.json', false, error.message);
   }
 } else {
   check('线上访问检查', true, '跳过；如需检查运行 npm run doctor -- --online');

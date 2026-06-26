@@ -16,6 +16,8 @@ npm run doctor
 npm run doctor -- --online
 ```
 
+线上体检会同时检查首页、文章页、RSS、sitemap、Manifest、示例文章和 `/search.json`，确认全文搜索索引已发布且包含 71 篇文章。
+
 如果正在改代码、还没提交：
 
 ```bash
