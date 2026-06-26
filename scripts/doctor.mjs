@@ -63,6 +63,7 @@ for (const path of [
   'src/pages/feed.json.ts',
   'src/pages/opensearch.xml.ts',
   'src/pages/llms.txt.ts',
+  'src/pages/humans.txt.ts',
   'src/pages/sitemap.xml.ts',
   'scripts/generate-wechat.mjs',
   'scripts/generate-wechat-all.mjs',
@@ -101,6 +102,7 @@ if (distExists) {
   check('JSON Feed 产物', existsSync(resolve('dist/feed.json')));
   check('OpenSearch 产物', existsSync(resolve('dist/opensearch.xml')));
   check('llms.txt 产物', existsSync(resolve('dist/llms.txt')));
+  check('humans.txt 产物', existsSync(resolve('dist/humans.txt')));
   const searchIndexPath = resolve('dist/search.json');
   check('全文搜索索引产物', existsSync(searchIndexPath));
   if (existsSync(searchIndexPath)) {
@@ -128,6 +130,7 @@ if (online) {
     ['/feed.json', 'jsonfeed.org/version/1.1'],
     ['/opensearch.xml', 'OpenSearchDescription'],
     ['/llms.txt', '## Articles (71)'],
+    ['/humans.txt', '/* TEAM */'],
     ['/sitemap.xml', '<urlset'],
     ['/posts/2026-06-24-welcome/', '/og/posts/2026-06-24-welcome/index.svg'],
     ['/og/posts/2026-06-24-welcome/index.svg', '<svg']

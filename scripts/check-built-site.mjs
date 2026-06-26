@@ -101,6 +101,11 @@ if (!existsSync(llmsText) || !readFileSync(llmsText, 'utf8').includes('## Articl
   failures.push('/llms.txt: 机器可读站点说明未生成或文章数量不正确');
 }
 
+const humansText = resolve('dist/humans.txt');
+if (!existsSync(humansText) || !readFileSync(humansText, 'utf8').includes('Built with Astro and GitHub Pages.')) {
+  failures.push('/humans.txt: 人类可读站点说明未生成或内容不正确');
+}
+
 const publishedNewPostCount = readdirSync(resolve('src/content/posts'))
   .filter((name) => name.endsWith('.md'))
   .map((name) => readFileSync(resolve('src/content/posts', name), 'utf8'))
