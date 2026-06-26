@@ -41,19 +41,25 @@ function optional(name, names, note) {
   };
 }
 
-async function fetchOK(path, expected) {
-  try {
-    const response = await fetch(`${siteURL}${path}`, {
-      signal: AbortSignal.timeout(20000)
-    });
-    const text = await response.text();
-    return {
-      ok: response.ok && (!expected || text.includes(expected)),
-      detail: `${response.status} ${response.statusText}`
-    };
-  } catch (error) {
-    return { ok: false, detail: error.message };
+async function fetchOK(path, expected, { timeout = 20000, attempts = 2 } = {}) {
+  let lastError;
+  for (let attempt = 1; attempt <= attempts; attempt++) {
+    try {
+      const response = await fetch(`${siteURL}${path}`, {
+        signal: AbortSignal.timeout(timeout)
+      });
+      const text = await response.text();
+      return {
+        ok: response.ok && (!expected || text.includes(expected)),
+        detail: `${response.status} ${response.statusText}${attempt > 1 ? `，第 ${attempt} 次成功` : ''}`
+      };
+    } catch (error) {
+      lastError = error;
+      if (attempt < attempts) await new Promise((resolveRetry) => setTimeout(resolveRetry, 1000));
+    }
   }
+
+  return { ok: false, detail: `${lastError?.message ?? '请求失败'}，已重试 ${attempts} 次` };
 }
 
 const packageJson = json('package.json');
@@ -143,7 +149,11 @@ if (online) {
   ];
 
   for (const [label, path, expected] of checks) {
-    const result = await fetchOK(path, expected);
+    const result = await fetchOK(
+      path,
+      expected,
+      path === '/search.json' ? { timeout: 30000, attempts: 3 } : undefined
+    );
     console.log(`  ${state(result.ok, `${label} ${path} — ${result.detail}`)}`);
   }
 }
