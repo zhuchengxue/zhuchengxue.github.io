@@ -7,6 +7,7 @@
     "dev": "node scripts/run-astro.mjs dev",
     "new": "node scripts/new-post.mjs",
     "prepare": "node scripts/prepare-post.mjs",
+    "ready": "node scripts/check-post-ready.mjs",
     "publish": "node scripts/publish-post.mjs",
     "wechat": "node scripts/generate-wechat.mjs",
     "wechat:draft": "node scripts/create-wechat-draft.mjs",

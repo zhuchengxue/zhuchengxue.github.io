@@ -67,6 +67,7 @@ const phase2 = [
   ['Obsidian Vault 配置', exists('.obsidian/app.json') && exists('.obsidian/templates.json')],
   ['统一文章模板', exists('templates/article.md')],
   ['统一图片目录', exists('public/images/inbox/.gitkeep') && exists('scripts/prepare-post.mjs')],
+  ['发布前体检脚本', Boolean(scripts.ready) && exists('scripts/check-post-ready.mjs')],
   ['一键发布脚本', Boolean(scripts.publish) && exists('scripts/publish-post.mjs')]
 ];
 
@@ -139,6 +140,6 @@ if (online) {
 }
 
 console.log('\n建议下一步：');
-console.log('  1. 日常写作：npm run new → Obsidian 编辑 → npm run publish');
+console.log('  1. 日常写作：npm run new → Obsidian 编辑 → npm run ready → npm run publish');
 console.log('  2. 发公众号：博客上线后运行 npm run wechat，再复制 HTML 到公众号后台');
 console.log('  3. 需要外部服务时运行 npm run config:services 生成配置清单');

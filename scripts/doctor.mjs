@@ -44,7 +44,7 @@ async function fetchText(path, { timeout = 15000, attempts = 2 } = {}) {
 }
 
 const packageJson = readJSON('package.json');
-for (const script of ['dev', 'new', 'prepare', 'publish', 'wechat', 'wechat:draft', 'import:wechat', 'mirror', 'config:services', 'status', 'og:images', 'build', 'build:ci', 'audit', 'doctor']) {
+for (const script of ['dev', 'new', 'prepare', 'ready', 'publish', 'wechat', 'wechat:draft', 'import:wechat', 'mirror', 'config:services', 'status', 'og:images', 'build', 'build:ci', 'audit', 'doctor']) {
   check(`npm script: ${script}`, Boolean(packageJson.scripts?.[script]));
 }
 
@@ -59,6 +59,7 @@ for (const path of [
   'src/pages/rss.xml.ts',
   'src/pages/sitemap.xml.ts',
   'scripts/generate-wechat.mjs',
+  'scripts/check-post-ready.mjs',
   'scripts/create-wechat-draft.mjs',
   'scripts/import-wechat.mjs',
   'scripts/deploy-mirror.mjs',

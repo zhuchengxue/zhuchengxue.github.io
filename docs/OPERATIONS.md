@@ -32,7 +32,13 @@ npm run new -- "文章标题" article-slug
 
 然后在 Obsidian 中编辑生成的 Markdown。图片直接粘贴即可，先进入 `public/images/inbox/`。
 
-发布前预检：
+发布前先做只读体检：
+
+```bash
+npm run ready -- "src/content/posts/YYYY-MM-DD-article-slug.md"
+```
+
+确认要执行图片整理和构建预检：
 
 ```bash
 npm run publish -- "src/content/posts/YYYY-MM-DD-article-slug.md" --dry-run

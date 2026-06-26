@@ -23,7 +23,7 @@ function mustInclude(path, pattern, label) {
 }
 
 const packageJson = JSON.parse(readFileSync(resolve('package.json'), 'utf8'));
-for (const script of ['new', 'prepare', 'publish', 'wechat', 'wechat:draft', 'import:wechat', 'mirror', 'config:services', 'status', 'search:index', 'og:images', 'build', 'build:ci', 'audit', 'doctor']) {
+for (const script of ['new', 'prepare', 'ready', 'publish', 'wechat', 'wechat:draft', 'import:wechat', 'mirror', 'config:services', 'status', 'search:index', 'og:images', 'build', 'build:ci', 'audit', 'doctor']) {
   if (!packageJson.scripts?.[script]) failures.push(`package.json: 缺少 npm script ${script}`);
 }
 
@@ -46,6 +46,7 @@ for (const [path, label] of [
   ['templates/article.md', '文章模板'],
   ['scripts/new-post.mjs', '新建文章脚本'],
   ['scripts/prepare-post.mjs', '图片整理脚本'],
+  ['scripts/check-post-ready.mjs', '文章发布前体检脚本'],
   ['scripts/publish-post.mjs', '一键发布脚本'],
   ['scripts/generate-wechat.mjs', '公众号分发脚本'],
   ['scripts/create-wechat-draft.mjs', '公众号草稿脚本'],
@@ -73,6 +74,7 @@ mustInclude('src/layouts/BaseLayout.astro', 'og:image', 'Open Graph');
 mustInclude('src/layouts/PostLayout.astro', '/og${currentHref}index.svg', '文章级 Open Graph 分享图');
 mustInclude('src/config.ts', 'PUBLIC_GISCUS_REPO', '可选评论');
 mustInclude('src/config.ts', 'PUBLIC_UMAMI_SCRIPT', '可选统计');
+mustInclude('scripts/check-post-ready.mjs', '公众号 HTML 转换预检通过', '文章发布前体检');
 mustInclude('.github/workflows/deploy.yml', 'CUSTOM_DOMAIN', '独立域名 CNAME');
 mustInclude('.github/workflows/deploy.yml', 'SITE_URL', '独立域名 URL');
 mustInclude('scripts/generate-wechat.mjs', 'content_source_url', '公众号原文链接');

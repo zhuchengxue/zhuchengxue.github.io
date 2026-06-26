@@ -108,7 +108,19 @@ npm run prepare -- "文章路径" --dry-run
 
 ## 一键发布
 
-发布前填写真实摘要和标签，然后运行：
+发布前填写真实摘要和标签。建议先做只读体检：
+
+```bash
+npm run ready -- "src/content/posts/YYYY-MM-DD-article-slug.md"
+```
+
+它会检查标题、摘要、发布日期、标签、正文长度、图片命名、封面图和公众号 HTML 转换可行性。严格要求 `draft: false` 时可以运行：
+
+```bash
+npm run ready -- "文章路径" --strict
+```
+
+确认无误后运行：
 
 ```bash
 npm run publish -- "src/content/posts/YYYY-MM-DD-article-slug.md"
@@ -134,6 +146,7 @@ npm run publish -- "文章路径" --dry-run
 
 ```bash
 npm run check:content
+npm run ready -- "src/content/posts/YYYY-MM-DD-article-slug.md"
 npm run build
 npm run audit
 npm run doctor
