@@ -42,8 +42,16 @@ jobs:
       - name: Type check Astro files
         run: npx astro check
         continue-on-error: true
-      - name: Build and verify static site
-        run: npm run build:ci
+      - name: Check content
+        run: npm run check:content
+      - name: Generate search index
+        run: npm run search:index
+      - name: Build static site
+        run: npx astro build
+      - name: Check built site
+        run: npm run check:build
+      - name: Audit goal deliverables
+        run: npm run audit
       - name: Write custom domain
         if: ${{ vars.CUSTOM_DOMAIN != '' }}
         run: printf '%s\n' "$CUSTOM_DOMAIN" > dist/CNAME
