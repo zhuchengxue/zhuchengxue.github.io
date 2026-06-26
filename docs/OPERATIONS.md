@@ -109,10 +109,14 @@ npm run import:wechat
 npm run config:services -- --domain example.com
 ```
 
-需要两处配置：
+需要三处配置：
 
 1. GitHub 仓库 Settings → Pages 绑定域名。
-2. GitHub 仓库 Settings → Secrets and variables → Actions → Variables 添加：
+2. 域名服务商添加 DNS 记录：
+   - 顶级域名：4 条 A 记录指向 `185.199.108.153`、`185.199.109.153`、`185.199.110.153`、`185.199.111.153`。
+   - 顶级域名可选 IPv6：4 条 AAAA 记录指向 `2606:50c0:8000::153`、`2606:50c0:8001::153`、`2606:50c0:8002::153`、`2606:50c0:8003::153`。
+   - 子域名：CNAME 指向 `zhuchengxue.github.io`。
+3. GitHub 仓库 Settings → Secrets and variables → Actions → Variables 添加：
 
 ```text
 SITE_URL=https://你的域名
@@ -120,6 +124,7 @@ CUSTOM_DOMAIN=你的域名
 ```
 
 推送后 GitHub Actions 会把 `dist/CNAME` 写入构建产物。
+建议顺序是先在 GitHub Pages 里添加并验证域名，再配置 DNS，最后开启 Enforce HTTPS。
 
 ## 6. 启用评论或访问统计
 

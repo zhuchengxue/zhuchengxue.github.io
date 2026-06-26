@@ -293,7 +293,18 @@ CUSTOM_DOMAIN=你的域名
 
 博客 canonical、Open Graph、结构化数据以及公众号原文和图片地址会一起切换，不需要逐文件修改。`CUSTOM_DOMAIN` 会让 GitHub Actions 在构建产物里生成 `CNAME`。
 
-如果使用 GitHub Pages 自定义域名，还需要在仓库 Settings → Pages 里绑定域名，并按 GitHub 提示配置 DNS。
+如果使用 GitHub Pages 自定义域名，还需要在仓库 Settings → Pages 里绑定域名，并按 GitHub 提示配置 DNS。可以先用配置助手生成清单：
+
+```bash
+npm run config:services -- --domain example.com
+```
+
+DNS 常见填法：
+
+- 顶级域名，例如 `example.com`：添加 4 条 A 记录到 `185.199.108.153`、`185.199.109.153`、`185.199.110.153`、`185.199.111.153`；需要 IPv6 时再添加 4 条 AAAA 记录到 `2606:50c0:8000::153`、`2606:50c0:8001::153`、`2606:50c0:8002::153`、`2606:50c0:8003::153`。
+- 子域名，例如 `www.example.com` 或 `blog.example.com`：添加 CNAME 到 `zhuchengxue.github.io`。
+
+建议顺序是先在 GitHub Pages 里添加并验证域名，再配置 DNS，最后开启 Enforce HTTPS。
 
 本地可复制 `.env.example` 作为配置参考。GitHub Pages 部署时，推荐在仓库 Settings → Secrets and variables → Actions → Variables 中配置同名变量。
 

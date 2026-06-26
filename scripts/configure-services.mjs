@@ -16,6 +16,11 @@ function printBlock(title, lines) {
   for (const line of lines) console.log(line);
 }
 
+function isApexDomain(hostname) {
+  const parts = hostname.split('.').filter(Boolean);
+  return parts.length === 2;
+}
+
 const domain = valueOf('domain');
 const giscusRepo = valueOf('giscus-repo');
 const giscusRepoId = valueOf('giscus-repo-id');
@@ -46,14 +51,30 @@ const variables = [];
 if (domain) {
   const siteURL = domain.startsWith('http') ? domain.replace(/\/$/, '') : `https://${domain}`;
   const customDomain = domain.replace(/^https?:\/\//, '').replace(/\/$/, '');
+  const apex = isApexDomain(customDomain);
   variables.push(['SITE_URL', siteURL]);
   variables.push(['CUSTOM_DOMAIN', customDomain]);
 
   printBlock('独立域名', [
     `GitHub Pages Custom domain: ${customDomain}`,
-    'DNS 建议：',
-    `- CNAME: ${customDomain} -> zhuchengxue.github.io`,
-    '- 或按 GitHub Pages 当前提示配置 A/AAAA 记录',
+    '推荐顺序：',
+    '1. 先在 GitHub 仓库 Settings → Pages → Custom domain 添加并验证域名。',
+    '2. 再到域名服务商添加 DNS 记录。',
+    '3. DNS 生效后启用 Enforce HTTPS。',
+    'DNS 记录：',
+    ...(apex
+      ? [
+          `- A: ${customDomain} -> 185.199.108.153`,
+          `- A: ${customDomain} -> 185.199.109.153`,
+          `- A: ${customDomain} -> 185.199.110.153`,
+          `- A: ${customDomain} -> 185.199.111.153`,
+          `- AAAA: ${customDomain} -> 2606:50c0:8000::153`,
+          `- AAAA: ${customDomain} -> 2606:50c0:8001::153`,
+          `- AAAA: ${customDomain} -> 2606:50c0:8002::153`,
+          `- AAAA: ${customDomain} -> 2606:50c0:8003::153`,
+          `- 可选：www.${customDomain} CNAME -> zhuchengxue.github.io`
+        ]
+      : [`- CNAME: ${customDomain} -> zhuchengxue.github.io`]),
     '验证：npm run doctor -- --online'
   ]);
 }
