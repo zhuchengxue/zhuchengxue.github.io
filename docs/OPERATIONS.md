@@ -210,7 +210,7 @@ MIRROR_REPO=https://gitee.com/用户名/仓库名.git MIRROR_BRANCH=pages npm ru
 MIRROR_DOMAIN=mirror.example.com MIRROR_REPO=https://gitee.com/用户名/仓库名.git MIRROR_BRANCH=pages npm run mirror
 ```
 
-镜像脚本会检查 `dist/` 关键文件，并在 dry-run 或加 `--report` 时生成 `exports/mirror-report.json`。它不会保存 token，也不会自动运行。
+镜像脚本会检查 `dist/` 关键文件，包括首页、RSS、JSON Feed、sitemap、Manifest 和搜索索引，并在 dry-run 或加 `--report` 时生成 `exports/mirror-report.json`。它不会保存 token，也不会自动运行。
 
 ## 8. 故障排查
 
