@@ -44,9 +44,12 @@ async function fetchText(path, { timeout = 15000, attempts = 2 } = {}) {
 }
 
 const packageJson = readJSON('package.json');
-for (const script of ['dev', 'new', 'prepare', 'ready', 'publish', 'wechat', 'wechat:draft', 'import:wechat', 'mirror', 'config:services', 'status', 'og:images', 'build', 'build:ci', 'audit', 'doctor']) {
+for (const script of ['dev', 'new', 'prepare', 'ready', 'publish', 'wechat', 'wechat:draft', 'import:wechat', 'mirror', 'config:services', 'services:check', 'status', 'og:images', 'build', 'build:ci', 'audit', 'doctor']) {
   check(`npm script: ${script}`, Boolean(packageJson.scripts?.[script]));
 }
+
+const servicesCheck = command(process.execPath, ['scripts/check-services.mjs']);
+check('外部服务变量完整性', servicesCheck.status === 0, servicesCheck.status === 0 ? '无半配置失败项' : (servicesCheck.stdout + servicesCheck.stderr).trim());
 
 for (const path of [
   '.github/workflows/deploy.yml',
@@ -64,6 +67,7 @@ for (const path of [
   'scripts/import-wechat.mjs',
   'scripts/deploy-mirror.mjs',
   'scripts/configure-services.mjs',
+  'scripts/check-services.mjs',
   'scripts/status-report.mjs',
   'scripts/run-astro.mjs',
   'scripts/generate-og-images.mjs',

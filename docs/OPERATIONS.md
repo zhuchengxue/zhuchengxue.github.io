@@ -143,6 +143,13 @@ npm run config:services -- --giscus-repo owner/repo --giscus-repo-id xxx --giscu
 npm run config:services -- --umami-script https://analytics.example.com/script.js --umami-website-id xxx
 ```
 
+检查变量是否只填了一半：
+
+```bash
+npm run services:check
+npm run services:check -- --strict
+```
+
 评论使用 Giscus，需要配置：
 
 ```text

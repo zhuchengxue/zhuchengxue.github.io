@@ -14,6 +14,7 @@
     "import:wechat": "node scripts/import-wechat.mjs",
     "mirror": "node scripts/deploy-mirror.mjs",
     "config:services": "node scripts/configure-services.mjs",
+    "services:check": "node scripts/check-services.mjs",
     "status": "node scripts/status-report.mjs",
     "og:images": "node scripts/generate-og-images.mjs",
     "search:index": "node scripts/generate-search-index.mjs",

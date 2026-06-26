@@ -26,11 +26,18 @@ function state(ok, detail = '') {
 }
 
 function optional(name, names, note) {
-  const configured = names.every(env);
+  const count = names.filter(env).length;
+  const configured = count === names.length;
+  const partial = count > 0 && !configured;
   return {
     name,
     configured,
-    detail: configured ? '已配置' : `待外部配置：${names.join(', ')}${note ? `；${note}` : ''}`
+    partial,
+    detail: configured
+      ? '已配置'
+      : partial
+        ? `部分配置：${count}/${names.length}，请补齐 ${names.filter((name) => !env(name)).join(', ')}${note ? `；${note}` : ''}`
+        : `待外部配置：${names.join(', ')}${note ? `；${note}` : ''}`
   };
 }
 
@@ -118,7 +125,8 @@ printPhase('第四阶段：完善能力', phase4);
 
 console.log('\n外部配置状态：');
 for (const item of external) {
-  console.log(`  ${state(item.configured, `${item.name} — ${item.detail}`)}`);
+  const mark = item.configured ? '✅' : item.partial ? '⚠️' : '⬜';
+  console.log(`  ${mark} ${item.name} — ${item.detail}`);
 }
 
 if (online) {

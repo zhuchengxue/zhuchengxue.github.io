@@ -193,6 +193,13 @@ npm run config:services -- --umami-script https://analytics.example.com/script.j
 npm run config:services -- --mirror-repo https://gitee.com/用户名/仓库名.git --mirror-branch pages --mirror-domain mirror.example.com
 ```
 
+检查外部服务变量是否只填了一半：
+
+```bash
+npm run services:check
+npm run services:check -- --strict
+```
+
 更完整的日常操作清单见 [docs/OPERATIONS.md](docs/OPERATIONS.md)，四阶段验收状态见 [docs/ACCEPTANCE.md](docs/ACCEPTANCE.md)。
 
 ## 主要目录
