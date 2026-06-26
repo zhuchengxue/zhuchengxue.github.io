@@ -293,6 +293,7 @@ imports/wechat/
 
 ```bash
 npm run import:wechat -- --dry-run
+npm run import:wechat -- --dry-run --report
 ```
 
 确认无误后导入：
@@ -307,6 +308,7 @@ npm run import:wechat
 - 标签为 `旧公众号`
 - 文件名优先使用源文件中的日期，例如 `2020-03-29-文章标题.html`
 - HTML 会尽量转换为 Markdown，图片链接会先保留原地址
+- 正式导入或加 `--report` 时，会生成 `exports/wechat-import-report.json`，记录导入、跳过和疑似重复项
 
 导入后建议逐篇检查标题、摘要、标签、图片和排版，再用正常发布流程上线。
 

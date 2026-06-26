@@ -85,6 +85,7 @@ mustInclude('scripts/generate-wechat-all.mjs', 'index.json', '公众号批量导
 mustInclude('scripts/create-wechat-draft.mjs', 'draft/add', '公众号草稿 API');
 mustInclude('scripts/create-wechat-draft.mjs', 'WECHAT_APP_SECRET', '公众号凭据环境变量');
 mustInclude('scripts/import-wechat.mjs', 'draft: true', '旧公众号导入为草稿');
+mustInclude('scripts/import-wechat.mjs', 'wechat-import-report.json', '旧公众号导入报告');
 mustInclude('scripts/deploy-mirror.mjs', 'MIRROR_REPO', '国内访问镜像发布');
 mustInclude('scripts/configure-services.mjs', 'GitHub Actions Variables', '外部服务配置助手');
 mustInclude('scripts/check-services.mjs', '半配置状态', '外部服务配置检查');

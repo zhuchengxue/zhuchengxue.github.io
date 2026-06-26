@@ -1,11 +1,15 @@
 import { existsSync, mkdirSync, readdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { basename, extname, join, resolve } from 'node:path';
+import matter from 'gray-matter';
 
 const args = process.argv.slice(2);
 const dryRun = args.includes('--dry-run');
-const inputArg = args.find((arg) => arg !== '--dry-run') ?? 'imports/wechat';
+const writeReport = args.includes('--report');
+const inputArg = args.find((arg) => !arg.startsWith('--')) ?? 'imports/wechat';
 const inputPath = resolve(inputArg);
 const postsDirectory = resolve('src/content/posts');
+const reportDirectory = resolve('exports');
+const reportPath = resolve(reportDirectory, 'wechat-import-report.json');
 const supportedExtensions = new Set(['.html', '.htm', '.txt', '.md']);
 
 if (!existsSync(inputPath)) {
@@ -80,6 +84,27 @@ function dateFromFilename(name) {
   return name.match(/\d{4}-\d{2}-\d{2}/)?.[0] ?? new Date().toISOString().slice(0, 10);
 }
 
+function normalizeTitle(title) {
+  return String(title || '').trim().replace(/\s+/g, ' ').toLowerCase();
+}
+
+function readExistingPosts() {
+  if (!existsSync(postsDirectory)) return { files: new Set(), titles: new Set() };
+
+  const files = new Set();
+  const titles = new Set();
+  for (const file of readdirSync(postsDirectory).filter((name) => name.endsWith('.md'))) {
+    files.add(file);
+    try {
+      const parsed = matter(readFileSync(join(postsDirectory, file), 'utf8'));
+      titles.add(normalizeTitle(parsed.data.title || basename(file, '.md')));
+    } catch {
+      titles.add(normalizeTitle(basename(file, '.md')));
+    }
+  }
+  return { files, titles };
+}
+
 const files = readdirSync(inputPath)
   .filter((file) => supportedExtensions.has(extname(file).toLowerCase()))
   .sort((a, b) => a.localeCompare(b, 'zh-CN'));
@@ -91,33 +116,74 @@ if (!files.length) {
 
 mkdirSync(postsDirectory, { recursive: true });
 
-let imported = 0;
+const existing = readExistingPosts();
+const plannedTargets = new Set();
+const report = [];
+
 for (const file of files) {
   const sourcePath = join(inputPath, file);
   const extension = extname(file).toLowerCase();
   const raw = readFileSync(sourcePath, 'utf8');
   const sourceBase = basename(file, extension);
   const pubDate = dateFromFilename(sourceBase);
-  const title = extension === '.md' ? sourceBase.replace(/^\d{4}-\d{2}-\d{2}-?/, '') : extractTitle(raw, sourceBase);
+  const title = extension === '.md'
+    ? sourceBase.replace(/^\d{4}-\d{2}-\d{2}-?/, '')
+    : extractTitle(raw, sourceBase);
   const markdown = extension === '.html' || extension === '.htm' ? htmlToMarkdown(raw) : raw.trim();
   const slug = slugify(sourceBase.replace(/^\d{4}-\d{2}-\d{2}-?/, '') || title);
   const targetName = `${pubDate}-${slug}.md`;
   const targetPath = join(postsDirectory, targetName);
+  const normalizedTitle = normalizeTitle(title);
+  const reasons = [];
 
-  if (existsSync(targetPath)) {
-    console.log(`跳过已存在：${targetName}`);
-    continue;
-  }
+  if (existing.files.has(targetName) || existsSync(targetPath)) reasons.push('target-exists');
+  if (plannedTargets.has(targetName)) reasons.push('duplicate-target-in-batch');
+  if (existing.titles.has(normalizedTitle)) reasons.push('title-looks-duplicate');
+  if (!markdown) reasons.push('empty-content');
 
-  const output = `---\ntitle: ${JSON.stringify(title)}\ndescription: 待补充\npubDate: ${pubDate}\ntags:\n  - 旧公众号\ndraft: true\nwechatUrl:\ncover:\n---\n\n${markdown}\n`;
+  const status = reasons.includes('target-exists') || reasons.includes('duplicate-target-in-batch')
+    ? 'skip'
+    : reasons.length
+      ? 'warn'
+      : 'import';
 
-  imported++;
-  if (dryRun) {
-    console.log(`将导入：${file} -> ${targetName}`);
-  } else {
-    writeFileSync(targetPath, output, 'utf8');
-    console.log(`已导入：${targetName}`);
+  plannedTargets.add(targetName);
+  report.push({
+    source: file,
+    target: targetName,
+    title,
+    pubDate,
+    status,
+    reasons,
+    contentLength: markdown.length
+  });
+
+  if (status === 'import' || status === 'warn') {
+    const output = `---\ntitle: ${JSON.stringify(title)}\ndescription: 待补充\npubDate: ${pubDate}\ntags:\n  - 旧公众号\ndraft: true\nwechatUrl:\ncover:\n---\n\n${markdown}\n`;
+
+    if (!dryRun) {
+      writeFileSync(targetPath, output, 'utf8');
+      existing.files.add(targetName);
+      existing.titles.add(normalizedTitle);
+    }
   }
 }
 
-console.log(`${dryRun ? '预检' : '导入'}完成：${imported} 篇。`);
+const counts = report.reduce((accumulator, item) => {
+  accumulator[item.status] = (accumulator[item.status] || 0) + 1;
+  return accumulator;
+}, {});
+
+for (const item of report) {
+  const marker = item.status === 'import' ? '将导入' : item.status === 'warn' ? '将导入（需复查）' : '跳过';
+  const reasonText = item.reasons.length ? `；原因：${item.reasons.join(', ')}` : '';
+  console.log(`${marker}：${item.source} -> ${item.target}${reasonText}`);
+}
+
+if (!dryRun || writeReport) {
+  mkdirSync(reportDirectory, { recursive: true });
+  writeFileSync(reportPath, `${JSON.stringify({ dryRun, input: inputPath, counts, items: report }, null, 2)}\n`, 'utf8');
+  console.log(`导入报告：${reportPath}`);
+}
+
+console.log(`${dryRun ? '预检' : '导入'}完成：${counts.import || 0} 篇可直接导入，${counts.warn || 0} 篇需复查，${counts.skip || 0} 篇跳过。`);

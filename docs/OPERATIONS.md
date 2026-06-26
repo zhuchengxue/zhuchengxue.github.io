@@ -105,6 +105,7 @@ imports/wechat/
 
 ```bash
 npm run import:wechat -- --dry-run
+npm run import:wechat -- --dry-run --report
 ```
 
 导入草稿：
@@ -113,7 +114,7 @@ npm run import:wechat -- --dry-run
 npm run import:wechat
 ```
 
-导入后逐篇检查标题、摘要、图片、标签，再按正常博客流程发布。
+导入脚本会识别目标文件是否已存在、标题是否疑似重复。正式导入或加 `--report` 时，会生成 `exports/wechat-import-report.json`。导入后逐篇检查标题、摘要、图片、标签，再按正常博客流程发布。
 
 ## 5. 绑定独立域名
 
