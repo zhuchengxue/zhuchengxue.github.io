@@ -35,6 +35,25 @@ npm run dev
 
 浏览器打开 <http://localhost:4321>。
 
+## 不用命令行：写作控制台
+
+日常推荐直接双击仓库根目录的：
+
+- Windows：`打开写作助手.cmd`
+- macOS：`打开写作助手.command`
+
+浏览器会打开仅运行在本机的“学语思写作控制台”。可以直接点击：
+
+- 新建文章并打开 Obsidian
+- 检查文章
+- 预发布
+- 正式发布到博客
+- 生成公众号版本
+- 批量导入旧文章
+- 系统体检与换电脑盘点
+
+控制台只有打开时才运行，不需要云服务器。正式发布和批量导入都会再次确认。
+
 用 Obsidian 的“打开本地仓库”功能选择本仓库根目录。仓库内已包含推荐配置：
 
 - 新笔记目录：`src/content/posts`
@@ -45,6 +64,8 @@ npm run dev
 个人工作区布局文件不会提交到 Git。
 
 ## 新建文章
+
+优先在写作控制台点击“新建并打开 Obsidian”。下面的命令只作为故障排查或高级用法保留。
 
 推荐使用命令创建，文件名和图片目录会自动符合规范：
 
@@ -270,27 +291,26 @@ npm run wechat -- "文章路径" --dry-run
 
 ## 自动创建公众号草稿
 
-如果公众号具备草稿箱接口权限，可以把上一步生成的 JSON 直接提交到微信草稿箱。先准备：
+如果公众号具备草稿箱接口权限，可以直接提交到微信草稿箱。最简单的方式是双击“打开写作助手”，在“公众号连接”里填写一次：
 
 - `WECHAT_APP_ID`
 - `WECHAT_APP_SECRET`
-- `WECHAT_THUMB_MEDIA_ID`
 
-其中 `WECHAT_THUMB_MEDIA_ID` 必须是已经上传到公众号素材库的封面图素材 ID。仓库不会保存这些凭据。
+配置只写入本机被 Git 忽略的 `.env`。选中文章并点击“推送到公众号草稿箱”后，系统会自动上传正文图片、上传文章封面（没有则使用 `public/og-default.png`），再创建草稿；不会自动群发。每台新电脑只需配置一次，且该电脑的公网 IP 需要在公众号后台白名单内。
 
-先预检：
-
-```bash
-WECHAT_THUMB_MEDIA_ID=你的封面素材ID npm run wechat:draft -- "exports/wechat/YYYY-MM-DD-article-slug.json" --dry-run
-```
-
-确认字段无误后创建草稿：
+命令行只是可选的诊断入口：
 
 ```bash
-WECHAT_APP_ID=你的AppID WECHAT_APP_SECRET=你的AppSecret WECHAT_THUMB_MEDIA_ID=你的封面素材ID npm run wechat:draft -- "exports/wechat/YYYY-MM-DD-article-slug.json"
+npm run wechat:push -- "src/content/posts/YYYY-MM-DD-article-slug.md" --dry-run
 ```
 
-正文图片默认使用博客绝对 URL。多数情况下可先进入公众号后台人工预览；如果微信编辑器不显示外链图片，后续再走微信图片上传接口替换正文图片地址。
+确认后创建草稿：
+
+```bash
+npm run wechat:push -- "src/content/posts/YYYY-MM-DD-article-slug.md"
+```
+
+草稿成功后，请进入公众号后台预览并人工群发。这样保留最后一道检查，也避免程序误发。
 
 ## 旧公众号文章批量迁移
 

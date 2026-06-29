@@ -65,6 +65,8 @@ npm run doctor -- --allow-dirty
 
 最后在 Obsidian 中选择“打开本地仓库”，打开这个 Git 仓库根目录。
 
+如果不想使用命令行，可以用 GitHub Desktop 克隆仓库，随后双击 `打开写作助手.cmd`，在控制台点击“安装/修复依赖”。
+
 ## 新 Mac
 
 安装 Git、Node.js 24 和 Obsidian，然后在 Terminal 执行：
@@ -77,6 +79,8 @@ npm run doctor
 ```
 
 再恢复迁移包并用 Obsidian 打开仓库根目录。所有日常 `npm run ...` 命令在 Windows 和 macOS 相同。
+
+不想使用命令行时，可以用 GitHub Desktop 克隆，然后双击 `打开写作助手.command`，在控制台安装依赖并完成后续操作。
 
 旧电脑设置的 `127.0.0.1:10023` 是全局 Git 代理，不会随仓库迁移。只有新电脑也运行同一个本地代理并使用同一端口时才重新设置，否则不要照搬。
 

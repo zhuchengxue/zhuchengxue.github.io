@@ -81,7 +81,8 @@ const phase2 = [
   ['统一文章模板', exists('templates/article.md')],
   ['统一图片目录', exists('public/images/inbox/.gitkeep') && exists('scripts/prepare-post.mjs')],
   ['发布前体检脚本', Boolean(scripts.ready) && exists('scripts/check-post-ready.mjs')],
-  ['一键发布脚本', Boolean(scripts.publish) && exists('scripts/publish-post.mjs')]
+  ['一键发布脚本', Boolean(scripts.publish) && exists('scripts/publish-post.mjs')],
+  ['无命令行写作控制台', Boolean(scripts.dashboard) && exists('scripts/writing-dashboard.mjs') && exists('打开写作助手.cmd') && exists('打开写作助手.command')]
 ];
 
 const wechatScript = exists('scripts/generate-wechat.mjs') ? read('scripts/generate-wechat.mjs') : '';
@@ -90,7 +91,7 @@ const phase3 = [
   ['公众号批量导出', Boolean(scripts['wechat:all']) && exists('scripts/generate-wechat-all.mjs')],
   ['图片路径转线上绝对地址', wechatScript.includes('SITE_ORIGIN') && wechatScript.includes('publicUrl')],
   ['保留博客原文链接', wechatScript.includes('content_source_url')],
-  ['可选草稿 API', Boolean(scripts['wechat:draft']) && exists('scripts/create-wechat-draft.mjs')]
+  ['可选草稿 API（含正文图片与封面）', Boolean(scripts['wechat:push']) && exists('scripts/create-wechat-draft.mjs')]
 ];
 
 const configText = exists('src/config.ts') ? read('src/config.ts') : '';
@@ -108,7 +109,7 @@ const external = [
   optional('独立域名', ['SITE_URL', 'CUSTOM_DOMAIN'], '未配置时默认使用 GitHub Pages 域名'),
   optional('Giscus 评论', ['PUBLIC_GISCUS_REPO', 'PUBLIC_GISCUS_REPO_ID', 'PUBLIC_GISCUS_CATEGORY', 'PUBLIC_GISCUS_CATEGORY_ID'], '保持未配置可继续零第三方脚本'),
   optional('Umami 统计', ['PUBLIC_UMAMI_SCRIPT', 'PUBLIC_UMAMI_WEBSITE_ID'], '保持未配置可继续零第三方脚本'),
-  optional('公众号草稿 API', ['WECHAT_APP_ID', 'WECHAT_APP_SECRET', 'WECHAT_THUMB_MEDIA_ID'], '没有接口权限时继续手动复制 HTML'),
+  optional('公众号草稿 API', ['WECHAT_APP_ID', 'WECHAT_APP_SECRET'], '没有接口权限时继续手动复制 HTML'),
   optional('国内镜像', ['MIRROR_REPO', 'MIRROR_BRANCH'], '最低成本策略是需要时手动同步')
 ];
 
@@ -164,5 +165,5 @@ if (online) {
 
 console.log('\n建议下一步：');
 console.log('  1. 日常写作：npm run new → Obsidian 编辑 → npm run ready → npm run publish');
-console.log('  2. 发公众号：博客上线后运行 npm run wechat 或 npm run wechat:all，再复制 HTML 到公众号后台');
+console.log('  2. 发公众号：双击打开写作助手，选文章后推送到公众号草稿箱，再到后台预览群发');
 console.log('  3. 需要外部服务时运行 npm run config:services 生成配置清单');

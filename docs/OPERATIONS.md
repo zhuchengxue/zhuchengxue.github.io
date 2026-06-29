@@ -4,6 +4,12 @@
 
 换 Windows 或 Mac、恢复未发布草稿以及补齐积压文章，请看 [MIGRATION.md](MIGRATION.md)。
 
+## 日常推荐：不用命令行
+
+Windows 双击 `打开写作助手.cmd`，Mac 双击 `打开写作助手.command`。浏览器控制台包含新建、检查、预发布、正式发布、公众号导出、批量导入、体检和迁移盘点按钮。
+
+以下命令行内容主要保留给故障排查和自动化使用。
+
 ## 0. 一键体检
 
 日常先跑：
@@ -86,16 +92,18 @@ exports/wechat/YYYY-MM-DD-article-slug.json
 exports/wechat/index.json
 ```
 
-常规做法：打开 HTML，把正文复制到公众号编辑器。
+推荐做法：双击“打开写作助手”，首次在“公众号连接”填写 AppID 和 AppSecret；之后选文章，点击“推送到公众号草稿箱”。程序会自动上传正文图片、封面和草稿，不会自动群发。
 
-如果有公众号草稿箱接口权限：
+每台电脑的凭据分别保存在本机 `.env`，不进 GitHub/Dropbox。换网络后若接口提示 IP 错误，需要把当前公网 IP 加入公众号后台白名单。
+
+命令行等价入口：
 
 ```bash
-WECHAT_THUMB_MEDIA_ID=封面素材ID npm run wechat:draft -- "exports/wechat/YYYY-MM-DD-article-slug.json" --dry-run
-WECHAT_APP_ID=你的AppID WECHAT_APP_SECRET=你的AppSecret WECHAT_THUMB_MEDIA_ID=封面素材ID npm run wechat:draft -- "exports/wechat/YYYY-MM-DD-article-slug.json"
+npm run wechat:push -- "src/content/posts/YYYY-MM-DD-article-slug.md" --dry-run
+npm run wechat:push -- "src/content/posts/YYYY-MM-DD-article-slug.md"
 ```
 
-注意：AppSecret 不要写入仓库。
+草稿进入后台后，人工预览并群发。没有接口权限时仍可打开生成的 HTML 复制到编辑器。
 
 ## 4. 批量迁移旧公众号文章
 

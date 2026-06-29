@@ -44,7 +44,7 @@ async function fetchText(path, { timeout = 15000, attempts = 2 } = {}) {
 }
 
 const packageJson = readJSON('package.json');
-for (const script of ['dev', 'new', 'prepare', 'ready', 'publish', 'handoff', 'wechat', 'wechat:all', 'wechat:draft', 'import:wechat', 'test:wechat-import', 'test:publish-worktree', 'mirror', 'config:services', 'services:check', 'status', 'og:images', 'build', 'build:ci', 'audit', 'doctor']) {
+for (const script of ['dev', 'dashboard', 'new', 'prepare', 'ready', 'publish', 'handoff', 'wechat', 'wechat:all', 'wechat:draft', 'wechat:push', 'import:wechat', 'test:wechat-import', 'test:wechat-draft', 'test:publish-worktree', 'test:dashboard', 'mirror', 'config:services', 'services:check', 'status', 'og:images', 'build', 'build:ci', 'audit', 'doctor']) {
   check(`npm script: ${script}`, Boolean(packageJson.scripts?.[script]));
 }
 
@@ -68,10 +68,18 @@ for (const path of [
   'scripts/generate-wechat.mjs',
   'scripts/generate-wechat-all.mjs',
   'scripts/check-post-ready.mjs',
+  'scripts/writing-dashboard.mjs',
+  'scripts/test-writing-dashboard.mjs',
+  '打开写作助手.cmd',
+  'open-writing-dashboard.cmd',
+  '打开写作助手.command',
   'scripts/handoff.mjs',
   'scripts/lib/publish-worktree.mjs',
   'scripts/test-publish-worktree.mjs',
   'scripts/create-wechat-draft.mjs',
+  'scripts/push-wechat.mjs',
+  'scripts/test-wechat-draft.mjs',
+  'scripts/lib/local-env.mjs',
   'scripts/import-wechat.mjs',
   'scripts/lib/wechat-import.mjs',
   'scripts/test-wechat-import.mjs',

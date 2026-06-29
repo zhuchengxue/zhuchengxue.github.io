@@ -19,9 +19,9 @@ const groups = [
   },
   {
     name: '微信公众号草稿 API',
-    variables: ['WECHAT_APP_ID', 'WECHAT_APP_SECRET', 'WECHAT_THUMB_MEDIA_ID'],
+    variables: ['WECHAT_APP_ID', 'WECHAT_APP_SECRET'],
     optional: true,
-    note: '只在本地创建微信草稿时需要；不要写入仓库。'
+    note: '只在本地创建微信草稿时需要；封面可自动上传，不要把凭据写入仓库。'
   },
   {
     name: '国内或备用镜像',

@@ -28,15 +28,16 @@
 | 统一文章模板 | 已完成 | `templates/article.md` |
 | 统一图片目录和文件命名 | 已完成 | `scripts/prepare-post.mjs`、`public/images/inbox/.gitkeep` |
 | 添加一键发布脚本 | 已完成 | `scripts/publish-post.mjs`、`npm run publish` |
+| 无命令行写作控制台 | 已完成 | `scripts/writing-dashboard.mjs`、Windows/macOS 双击启动入口、`npm run test:dashboard` |
 
 ## 第三阶段：公众号分发
 
 | 要求 | 状态 | 证据 |
 | --- | --- | --- |
 | 生成适合公众号的 HTML | 已完成 | `scripts/generate-wechat.mjs`、`npm run wechat` |
-| 自动处理图片路径 | 已完成 | `scripts/generate-wechat.mjs` 将本地图片转为博客绝对 URL |
+| 自动处理正文图片和封面 | 已完成 | `scripts/create-wechat-draft.mjs` 上传正文图片并替换 URL，自动上传文章封面或默认封面 |
 | 保留博客原文链接 | 已完成 | `content_source_url`、文末原文地址 |
-| 视接口权限自动创建草稿 | 可选启用 | `scripts/create-wechat-draft.mjs`、`npm run wechat:draft`；需要 `WECHAT_APP_ID`、`WECHAT_APP_SECRET`、`WECHAT_THUMB_MEDIA_ID` |
+| 视接口权限自动创建草稿 | 可选启用 | 写作控制台“推送到公众号草稿箱”、`npm run wechat:push`；需要 `WECHAT_APP_ID`、`WECHAT_APP_SECRET` 和 IP 白名单 |
 
 ## 第四阶段：完善
 
