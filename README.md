@@ -142,6 +142,8 @@ npm run publish -- "src/content/posts/YYYY-MM-DD-article-slug.md"
 npm run publish -- "文章路径" --dry-run
 ```
 
+该命令会检查图片整理计划，并复用 `npm run ready` 的标题、摘要、日期、标签、正文、图片和公众号转换体检；不会改文件、提交或推送。
+
 ## 手动检查
 
 ```bash

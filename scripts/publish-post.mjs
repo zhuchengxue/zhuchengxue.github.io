@@ -63,8 +63,13 @@ if (unrelated.length) {
 }
 
 run('node', ['scripts/prepare-post.mjs', articlePath, ...(dryRun ? ['--dry-run'] : [])]);
+const readySucceeded = run('node', ['scripts/check-post-ready.mjs', articlePath], { allowFailure: true });
+if (!readySucceeded) {
+  console.error('发布前体检失败；请按上方提示修正文章后重试。');
+  process.exit(1);
+}
 if (dryRun) {
-  console.log('预检通过；未修改文件、未提交、未推送。');
+  console.log('完整预检通过；未修改文件、未提交、未推送。');
   process.exit(0);
 }
 

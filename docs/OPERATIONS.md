@@ -44,6 +44,8 @@ npm run ready -- "src/content/posts/YYYY-MM-DD-article-slug.md"
 npm run publish -- "src/content/posts/YYYY-MM-DD-article-slug.md" --dry-run
 ```
 
+dry-run 会检查图片整理计划并执行完整文章体检，不会修改文件、提交或推送。
+
 正式发布：
 
 ```bash

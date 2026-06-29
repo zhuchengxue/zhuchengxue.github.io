@@ -22,6 +22,19 @@ function mustInclude(path, pattern, label) {
   }
 }
 
+function mustNotInclude(path, pattern, label) {
+  const fullPath = resolve(path);
+  if (!existsSync(fullPath)) {
+    failures.push(`${label}: 缺少 ${path}`);
+    return;
+  }
+
+  const text = readFileSync(fullPath, 'utf8');
+  if (pattern instanceof RegExp ? pattern.test(text) : text.includes(pattern)) {
+    failures.push(`${label}: ${path} 不应包含 ${pattern}`);
+  }
+}
+
 const packageJson = JSON.parse(readFileSync(resolve('package.json'), 'utf8'));
 for (const script of ['new', 'prepare', 'ready', 'publish', 'wechat', 'wechat:all', 'wechat:draft', 'import:wechat', 'mirror', 'config:services', 'services:check', 'status', 'search:index', 'og:images', 'build', 'build:ci', 'audit', 'doctor']) {
   if (!packageJson.scripts?.[script]) failures.push(`package.json: 缺少 npm script ${script}`);
@@ -88,6 +101,8 @@ mustInclude('src/lib/posts.ts', 'getReadingStats', '统一阅读字数统计');
 mustInclude('src/config.ts', 'PUBLIC_GISCUS_REPO', '可选评论');
 mustInclude('src/config.ts', 'PUBLIC_UMAMI_SCRIPT', '可选统计');
 mustInclude('scripts/check-post-ready.mjs', '公众号 HTML 转换预检通过', '文章发布前体检');
+mustInclude('scripts/publish-post.mjs', 'scripts/check-post-ready.mjs', '一键发布复用完整体检');
+mustNotInclude('.github/workflows/deploy.yml', 'continue-on-error: true', 'GitHub Pages 类型检查必须阻止错误部署');
 mustInclude('.github/workflows/deploy.yml', 'CUSTOM_DOMAIN', '独立域名 CNAME');
 mustInclude('.github/workflows/deploy.yml', 'SITE_URL', '独立域名 URL');
 mustInclude('scripts/generate-wechat.mjs', 'content_source_url', '公众号原文链接');
