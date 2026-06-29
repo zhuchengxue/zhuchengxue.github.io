@@ -116,7 +116,7 @@ npm run import:wechat -- --dry-run --report
 npm run import:wechat
 ```
 
-导入脚本会识别目标文件是否已存在、标题是否疑似重复。正式导入或加 `--report` 时，会生成 `exports/wechat-import-report.json`。导入后逐篇检查标题、摘要、图片、标签，再按正常博客流程发布。
+导入脚本会识别目标文件是否已存在、标题是否疑似重复，并处理微信常见的 `#js_content` 正文容器、`data-src` 懒加载图片以及页面中的标题、日期、摘要和原文地址。正式导入或加 `--report` 时，会生成 `exports/wechat-import-report.json`。导入后逐篇检查标题、摘要、图片、标签，再按正常博客流程发布。
 
 ## 5. 绑定独立域名
 

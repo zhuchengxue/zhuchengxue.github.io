@@ -13,6 +13,7 @@
     "wechat:all": "node scripts/generate-wechat-all.mjs",
     "wechat:draft": "node scripts/create-wechat-draft.mjs",
     "import:wechat": "node scripts/import-wechat.mjs",
+    "test:wechat-import": "node scripts/test-wechat-import.mjs",
     "mirror": "node scripts/deploy-mirror.mjs",
     "config:services": "node scripts/configure-services.mjs",
     "services:check": "node scripts/check-services.mjs",
@@ -23,8 +24,8 @@
     "check:build": "node scripts/check-built-site.mjs",
     "audit": "node scripts/audit-goal.mjs",
     "doctor": "node scripts/doctor.mjs",
-    "build:ci": "npm run check:content && npm run search:index && npm run og:images && node scripts/run-astro.mjs build && npm run check:build && npm run audit",
-    "build": "npm run check:content && npm run search:index && npm run og:images && node scripts/run-astro.mjs check && node scripts/run-astro.mjs build && npm run check:build && npm run audit",
+    "build:ci": "npm run check:content && npm run test:wechat-import && npm run search:index && npm run og:images && node scripts/run-astro.mjs build && npm run check:build && npm run audit",
+    "build": "npm run check:content && npm run test:wechat-import && npm run search:index && npm run og:images && node scripts/run-astro.mjs check && node scripts/run-astro.mjs build && npm run check:build && npm run audit",
     "preview": "node scripts/run-astro.mjs preview",
     "astro": "node scripts/run-astro.mjs"
   },

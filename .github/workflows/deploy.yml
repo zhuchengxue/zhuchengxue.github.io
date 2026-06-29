@@ -43,6 +43,8 @@ jobs:
         run: npx astro check
       - name: Check content
         run: npm run check:content
+      - name: Test WeChat importer
+        run: npm run test:wechat-import
       - name: Generate search index
         run: npm run search:index
       - name: Generate OG images

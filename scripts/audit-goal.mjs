@@ -36,7 +36,7 @@ function mustNotInclude(path, pattern, label) {
 }
 
 const packageJson = JSON.parse(readFileSync(resolve('package.json'), 'utf8'));
-for (const script of ['new', 'prepare', 'ready', 'publish', 'wechat', 'wechat:all', 'wechat:draft', 'import:wechat', 'mirror', 'config:services', 'services:check', 'status', 'search:index', 'og:images', 'build', 'build:ci', 'audit', 'doctor']) {
+for (const script of ['new', 'prepare', 'ready', 'publish', 'wechat', 'wechat:all', 'wechat:draft', 'import:wechat', 'test:wechat-import', 'mirror', 'config:services', 'services:check', 'status', 'search:index', 'og:images', 'build', 'build:ci', 'audit', 'doctor']) {
   if (!packageJson.scripts?.[script]) failures.push(`package.json: 缺少 npm script ${script}`);
 }
 
@@ -69,6 +69,8 @@ for (const [path, label] of [
   ['scripts/generate-wechat-all.mjs', '公众号批量分发脚本'],
   ['scripts/create-wechat-draft.mjs', '公众号草稿脚本'],
   ['scripts/import-wechat.mjs', '旧公众号导入脚本'],
+  ['scripts/lib/wechat-import.mjs', '旧公众号转换模块'],
+  ['scripts/test-wechat-import.mjs', '旧公众号转换测试'],
   ['scripts/deploy-mirror.mjs', '镜像发布脚本'],
   ['scripts/configure-services.mjs', '外部服务配置助手'],
   ['scripts/check-services.mjs', '外部服务配置检查'],
@@ -112,6 +114,9 @@ mustInclude('scripts/create-wechat-draft.mjs', 'draft/add', '公众号草稿 API
 mustInclude('scripts/create-wechat-draft.mjs', 'WECHAT_APP_SECRET', '公众号凭据环境变量');
 mustInclude('scripts/import-wechat.mjs', 'draft: true', '旧公众号导入为草稿');
 mustInclude('scripts/import-wechat.mjs', 'wechat-import-report.json', '旧公众号导入报告');
+mustInclude('scripts/lib/wechat-import.mjs', "getAttribute(tag, 'data-src')", '旧公众号懒加载图片迁移');
+mustInclude('scripts/test-wechat-import.mjs', '页脚不应进入正文', '旧公众号正文范围测试');
+mustInclude('.github/workflows/deploy.yml', 'npm run test:wechat-import', '旧公众号迁移 CI 测试');
 mustInclude('scripts/deploy-mirror.mjs', 'MIRROR_REPO', '国内访问镜像发布');
 mustInclude('scripts/deploy-mirror.mjs', 'feed.json', '国内访问镜像 JSON Feed 完整性');
 mustInclude('scripts/deploy-mirror.mjs', 'opensearch.xml', '国内访问镜像 OpenSearch 完整性');
