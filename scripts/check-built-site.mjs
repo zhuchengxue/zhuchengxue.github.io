@@ -1,5 +1,6 @@
 import { existsSync, readFileSync, readdirSync, statSync } from 'node:fs';
 import { join, resolve } from 'node:path';
+import sharp from 'sharp';
 
 const legacyPosts = JSON.parse(readFileSync(resolve('src/content/legacy-posts.json'), 'utf8'));
 const failures = [];
@@ -128,19 +129,35 @@ if (!existsSync(jsonFeed)) {
   }
 }
 
-const welcomeOg = resolve('dist/og/posts/2026-06-24-welcome/index.svg');
-if (!existsSync(welcomeOg) || !readFileSync(welcomeOg, 'utf8').includes('博客开始营业')) {
-  failures.push('/og/posts/2026-06-24-welcome/index.svg: 新文章分享图未生成');
+const welcomeOg = resolve('dist/og/posts/2026-06-24-welcome/index.png');
+if (!existsSync(welcomeOg)) {
+  failures.push('/og/posts/2026-06-24-welcome/index.png: 新文章分享图未生成');
+} else {
+  const metadata = await sharp(welcomeOg).metadata();
+  if (metadata.format !== 'png' || metadata.width !== 1200 || metadata.height !== 630) {
+    failures.push('/og/posts/2026-06-24-welcome/index.png: 分享图不是 1200×630 PNG');
+  }
 }
 
-const firstLegacyOg = resolve('dist', 'og', legacyPosts[0].href.slice(1), 'index.svg');
-if (!existsSync(firstLegacyOg) || !readFileSync(firstLegacyOg, 'utf8').includes(legacyPosts[0].title)) {
+const firstLegacyOg = resolve('dist', 'og', legacyPosts[0].href.slice(1), 'index.png');
+if (!existsSync(firstLegacyOg)) {
   failures.push(`${legacyPosts[0].href}: 旧文章分享图未生成`);
 }
 
+const articleOgImages = walk(resolve('dist/og')).filter((path) => path.endsWith('index.png'));
+if (articleOgImages.length !== 71) {
+  failures.push(`/og/: 文章级 PNG 分享图数量不正确，当前 ${articleOgImages.length} 张`);
+}
+
 const welcomePage = resolve('dist/posts/2026-06-24-welcome/index.html');
-if (!readFileSync(welcomePage, 'utf8').includes('/og/posts/2026-06-24-welcome/index.svg')) {
+if (!readFileSync(welcomePage, 'utf8').includes('/og/posts/2026-06-24-welcome/index.png')) {
   failures.push('/posts/2026-06-24-welcome/: 未引用文章级 Open Graph 分享图');
+}
+if (!readFileSync(welcomePage, 'utf8').includes('property="og:image:alt" content="博客开始营业"')) {
+  failures.push('/posts/2026-06-24-welcome/: 分享图替代文本未使用文章标题');
+}
+if (!readFileSync(welcomePage, 'utf8').includes('property="og:image:type" content="image/png"')) {
+  failures.push('/posts/2026-06-24-welcome/: 分享图未声明 image/png 类型');
 }
 if (!/[\d,]+ 字 · 约 \d+ 分钟/.test(readFileSync(welcomePage, 'utf8'))) {
   failures.push('/posts/2026-06-24-welcome/: 未展示统一阅读字数和预计阅读时间');

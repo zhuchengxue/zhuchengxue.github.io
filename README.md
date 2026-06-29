@@ -18,12 +18,13 @@
 - 71 篇新旧文章统一 Astro 风格
 - 静态全文搜索、OpenSearch 站内搜索发现、上一篇/下一篇导航
 - RSS、Atom、JSON Feed 和 sitemap
-- 自动生成文章级 Open Graph 分享图、文章结构化数据、`llms.txt` 与 `humans.txt`
+- 自动生成 1200×630 压缩 PNG 文章级 Open Graph 分享图、文章结构化数据、`llms.txt` 与 `humans.txt`
 - 完整文章元数据与 Web App Manifest
 - GitHub Pages 自动构建与发布
 - Obsidian Vault、图片整理和一键发布脚本
 - 公众号 HTML/JSON 分发和旧公众号文章批量导入草稿
 - 独立域名、评论、统计、镜像的配置清单生成助手
+- Windows / macOS 换电脑盘点与私密迁移包
 
 ## 首次使用
 
@@ -203,6 +204,14 @@ npm run services:check -- --strict
 ```
 
 更完整的日常操作清单见 [docs/OPERATIONS.md](docs/OPERATIONS.md)，四阶段验收状态见 [docs/ACCEPTANCE.md](docs/ACCEPTANCE.md)。
+
+换工作电脑前先运行：
+
+```bash
+npm run handoff
+```
+
+它会区分哪些内容能随 Git 恢复，哪些未发布文章、导入源文件、图片或密钥需要私密复制。完整步骤见 [docs/MIGRATION.md](docs/MIGRATION.md)。
 
 ## 主要目录
 

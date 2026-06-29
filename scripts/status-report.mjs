@@ -48,7 +48,7 @@ async function fetchOK(path, expected, { timeout = 20000, attempts = 2 } = {}) {
       const response = await fetch(`${siteURL}${path}`, {
         signal: AbortSignal.timeout(timeout)
       });
-      const text = await response.text();
+      const text = expected ? await response.text() : '';
       return {
         ok: response.ok && (!expected || text.includes(expected)),
         detail: `${response.status} ${response.statusText}${attempt > 1 ? `，第 ${attempt} 次成功` : ''}`
@@ -148,8 +148,8 @@ if (online) {
     ['humans.txt', '/humans.txt', '/* TEAM */'],
     ['Sitemap', '/sitemap.xml', '<urlset'],
     ['搜索索引', '/search.json', 'Chrome'],
-    ['示例文章', '/posts/2026-06-24-welcome/', '/og/posts/2026-06-24-welcome/index.svg'],
-    ['示例文章分享图', '/og/posts/2026-06-24-welcome/index.svg', '<svg']
+    ['示例文章', '/posts/2026-06-24-welcome/', '/og/posts/2026-06-24-welcome/index.png'],
+    ['示例文章分享图', '/og/posts/2026-06-24-welcome/index.png', null]
   ];
 
   for (const [label, path, expected] of checks) {

@@ -36,7 +36,7 @@ function mustNotInclude(path, pattern, label) {
 }
 
 const packageJson = JSON.parse(readFileSync(resolve('package.json'), 'utf8'));
-for (const script of ['new', 'prepare', 'ready', 'publish', 'wechat', 'wechat:all', 'wechat:draft', 'import:wechat', 'test:wechat-import', 'mirror', 'config:services', 'services:check', 'status', 'search:index', 'og:images', 'build', 'build:ci', 'audit', 'doctor']) {
+for (const script of ['new', 'prepare', 'ready', 'publish', 'handoff', 'wechat', 'wechat:all', 'wechat:draft', 'import:wechat', 'test:wechat-import', 'test:publish-worktree', 'mirror', 'config:services', 'services:check', 'status', 'search:index', 'og:images', 'build', 'build:ci', 'audit', 'doctor']) {
   if (!packageJson.scripts?.[script]) failures.push(`package.json: 缺少 npm script ${script}`);
 }
 
@@ -65,6 +65,9 @@ for (const [path, label] of [
   ['scripts/prepare-post.mjs', '图片整理脚本'],
   ['scripts/check-post-ready.mjs', '文章发布前体检脚本'],
   ['scripts/publish-post.mjs', '一键发布脚本'],
+  ['scripts/handoff.mjs', '换电脑迁移脚本'],
+  ['scripts/lib/publish-worktree.mjs', '积压草稿隔离模块'],
+  ['scripts/test-publish-worktree.mjs', '积压草稿隔离测试'],
   ['scripts/generate-wechat.mjs', '公众号分发脚本'],
   ['scripts/generate-wechat-all.mjs', '公众号批量分发脚本'],
   ['scripts/create-wechat-draft.mjs', '公众号草稿脚本'],
@@ -80,6 +83,7 @@ for (const [path, label] of [
   ['scripts/generate-og-images.mjs', '文章级分享图脚本'],
   ['scripts/doctor.mjs', '站点诊断脚本'],
   ['docs/OPERATIONS.md', '博客运维手册'],
+  ['docs/MIGRATION.md', '换电脑迁移手册'],
   ['docs/ACCEPTANCE.md', '四阶段验收清单'],
   ['imports/wechat/.gitkeep', '旧公众号导入目录'],
   ['.env.example', '环境变量模板']
@@ -97,13 +101,18 @@ mustInclude('src/pages/humans.txt.ts', 'Built with Astro and GitHub Pages', '人
 mustInclude('scripts/generate-search-index.mjs', 'public/search.json', '静态全文搜索索引生成');
 mustInclude('src/layouts/BaseLayout.astro', 'application/ld+json', '结构化数据');
 mustInclude('src/layouts/BaseLayout.astro', 'og:image', 'Open Graph');
-mustInclude('src/layouts/PostLayout.astro', '/og${currentHref}index.svg', '文章级 Open Graph 分享图');
+mustInclude('src/layouts/PostLayout.astro', '/og${currentHref}index.png', '文章级 Open Graph PNG 分享图');
+mustInclude('src/layouts/BaseLayout.astro', 'og:image:type', 'Open Graph 分享图类型');
+mustInclude('src/layouts/BaseLayout.astro', 'socialImageAlt', 'Open Graph 分享图替代文本');
 mustInclude('src/layouts/PostLayout.astro', 'readingMinutes', '统一阅读时间');
 mustInclude('src/lib/posts.ts', 'getReadingStats', '统一阅读字数统计');
 mustInclude('src/config.ts', 'PUBLIC_GISCUS_REPO', '可选评论');
 mustInclude('src/config.ts', 'PUBLIC_UMAMI_SCRIPT', '可选统计');
 mustInclude('scripts/check-post-ready.mjs', '公众号 HTML 转换预检通过', '文章发布前体检');
 mustInclude('scripts/publish-post.mjs', 'scripts/check-post-ready.mjs', '一键发布复用完整体检');
+mustInclude('scripts/publish-post.mjs', 'isAllowedBacklogChange', '一键发布隔离积压草稿');
+mustInclude('scripts/handoff.mjs', '私密迁移包', '换电脑私密资料迁移');
+mustInclude('docs/MIGRATION.md', '新 Mac', '跨平台迁移说明');
 mustNotInclude('.github/workflows/deploy.yml', 'continue-on-error: true', 'GitHub Pages 类型检查必须阻止错误部署');
 mustInclude('.github/workflows/deploy.yml', 'CUSTOM_DOMAIN', '独立域名 CNAME');
 mustInclude('.github/workflows/deploy.yml', 'SITE_URL', '独立域名 URL');
@@ -117,6 +126,7 @@ mustInclude('scripts/import-wechat.mjs', 'wechat-import-report.json', '旧公众
 mustInclude('scripts/lib/wechat-import.mjs', "getAttribute(tag, 'data-src')", '旧公众号懒加载图片迁移');
 mustInclude('scripts/test-wechat-import.mjs', '页脚不应进入正文', '旧公众号正文范围测试');
 mustInclude('.github/workflows/deploy.yml', 'npm run test:wechat-import', '旧公众号迁移 CI 测试');
+mustInclude('.github/workflows/deploy.yml', 'npm run test:publish-worktree', '积压草稿隔离 CI 测试');
 mustInclude('scripts/deploy-mirror.mjs', 'MIRROR_REPO', '国内访问镜像发布');
 mustInclude('scripts/deploy-mirror.mjs', 'feed.json', '国内访问镜像 JSON Feed 完整性');
 mustInclude('scripts/deploy-mirror.mjs', 'opensearch.xml', '国内访问镜像 OpenSearch 完整性');
@@ -142,7 +152,7 @@ if (existsSync(resolve('dist/index.html'))) {
   mustInclude('dist/llms.txt', '## Articles (71)', 'llms.txt 产物');
   mustInclude('dist/humans.txt', 'Built with Astro and GitHub Pages', 'humans.txt 产物');
   mustInclude('dist/search.json', 'Chrome', '全文搜索索引产物');
-  mustInclude('dist/og/posts/2026-06-24-welcome/index.svg', '博客开始营业', '文章级分享图产物');
+  mustExist('dist/og/posts/2026-06-24-welcome/index.png', '文章级 PNG 分享图产物');
   mustInclude('dist/sitemap.xml', '<urlset', '站点地图产物');
   mustInclude('dist/site.webmanifest', '"name"', 'Manifest 产物');
 

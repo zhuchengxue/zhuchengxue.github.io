@@ -2,9 +2,40 @@ import { existsSync, mkdirSync, readdirSync, readFileSync, rmSync, writeFileSync
 import { dirname, join, resolve } from 'node:path';
 import matter from 'gray-matter';
 
+const fontCacheDirectory = resolve('.astro/fontconfig-cache');
+mkdirSync(fontCacheDirectory, { recursive: true });
+const fontHomeDirectory = resolve('.astro/font-home');
+const fontLocalAppData = resolve(fontHomeDirectory, 'AppData/Local');
+mkdirSync(resolve(fontHomeDirectory, '.cache/fontconfig'), { recursive: true });
+mkdirSync(resolve(fontLocalAppData, 'fontconfig/cache'), { recursive: true });
+process.env.HOME = fontHomeDirectory;
+process.env.USERPROFILE = fontHomeDirectory;
+process.env.LOCALAPPDATA = fontLocalAppData;
+const fontConfigPath = resolve('.astro/fontconfig.xml');
+const fontDirectories = process.platform === 'win32'
+  ? [`${process.env.WINDIR || 'C:/Windows'}/Fonts`]
+  : ['/usr/share/fonts', '/usr/local/share/fonts'];
+const xmlPath = (value) => value.replaceAll('\\', '/').replaceAll('&', '&amp;');
+writeFileSync(fontConfigPath, `<?xml version="1.0"?>
+<!DOCTYPE fontconfig SYSTEM "fonts.dtd">
+<fontconfig>
+${fontDirectories.map((directory) => `  <dir>${xmlPath(directory)}</dir>`).join('\n')}
+  <cachedir>${xmlPath(fontCacheDirectory)}</cachedir>
+</fontconfig>
+`, 'utf8');
+process.env.FONTCONFIG_FILE = fontConfigPath;
+const { default: sharp } = await import('sharp');
+
 const legacyPosts = JSON.parse(readFileSync(resolve('src/content/legacy-posts.json'), 'utf8'));
 const postsDirectory = resolve('src/content/posts');
 const outputRoot = resolve('public/og');
+const siteLabel = (() => {
+  try {
+    return new URL(process.env.SITE_URL || 'https://zhuchengxue.github.io').hostname;
+  } catch {
+    return 'zhuchengxue.github.io';
+  }
+})();
 
 function escapeHTML(value) {
   return String(value ?? '')
@@ -50,7 +81,7 @@ function dateText(value) {
 }
 
 function postOutputPath(href) {
-  return resolve(outputRoot, href.replace(/^\/+/, ''), 'index.svg');
+  return resolve(outputRoot, href.replace(/^\/+/, ''), 'index.png');
 }
 
 function renderSVG(post) {
@@ -88,7 +119,7 @@ ${titleLines.map((line, index) => `    <text x="116" y="${238 + index * 82}">${e
 ${descriptionLines.map((line, index) => `    <text x="118" y="${470 + index * 44}">${escapeHTML(line)}</text>`).join('\n')}
   </g>
   <line x1="116" y1="520" x2="1084" y2="520" stroke="#276749" stroke-opacity="0.16" stroke-width="2"/>
-  <text x="116" y="556" fill="#276749" font-family="'Microsoft YaHei','PingFang SC','Noto Sans CJK SC',sans-serif" font-size="24">zhuchengxue.github.io</text>
+  <text x="116" y="556" fill="#276749" font-family="'Microsoft YaHei','PingFang SC','Noto Sans CJK SC',sans-serif" font-size="24">${escapeHTML(siteLabel)}</text>
 </svg>
 `;
 }
@@ -125,10 +156,14 @@ const posts = [
 
 rmSync(outputRoot, { recursive: true, force: true });
 
-for (const post of posts) {
-  const outputPath = postOutputPath(post.href);
-  mkdirSync(dirname(outputPath), { recursive: true });
-  writeFileSync(outputPath, renderSVG(post));
+for (let index = 0; index < posts.length; index += 6) {
+  await Promise.all(posts.slice(index, index + 6).map(async (post) => {
+    const outputPath = postOutputPath(post.href);
+    mkdirSync(dirname(outputPath), { recursive: true });
+    await sharp(Buffer.from(renderSVG(post)))
+      .png({ compressionLevel: 9, palette: true, colours: 128 })
+      .toFile(outputPath);
+  }));
 }
 
-console.log(`OG 分享图已生成：${posts.length} 张 -> ${outputRoot}`);
+console.log(`OG 分享图已生成：${posts.length} 张压缩 PNG -> ${outputRoot}`);

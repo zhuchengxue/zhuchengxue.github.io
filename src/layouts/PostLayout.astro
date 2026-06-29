@@ -25,7 +25,7 @@ const newerPost = currentIndex > 0 ? allPosts[currentIndex - 1] : undefined;
 const olderPost = currentIndex >= 0 ? allPosts[currentIndex + 1] : undefined;
 const base = import.meta.env.BASE_URL.replace(/\/$/, '');
 const canonicalURL = new URL(Astro.url.pathname, Astro.site);
-const socialImage = frontmatter.cover || `/og${currentHref}index.svg`;
+const socialImage = frontmatter.cover || `/og${currentHref}index.png`;
 const commentsEnabled = Boolean(
   COMMENTS.giscusRepo
     && COMMENTS.giscusRepoId
@@ -60,6 +60,7 @@ const structuredData = {
   title={frontmatter.title}
   description={frontmatter.description}
   image={socialImage}
+  imageAlt={frontmatter.title}
   type="article"
   publishedTime={date.toISOString()}
   modifiedTime={(updatedDate ?? date).toISOString()}

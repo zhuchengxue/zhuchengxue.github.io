@@ -2,6 +2,8 @@
 
 这份手册只记录日常操作，不替代 README。README 讲“有什么能力”，这里讲“遇到具体场景怎么做”。
 
+换 Windows 或 Mac、恢复未发布草稿以及补齐积压文章，请看 [MIGRATION.md](MIGRATION.md)。
+
 ## 0. 一键体检
 
 日常先跑：
@@ -240,7 +242,7 @@ npm run doctor -- --online
 
 ### 分享图没有更新
 
-文章级 Open Graph 分享图是构建前生成的静态 SVG。先本地重新生成并构建：
+文章级 Open Graph 分享图是构建前生成的 1200×630 压缩 PNG。先本地重新生成并构建：
 
 ```bash
 npm run og:images

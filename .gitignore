@@ -1,6 +1,9 @@
 node_modules/
 dist/
 .astro/
+.env
+.env.*
+!.env.example
 .DS_Store
 .obsidian/workspace.json
 .obsidian/workspace-mobile.json

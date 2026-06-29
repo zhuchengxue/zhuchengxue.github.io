@@ -1,6 +1,7 @@
 import { readFileSync, writeFileSync } from 'node:fs';
 import { basename, isAbsolute, relative, resolve } from 'node:path';
 import { spawnSync } from 'node:child_process';
+import { collectDraftBacklog, isAllowedBacklogChange } from './lib/publish-worktree.mjs';
 
 const postsDirectory = resolve('src/content/posts');
 const articleArgument = process.argv.slice(2).find((arg) => arg !== '--dry-run');
@@ -48,12 +49,14 @@ const allowedPrefixes = [
   relative(resolve('.'), articlePath).replaceAll('\\', '/'),
   `public/images/${slug}/`
 ];
+const backlog = collectDraftBacklog(postsDirectory, resolve('.'));
 const status = run('git', ['status', '--porcelain=v1', '-z'], { capture: true })
   .split('\0')
   .filter(Boolean);
 const unrelated = status.filter((line) => {
   const path = line.slice(3).replaceAll('\\', '/').replace(/^"|"$/g, '');
-  return !allowedPrefixes.some((allowed) => path === allowed || path.startsWith(allowed));
+  return !allowedPrefixes.some((allowed) => path === allowed || path.startsWith(allowed))
+    && !isAllowedBacklogChange(line, backlog);
 });
 
 if (unrelated.length) {

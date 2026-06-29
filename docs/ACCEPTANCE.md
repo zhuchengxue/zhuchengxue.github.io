@@ -47,7 +47,7 @@
 | 评论 | 可选启用 | Giscus 环境变量入口、`npm run config:services` 配置清单；默认不加载第三方脚本 |
 | 访问统计 | 可选启用 | Umami 环境变量入口、`npm run config:services` 配置清单；默认不加载第三方脚本 |
 | SEO | 已完成 | canonical、结构化数据、文章时间、sitemap、robots、`llms.txt`、`humans.txt` |
-| Open Graph 分享图 | 已完成 | `scripts/generate-og-images.mjs`、`dist/og/posts/2026-06-24-welcome/index.svg`、文章页 `og:image` |
+| Open Graph 分享图 | 已完成 | `scripts/generate-og-images.mjs`、`dist/og/posts/2026-06-24-welcome/index.png`、文章页 `og:image` / `og:image:type` / 标题替代文本 |
 | 旧公众号文章批量迁移 | 可选启用 | `scripts/import-wechat.mjs`、`imports/wechat/`、`exports/wechat-import-report.json` 导入报告；需要提供旧文章导出文件 |
 | 国内访问镜像 | 可选启用 | `scripts/deploy-mirror.mjs`、`npm run mirror`、`exports/mirror-report.json` 发布报告、`npm run config:services` 配置清单；需要目标镜像仓库和平台权限 |
 

@@ -44,7 +44,7 @@ async function fetchText(path, { timeout = 15000, attempts = 2 } = {}) {
 }
 
 const packageJson = readJSON('package.json');
-for (const script of ['dev', 'new', 'prepare', 'ready', 'publish', 'wechat', 'wechat:all', 'wechat:draft', 'import:wechat', 'test:wechat-import', 'mirror', 'config:services', 'services:check', 'status', 'og:images', 'build', 'build:ci', 'audit', 'doctor']) {
+for (const script of ['dev', 'new', 'prepare', 'ready', 'publish', 'handoff', 'wechat', 'wechat:all', 'wechat:draft', 'import:wechat', 'test:wechat-import', 'test:publish-worktree', 'mirror', 'config:services', 'services:check', 'status', 'og:images', 'build', 'build:ci', 'audit', 'doctor']) {
   check(`npm script: ${script}`, Boolean(packageJson.scripts?.[script]));
 }
 
@@ -68,6 +68,9 @@ for (const path of [
   'scripts/generate-wechat.mjs',
   'scripts/generate-wechat-all.mjs',
   'scripts/check-post-ready.mjs',
+  'scripts/handoff.mjs',
+  'scripts/lib/publish-worktree.mjs',
+  'scripts/test-publish-worktree.mjs',
   'scripts/create-wechat-draft.mjs',
   'scripts/import-wechat.mjs',
   'scripts/lib/wechat-import.mjs',
@@ -82,6 +85,8 @@ for (const path of [
 ]) {
   check(`关键文件: ${path}`, existsSync(resolve(path)));
 }
+check('换电脑迁移手册', existsSync(resolve('docs/MIGRATION.md')));
+check('.env 默认不提交', command('git', ['-c', 'safe.directory=C:/Users/zhuch/Documents/个人博客网站', 'check-ignore', '-q', '.env']).status === 0);
 
 const gitStatus = command('git', ['-c', 'safe.directory=C:/Users/zhuch/Documents/个人博客网站', 'status', '--short']);
 const gitDirty = gitStatus.status !== 0 || gitStatus.stdout.trim() !== '';
@@ -98,7 +103,9 @@ if (distExists) {
   check('构建产物由 Astro 生成', home.includes('name="generator" content="Astro'));
   check('默认不加载评论/统计脚本', !/giscus\.app|umami|data-website-id/i.test(welcome));
   check('文章 SEO 元数据', welcome.includes('article:published_time') && welcome.includes('og:image'));
-  check('文章级 OG 分享图引用', welcome.includes('/og/posts/2026-06-24-welcome/index.svg'));
+  check('文章级 OG 分享图引用', welcome.includes('/og/posts/2026-06-24-welcome/index.png'));
+  check('文章级 OG 分享图类型', welcome.includes('property="og:image:type" content="image/png"'));
+  check('文章级 OG 分享图替代文本', welcome.includes('property="og:image:alt" content="博客开始营业"'));
   check('Manifest 产物', existsSync(resolve('dist/site.webmanifest')));
   check('RSS 产物', existsSync(resolve('dist/rss.xml')));
   check('JSON Feed 产物', existsSync(resolve('dist/feed.json')));
@@ -113,7 +120,7 @@ if (distExists) {
     check('全文搜索包含正文关键词', search.includes('Chrome'));
   }
   check('Sitemap 产物', existsSync(resolve('dist/sitemap.xml')));
-  check('文章级 OG 分享图产物', existsSync(resolve('dist/og/posts/2026-06-24-welcome/index.svg')));
+  check('文章级 OG 分享图产物', existsSync(resolve('dist/og/posts/2026-06-24-welcome/index.png')));
 }
 
 check('SITE_URL', true, process.env.SITE_URL || '默认 https://zhuchengxue.github.io');
@@ -134,15 +141,18 @@ if (online) {
     ['/llms.txt', '## Articles (71)'],
     ['/humans.txt', '/* TEAM */'],
     ['/sitemap.xml', '<urlset'],
-    ['/posts/2026-06-24-welcome/', '/og/posts/2026-06-24-welcome/index.svg'],
-    ['/og/posts/2026-06-24-welcome/index.svg', '<svg']
+    ['/posts/2026-06-24-welcome/', '/og/posts/2026-06-24-welcome/index.png'],
+    ['/og/posts/2026-06-24-welcome/index.png', null, 'image/png']
   ];
 
-  for (const [path, expectedText] of onlinePages) {
+  for (const [path, expectedText, expectedType] of onlinePages) {
     try {
       const { response, text } = await fetchText(path);
       check(`线上访问: ${path}`, response.ok, `${response.status} ${response.statusText}`);
-      check(`线上内容: ${path}`, response.ok && text.includes(expectedText), expectedText);
+      const contentMatches = expectedType
+        ? response.headers.get('content-type')?.includes(expectedType)
+        : text.includes(expectedText);
+      check(`线上内容: ${path}`, response.ok && contentMatches, expectedType || expectedText);
     } catch (error) {
       check(`线上访问: ${path}`, false, error.message);
     }
