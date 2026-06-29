@@ -20,6 +20,7 @@ const date = new Date(frontmatter.pubDate);
 const updatedDate = frontmatter.updatedDate ? new Date(frontmatter.updatedDate) : undefined;
 const allPosts = getAllPosts();
 const currentIndex = allPosts.findIndex((post) => post.href === currentHref);
+const currentPost = currentIndex >= 0 ? allPosts[currentIndex] : undefined;
 const newerPost = currentIndex > 0 ? allPosts[currentIndex - 1] : undefined;
 const olderPost = currentIndex >= 0 ? allPosts[currentIndex + 1] : undefined;
 const base = import.meta.env.BASE_URL.replace(/\/$/, '');
@@ -78,6 +79,11 @@ const structuredData = {
             · 更新于 <time datetime={updatedDate.toISOString()}>
               {updatedDate.toLocaleDateString('zh-CN')}
             </time>
+          </span>
+        )}
+        {currentPost && (
+          <span>
+            · {currentPost.wordCount.toLocaleString('zh-CN')} 字 · 约 {currentPost.readingMinutes} 分钟
           </span>
         )}
       </div>

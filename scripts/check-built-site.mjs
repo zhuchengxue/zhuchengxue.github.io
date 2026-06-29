@@ -142,6 +142,9 @@ const welcomePage = resolve('dist/posts/2026-06-24-welcome/index.html');
 if (!readFileSync(welcomePage, 'utf8').includes('/og/posts/2026-06-24-welcome/index.svg')) {
   failures.push('/posts/2026-06-24-welcome/: 未引用文章级 Open Graph 分享图');
 }
+if (!/[\d,]+ 字 · 约 \d+ 分钟/.test(readFileSync(welcomePage, 'utf8'))) {
+  failures.push('/posts/2026-06-24-welcome/: 未展示统一阅读字数和预计阅读时间');
+}
 
 const tagIndex = resolve('dist/tags/index.html');
 const blogTag = resolve('dist/tags/博客/index.html');
@@ -168,6 +171,9 @@ if (!builtCSS.includes('@media print') || !builtCSS.includes('article-body a[hre
 const firstLegacyPage = resolve('dist', legacyPosts[0].href.slice(1), 'index.html');
 if (!readFileSync(firstLegacyPage, 'utf8').includes('aria-label="文章导航"')) {
   failures.push(`${legacyPosts[0].href}: 缺少上一篇/下一篇导航`);
+}
+if (!/[\d,]+ 字 · 约 \d+ 分钟/.test(readFileSync(firstLegacyPage, 'utf8'))) {
+  failures.push(`${legacyPosts[0].href}: 缺少统一阅读字数和预计阅读时间`);
 }
 
 if (failures.length) {

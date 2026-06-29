@@ -83,6 +83,8 @@ mustInclude('scripts/generate-search-index.mjs', 'public/search.json', '静态�
 mustInclude('src/layouts/BaseLayout.astro', 'application/ld+json', '结构化数据');
 mustInclude('src/layouts/BaseLayout.astro', 'og:image', 'Open Graph');
 mustInclude('src/layouts/PostLayout.astro', '/og${currentHref}index.svg', '文章级 Open Graph 分享图');
+mustInclude('src/layouts/PostLayout.astro', 'readingMinutes', '统一阅读时间');
+mustInclude('src/lib/posts.ts', 'getReadingStats', '统一阅读字数统计');
 mustInclude('src/config.ts', 'PUBLIC_GISCUS_REPO', '可选评论');
 mustInclude('src/config.ts', 'PUBLIC_UMAMI_SCRIPT', '可选统计');
 mustInclude('scripts/check-post-ready.mjs', '公众号 HTML 转换预检通过', '文章发布前体检');
@@ -126,6 +128,7 @@ if (existsSync(resolve('dist/index.html'))) {
 
   const welcome = 'dist/posts/2026-06-24-welcome/index.html';
   mustInclude(welcome, 'article:published_time', '文章 SEO 产物');
+  mustInclude(welcome, '约', '文章阅读时间产物');
   const html = readFileSync(resolve(welcome), 'utf8');
   if (/giscus\.app|umami|data-website-id/i.test(html)) {
     failures.push('默认构建产物不应加载评论或统计第三方脚本');

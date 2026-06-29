@@ -7,6 +7,8 @@ export interface PostSummary {
   href: string;
   tags: string[];
   legacy: boolean;
+  wordCount: number;
+  readingMinutes: number;
 }
 
 export function htmlToText(html: string) {
@@ -22,33 +24,57 @@ export function htmlToText(html: string) {
     .trim();
 }
 
+export function getReadingStats(text = '') {
+  const normalized = text.replace(/\s+/g, ' ').trim();
+  const cjkCount = normalized.match(/[\u3400-\u9fff\uf900-\ufaff]/g)?.length ?? 0;
+  const latinWordCount = normalized
+    .replace(/[\u3400-\u9fff\uf900-\ufaff]/g, ' ')
+    .match(/[A-Za-z0-9]+(?:[-'][A-Za-z0-9]+)*/g)?.length ?? 0;
+  const wordCount = cjkCount + latinWordCount;
+
+  return {
+    wordCount,
+    readingMinutes: Math.max(1, Math.ceil(wordCount / 450))
+  };
+}
+
 export function getNewPosts(): PostSummary[] {
   const modules = import.meta.glob('../content/posts/*.md', { eager: true });
 
   return Object.entries(modules)
-    .map(([path, post]: [string, any]) => ({
-      title: post.frontmatter.title,
-      description: post.frontmatter.description,
-      pubDate: new Date(post.frontmatter.pubDate),
-      href: `/posts/${path.split('/').pop()!.replace(/\.md$/, '')}/`,
-      tags: post.frontmatter.tags ?? [],
-      legacy: false,
-      draft: post.frontmatter.draft
-    }))
+    .map(([path, post]: [string, any]) => {
+      const stats = getReadingStats(post.rawContent?.() ?? '');
+
+      return {
+        title: post.frontmatter.title,
+        description: post.frontmatter.description,
+        pubDate: new Date(post.frontmatter.pubDate),
+        href: `/posts/${path.split('/').pop()!.replace(/\.md$/, '')}/`,
+        tags: post.frontmatter.tags ?? [],
+        legacy: false,
+        draft: post.frontmatter.draft,
+        ...stats
+      };
+    })
     .filter((post: PostSummary & { draft?: boolean }) => !post.draft)
     .sort((a, b) => b.pubDate.valueOf() - a.pubDate.valueOf());
 }
 
 export function getLegacyPosts(): PostSummary[] {
   return legacyPosts
-    .map((post) => ({
-      title: post.title,
-      description: htmlToText(post.html).slice(0, 120),
-      pubDate: new Date(post.pubDate),
-      href: post.href,
-      tags: post.tags,
-      legacy: true
-    }))
+    .map((post) => {
+      const text = htmlToText(post.html);
+
+      return {
+        title: post.title,
+        description: text.slice(0, 120),
+        pubDate: new Date(post.pubDate),
+        href: post.href,
+        tags: post.tags,
+        legacy: true,
+        ...getReadingStats(text)
+      };
+    })
     .sort((a, b) => b.pubDate.valueOf() - a.pubDate.valueOf());
 }
 
