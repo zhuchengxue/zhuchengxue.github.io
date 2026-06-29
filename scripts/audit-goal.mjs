@@ -66,6 +66,7 @@ for (const [path, label] of [
   ['scripts/check-post-ready.mjs', '文章发布前体检脚本'],
   ['scripts/publish-post.mjs', '一键发布脚本'],
   ['scripts/writing-dashboard.mjs', '本地写作控制台'],
+  ['scripts/lib/obsidian-vault.mjs', 'Dropbox Obsidian Vault 自动识别'],
   ['scripts/test-writing-dashboard.mjs', '本地写作控制台测试'],
   ['打开写作助手.cmd', 'Windows 双击启动入口'],
   ['open-writing-dashboard.cmd', 'Windows 兼容启动逻辑'],
@@ -120,6 +121,8 @@ mustInclude('scripts/check-post-ready.mjs', '公众号 HTML 转换预检通过',
 mustInclude('scripts/publish-post.mjs', 'scripts/check-post-ready.mjs', '一键发布复用完整体检');
 mustInclude('scripts/writing-dashboard.mjs', "server.listen(port, '127.0.0.1'", '写作控制台仅监听本机');
 mustInclude('scripts/writing-dashboard.mjs', 'x-writing-token', '写作控制台本机会话验证');
+mustInclude('scripts/writing-dashboard.mjs', "resolve(writingVault, '博客网站')", 'Dropbox 写作目录同步');
+mustInclude('scripts/lib/obsidian-vault.mjs', 'obsidian://open', 'Obsidian Vault 文件链接');
 mustInclude('scripts/publish-post.mjs', 'isAllowedBacklogChange', '一键发布隔离积压草稿');
 mustInclude('scripts/handoff.mjs', '私密迁移包', '换电脑私密资料迁移');
 mustInclude('docs/MIGRATION.md', '新 Mac', '跨平台迁移说明');

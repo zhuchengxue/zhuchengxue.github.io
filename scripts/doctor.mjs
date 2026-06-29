@@ -69,6 +69,7 @@ for (const path of [
   'scripts/generate-wechat-all.mjs',
   'scripts/check-post-ready.mjs',
   'scripts/writing-dashboard.mjs',
+  'scripts/lib/obsidian-vault.mjs',
   'scripts/test-writing-dashboard.mjs',
   '打开写作助手.cmd',
   'open-writing-dashboard.cmd',

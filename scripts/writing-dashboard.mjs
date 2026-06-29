@@ -1,29 +1,55 @@
 import { createServer } from 'node:http';
-import { existsSync, readdirSync, readFileSync } from 'node:fs';
+import { copyFileSync, existsSync, mkdirSync, readdirSync, readFileSync, statSync } from 'node:fs';
 import { basename, dirname, relative, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { randomBytes } from 'node:crypto';
 import { spawn } from 'node:child_process';
 import { readLocalEnv, updateLocalEnv } from './lib/local-env.mjs';
+import { findObsidianVault, obsidianFileURL } from './lib/obsidian-vault.mjs';
 
 const workspace = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const postsDirectory = resolve(workspace, 'src/content/posts');
 const importsDirectory = resolve(workspace, 'imports/wechat');
+const writingVault = findObsidianVault();
+const writingDirectory = writingVault ? resolve(writingVault, '博客网站') : null;
 const MAX_BODY_BYTES = 64 * 1024;
 const MAX_OUTPUT_CHARS = 120_000;
 
 function parsePost(file) {
   const path = resolve(postsDirectory, file);
-  const source = readFileSync(path, 'utf8');
+  const mirror = writingDirectory ? resolve(writingDirectory, file) : null;
+  const sourcePath = mirror && existsSync(mirror) && statSync(mirror).mtimeMs > statSync(path).mtimeMs ? mirror : path;
+  const source = readFileSync(sourcePath, 'utf8');
   const field = (name) => source.match(new RegExp(`^${name}:\\s*(.*?)\\s*$`, 'm'))?.[1]?.trim().replace(/^['"]|['"]$/g, '') ?? '';
-  const absolute = path.replaceAll('\\', '/');
   return {
     path: relative(workspace, path).replaceAll('\\', '/'),
     title: field('title') || basename(file, '.md'),
     pubDate: field('pubDate'),
-    draft: field('draft') === 'true',
-    obsidianUrl: `obsidian://open?path=${encodeURIComponent(absolute)}`
+    draft: field('draft') === 'true'
   };
+}
+
+function writingPath(post) {
+  return writingDirectory ? resolve(writingDirectory, basename(post.path)) : null;
+}
+
+function requireWritingVault() {
+  if (!writingVault || !writingDirectory) throw new Error('没有找到 Obsidian Vault。请先在 Obsidian 中打开你的 Dropbox 写作文件夹。');
+  mkdirSync(writingDirectory, { recursive: true });
+}
+
+function syncToWritingVault(post, force = false) {
+  requireWritingVault();
+  const source = resolve(workspace, post.path);
+  const target = writingPath(post);
+  if (force || !existsSync(target) || statSync(source).mtimeMs >= statSync(target).mtimeMs) copyFileSync(source, target);
+  return target;
+}
+
+function syncFromWritingVault(post) {
+  const source = writingPath(post);
+  const target = resolve(workspace, post.path);
+  if (source && existsSync(source) && statSync(source).mtimeMs > statSync(target).mtimeMs) copyFileSync(source, target);
 }
 
 function listPosts() {
@@ -55,6 +81,7 @@ function getState(activeOperation) {
     inboxImages: countFiles(resolve(workspace, 'public/images/inbox')),
     dependenciesReady: existsSync(resolve(workspace, 'node_modules/astro/package.json')),
     wechatConfigured: Boolean(localEnv.WECHAT_APP_ID && localEnv.WECHAT_APP_SECRET),
+    writingVault: writingVault ? basename(writingVault) : '',
     activeOperation
   };
 }
@@ -108,33 +135,38 @@ function dashboardHTML(token, nonce) {
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <title>学语思 · 写作控制台</title>
   <style>
-    :root{color-scheme:light dark;--bg:#f4f6f2;--card:#fffdf8;--text:#17251e;--muted:#647169;--green:#276749;--button:#276749;--line:#dce5de;--warn:#9a5b13;--shadow:0 16px 40px rgba(29,61,45,.09)}
-    @media(prefers-color-scheme:dark){:root{--bg:#101713;--card:#18221c;--text:#eef6f0;--muted:#a4b2a9;--green:#7fc39a;--button:#2d7a4f;--line:#304137;--warn:#e6ad67;--shadow:none}}
-    *{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);font:15px/1.65 system-ui,-apple-system,"PingFang SC","Microsoft YaHei",sans-serif}.shell{width:min(1080px,calc(100% - 32px));margin:auto;padding:34px 0 60px}header{display:flex;justify-content:space-between;gap:20px;align-items:flex-end;margin-bottom:22px}h1{margin:0;font-size:clamp(28px,5vw,44px);letter-spacing:-.04em}h1 span{color:var(--green)}.subtitle{margin:5px 0 0;color:var(--muted)}.status{display:flex;gap:8px;flex-wrap:wrap}.pill{padding:5px 10px;border:1px solid var(--line);border-radius:999px;color:var(--muted);background:var(--card)}.grid{display:grid;grid-template-columns:1fr 1fr;gap:18px}.card{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:20px;box-shadow:var(--shadow)}.wide{grid-column:1/-1}h2{margin:0 0 14px;font-size:19px}label{display:block;margin:9px 0 5px;color:var(--muted);font-size:13px}input,select{width:100%;border:1px solid var(--line);border-radius:10px;padding:10px 12px;background:var(--bg);color:var(--text);font:inherit}.row{display:flex;gap:9px;flex-wrap:wrap;margin-top:14px}button,.link-button{border:0;border-radius:10px;padding:10px 14px;background:var(--button);color:white;font:inherit;font-size:14px;font-weight:600;cursor:pointer;text-decoration:none}.secondary{background:transparent;color:var(--green);border:1px solid var(--green)}.danger{background:#a53b32}button:disabled{opacity:.55;cursor:wait}.hint{color:var(--muted);font-size:13px;margin:10px 0 0}.warning{color:var(--warn)}pre{min-height:190px;max-height:420px;overflow:auto;white-space:pre-wrap;word-break:break-word;margin:0;background:#101713;color:#dce8df;border-radius:12px;padding:16px;font:13px/1.6 ui-monospace,SFMono-Regular,Consolas,monospace}.empty{color:var(--muted)}@media(max-width:760px){header{align-items:flex-start;flex-direction:column}.grid{grid-template-columns:1fr}.wide{grid-column:auto}}
+    :root{color-scheme:light dark;--bg:#f5f7f4;--card:#fff;--text:#17251e;--muted:#6c776f;--green:#276749;--line:#dbe4dd;--soft:#eef4f0;--warn:#a64a3d}
+    @media(prefers-color-scheme:dark){:root{--bg:#101713;--card:#18221c;--text:#eef6f0;--muted:#a4b2a9;--green:#75c794;--line:#304137;--soft:#213128;--warn:#df8073}}
+    *{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);font:15px/1.6 system-ui,-apple-system,"PingFang SC","Microsoft YaHei",sans-serif}.shell{width:min(760px,calc(100% - 28px));margin:auto;padding:54px 0 70px}header{text-align:center;margin-bottom:28px}h1{margin:0;font-size:clamp(32px,7vw,48px);letter-spacing:-.05em}h1 span{color:var(--green)}.subtitle{margin:5px 0 14px;color:var(--muted)}.status{display:flex;justify-content:center;gap:8px;flex-wrap:wrap}.pill{padding:4px 10px;border-radius:999px;color:var(--muted);background:var(--soft);font-size:13px}.card{background:var(--card);border:1px solid var(--line);border-radius:20px;padding:24px;margin-bottom:14px}h2{margin:0 0 14px;font-size:18px}label{display:block;margin:13px 0 6px;color:var(--muted);font-size:13px}input,select{width:100%;border:1px solid var(--line);border-radius:12px;padding:12px 14px;background:var(--bg);color:var(--text);font:inherit}.new-row{display:grid;grid-template-columns:1fr auto;gap:10px}.new-row button{white-space:nowrap}.actions{display:grid;grid-template-columns:1.2fr 1fr 1fr;gap:10px;margin-top:16px}button,.link-button{border:0;border-radius:11px;padding:12px 16px;background:var(--green);color:white;font:inherit;font-weight:650;cursor:pointer;text-decoration:none;text-align:center}.secondary{background:var(--soft);color:var(--green)}.danger{background:var(--warn)}button:disabled{opacity:.55;cursor:wait}.hint{color:var(--muted);font-size:13px;margin:11px 0 0}.divider{height:1px;background:var(--line);margin:22px 0}details{background:var(--card);border:1px solid var(--line);border-radius:16px;margin-top:14px}summary{padding:15px 18px;cursor:pointer;color:var(--muted);font-weight:600}details[open] summary{border-bottom:1px solid var(--line)}.tools{padding:6px 18px 18px}.tool-section{padding:12px 0}.tool-section+.tool-section{border-top:1px solid var(--line)}.tool-section h3{margin:0 0 8px;font-size:14px}.row{display:flex;gap:8px;flex-wrap:wrap}.row button,.row .link-button{padding:8px 11px;font-size:13px}.result{margin-top:14px;padding:14px 16px;border-radius:14px;background:var(--soft)}pre{max-height:240px;overflow:auto;white-space:pre-wrap;word-break:break-word;margin:0;color:var(--text);font:13px/1.55 ui-monospace,SFMono-Regular,Consolas,monospace}.result-actions{display:flex;gap:8px;margin-top:10px}.result-actions button{padding:6px 9px;font-size:12px}@media(max-width:620px){.shell{padding-top:30px}.new-row,.actions{grid-template-columns:1fr}.card{padding:19px}}
   </style>
 </head>
 <body><main class="shell">
-  <header><div><h1><span>学语思</span> · 写作控制台</h1><p class="subtitle">写作、检查、发布都在这里完成，不用记命令。</p></div><div id="status" class="status"></div></header>
-  <section class="grid">
-    <div class="card"><h2>新建文章</h2><form id="new-form"><label for="title">文章标题</label><input id="title" required maxlength="100" placeholder="输入文章标题"><label for="slug">英文或拼音短名（可不填）</label><input id="slug" maxlength="80" placeholder="例如 my-new-article"><div class="row"><button type="submit">新建并打开 Obsidian</button></div></form><p class="hint">文章默认是草稿，不会直接上线。</p></div>
-    <div class="card"><h2>当前文章</h2><label for="article">选择文章</label><select id="article"></select><div class="row"><a id="open-obsidian" class="link-button secondary" href="#">打开 Obsidian</a><button class="secondary" data-action="check">检查文章</button><button class="secondary" data-action="preview">预发布</button><button class="danger" data-action="publish">正式发布博客</button><button class="secondary" data-action="wechat">导出公众号版</button><button data-action="wechat-push">推送到公众号草稿箱</button></div><p class="hint warning">正式发布博客会提交并推送到线上；公众号按钮只创建草稿，不会自动群发。</p></div>
-    <div class="card"><h2>公众号连接</h2><form id="wechat-form"><label for="wechat-app-id">AppID</label><input id="wechat-app-id" autocomplete="off" placeholder="公众号后台的开发者 ID"><label for="wechat-app-secret">AppSecret</label><input id="wechat-app-secret" type="password" autocomplete="new-password" placeholder="只保存在本机，不会上传 GitHub"><div class="row"><button type="submit">保存到本机</button></div></form><p id="wechat-status" class="hint">正在检查配置…</p></div>
-    <div class="card"><h2>积压文章</h2><p class="hint">把公众号导出的 HTML、Markdown 或 TXT 放进导入目录，再在这里批量转为草稿。</p><div class="row"><button class="secondary" data-action="open-imports">打开导入目录</button><button class="secondary" data-action="import-preview">预览批量导入</button><button data-action="import">批量导入为草稿</button></div></div>
-    <div class="card"><h2>系统与换电脑</h2><div class="row"><button class="secondary" data-action="doctor">系统体检</button><button class="secondary" data-action="handoff">换电脑盘点</button><button class="secondary" data-action="install">安装/修复依赖</button><a class="link-button secondary" href="https://zhuchengxue.github.io/" target="_blank" rel="noreferrer">打开博客</a></div><p class="hint">依赖安装只在新电脑首次使用或环境损坏时需要。</p></div>
-    <div class="card wide"><h2>操作结果</h2><pre id="output">控制台已启动，正在读取文章…</pre><div class="row"><button class="secondary" data-action="refresh">刷新状态</button><button class="secondary" data-action="shutdown">关闭本地控制台</button></div></div>
+  <header><h1><span>学语思</span></h1><p class="subtitle">写一次，发布到博客和公众号。</p><div id="status" class="status"></div></header>
+  <section class="card">
+    <form id="new-form"><label for="title">新文章</label><div class="new-row"><input id="title" required maxlength="100" placeholder="输入标题"><button type="submit">开始写作</button></div></form>
+    <div class="divider"></div>
+    <label for="article">我的文章</label><select id="article"></select>
+    <div class="actions"><button data-action="open-article">打开写作</button><button class="secondary" data-action="publish">发布博客</button><button class="secondary" data-action="wechat-push">推送公众号</button></div>
+    <p class="hint">文章保存在 Dropbox；公众号只推送到草稿箱，不会自动群发。</p>
   </section>
+  <div class="result"><pre id="output">正在准备…</pre></div>
+  <details><summary>设置与工具</summary><div class="tools">
+    <div class="tool-section"><h3>文章工具</h3><div class="row"><button class="secondary" data-action="check">检查</button><button class="secondary" data-action="preview">预发布</button><button class="secondary" data-action="wechat">导出公众号 HTML</button></div></div>
+    <div class="tool-section"><h3>公众号连接</h3><form id="wechat-form"><input id="wechat-app-id" autocomplete="off" placeholder="AppID"><label for="wechat-app-secret">AppSecret</label><input id="wechat-app-secret" type="password" autocomplete="new-password" placeholder="只保存在本机"><div class="row"><button type="submit">保存连接</button></div></form><p id="wechat-status" class="hint">正在检查配置…</p></div>
+    <div class="tool-section"><h3>旧文章</h3><div class="row"><button class="secondary" data-action="open-imports">打开导入目录</button><button class="secondary" data-action="import-preview">预览导入</button><button class="secondary" data-action="import">批量导入</button></div></div>
+    <div class="tool-section"><h3>系统</h3><div class="row"><button class="secondary" data-action="doctor">体检</button><button class="secondary" data-action="handoff">换电脑盘点</button><button class="secondary" data-action="install">修复依赖</button><button class="secondary" data-action="refresh">刷新</button><button class="secondary" data-action="shutdown">关闭</button><a class="link-button secondary" href="https://zhuchengxue.github.io/" target="_blank" rel="noreferrer">查看博客</a></div></div>
+  </div></details>
 </main>
 <script nonce="${nonce}">
 const token=${JSON.stringify(token)};let state=null;let busy=false;let firstLoad=true;const output=document.querySelector('#output');const articleSelect=document.querySelector('#article');
 async function request(path,options={}){const headers={...(options.headers||{}),'x-writing-token':token};const response=await fetch(path,{...options,headers});const data=await response.json();if(!response.ok)throw Object.assign(new Error(data.error||'操作失败'),{data});return data}
 function setBusy(value){busy=value;document.querySelectorAll('button').forEach(button=>button.disabled=value)}
-function render(next){state=next;const status=document.querySelector('#status');status.textContent='';[['线上文章',next.legacy+next.publishedMarkdown],['草稿',next.drafts],['待导入',next.importFiles],['图片收件箱',next.inboxImages]].forEach(([label,value])=>{const span=document.createElement('span');span.className='pill';span.textContent=label+' '+value;status.append(span)});document.querySelector('#wechat-status').textContent=next.wechatConfigured?'已连接。可以把当前文章推送到公众号草稿箱。':'尚未配置。只需在每台电脑首次填写一次。';const selected=articleSelect.value;articleSelect.textContent='';for(const post of next.posts){const option=document.createElement('option');option.value=post.path;option.textContent=(post.draft?'草稿｜':'已发布｜')+post.title;articleSelect.append(option)}if(next.posts.some(post=>post.path===selected))articleSelect.value=selected;updateOpenLink();if(!next.dependenciesReady)output.textContent='尚未安装项目依赖。请点击“安装/修复依赖”，完成后即可检查和发布。'}
-function updateOpenLink(){const post=state?.posts.find(item=>item.path===articleSelect.value);const link=document.querySelector('#open-obsidian');link.href=post?.obsidianUrl||'#';link.style.pointerEvents=post?'auto':'none'}articleSelect.addEventListener('change',updateOpenLink);
+function render(next){state=next;const status=document.querySelector('#status');status.textContent='';[['Dropbox',next.writingVault?'已连接':'未连接'],['公众号',next.wechatConfigured?'已连接':'未连接'],['文章',next.legacy+next.publishedMarkdown+next.drafts]].forEach(([label,value])=>{const span=document.createElement('span');span.className='pill';span.textContent=label+' · '+value;status.append(span)});document.querySelector('#wechat-status').textContent=next.wechatConfigured?'公众号已连接。':'每台电脑首次填写一次。';const selected=articleSelect.value;articleSelect.textContent='';for(const post of next.posts){const option=document.createElement('option');option.value=post.path;option.textContent=(post.draft?'草稿 · ':'')+post.title;articleSelect.append(option)}if(next.posts.some(post=>post.path===selected))articleSelect.value=selected;if(!next.dependenciesReady)output.textContent='首次使用，请展开“设置与工具”并点击“修复依赖”。'}
 async function refresh(){try{render(await request('/api/state'));if(firstLoad){output.textContent='准备就绪。请选择文章或新建文章开始写作。';firstLoad=false}}catch(error){output.textContent=error.message}}
 async function action(name,payload={}){if(busy)return;setBusy(true);output.textContent='正在执行，请稍候…';try{const result=await request('/api/action',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({action:name,...payload})});output.textContent=result.output||'操作完成。';await refresh();if(result.obsidianUrl)location.href=result.obsidianUrl;if(name==='shutdown')output.textContent='控制台已关闭，可以关闭这个页面。'}catch(error){output.textContent=(error.data?.output?error.data.output+String.fromCharCode(10,10):'')+error.message}finally{setBusy(false)}}
-document.querySelector('#new-form').addEventListener('submit',event=>{event.preventDefault();action('new',{title:document.querySelector('#title').value,slug:document.querySelector('#slug').value})});
+document.querySelector('#new-form').addEventListener('submit',event=>{event.preventDefault();action('new',{title:document.querySelector('#title').value})});
 document.querySelector('#wechat-form').addEventListener('submit',event=>{event.preventDefault();const appId=document.querySelector('#wechat-app-id').value.trim();const appSecret=document.querySelector('#wechat-app-secret').value.trim();if(!appId||!appSecret){output.textContent='请同时填写 AppID 和 AppSecret。';return}action('wechat-config',{appId,appSecret});document.querySelector('#wechat-app-secret').value=''});
-document.querySelectorAll('[data-action]').forEach(button=>button.addEventListener('click',()=>{const name=button.dataset.action;if(name==='refresh')return refresh();const article=articleSelect.value;if(['check','preview','wechat'].includes(name))return action(name,{article});if(name==='wechat-push'){if(confirm('确定把这篇文章上传到公众号草稿箱吗？不会自动群发。'))return action(name,{article,confirmation:article});return}if(name==='publish'){if(confirm('确定正式发布这篇文章吗？这会提交并推送到博客。'))return action(name,{article,confirmation:article});return}if(name==='import'){if(confirm('确定把导入目录中的文件批量转换为草稿吗？'))return action(name,{confirmation:'import'});return}if(name==='install'){if(confirm('确定安装或修复项目依赖吗？需要访问 npm 软件源。'))return action(name,{confirmation:'install'});return}action(name)}));refresh();
+document.querySelectorAll('[data-action]').forEach(button=>button.addEventListener('click',()=>{const name=button.dataset.action;if(name==='refresh')return refresh();const article=articleSelect.value;if(['open-article','check','preview','wechat'].includes(name))return action(name,{article});if(name==='wechat-push'){if(confirm('确定把这篇文章上传到公众号草稿箱吗？不会自动群发。'))return action(name,{article,confirmation:article});return}if(name==='publish'){if(confirm('确定正式发布这篇文章吗？这会提交并推送到博客。'))return action(name,{article,confirmation:article});return}if(name==='import'){if(confirm('确定把导入目录中的文件批量转换为草稿吗？'))return action(name,{confirmation:'import'});return}if(name==='install'){if(confirm('确定安装或修复项目依赖吗？需要访问 npm 软件源。'))return action(name,{confirmation:'install'});return}action(name)}));refresh();
 </script></body></html>`;
 }
 
@@ -195,7 +227,7 @@ export async function createDashboardServer({ port = 4179, openBrowser = true, q
     const action = String(payload.action || '');
     const posts = listPosts();
     const selected = posts.find((post) => post.path === payload.article);
-    const articleActions = new Set(['check', 'preview', 'publish', 'wechat', 'wechat-push']);
+    const articleActions = new Set(['open-article', 'check', 'preview', 'publish', 'wechat', 'wechat-push']);
     if (articleActions.has(action) && !selected) return sendJSON(response, 400, { error: '请选择有效文章。' });
     if (action === 'publish' && payload.confirmation !== selected.path) return sendJSON(response, 400, { error: '正式发布确认失败。' });
     if (action === 'wechat-push' && payload.confirmation !== selected.path) return sendJSON(response, 400, { error: '公众号草稿推送确认失败。' });
@@ -208,6 +240,10 @@ export async function createDashboardServer({ port = 4179, openBrowser = true, q
       const slug = String(payload.slug || '').trim();
       if (!title || title.length > 100 || slug.length > 80) return sendJSON(response, 400, { error: '请填写有效标题，短名不能超过 80 个字符。' });
       command = ['node', ['scripts/new-post.mjs', title, ...(slug ? [slug] : [])]];
+    } else if (action === 'open-article') {
+      const target = syncToWritingVault(selected);
+      openExternal(obsidianFileURL(writingVault, target));
+      return sendJSON(response, 200, { ok: true, output: `已在 Dropbox 写作库中打开：${target}` });
     } else if (action === 'check') command = ['node', ['scripts/check-post-ready.mjs', selected.path]];
     else if (action === 'preview') command = ['node', ['scripts/publish-post.mjs', selected.path, '--dry-run']];
     else if (action === 'publish') command = ['node', ['scripts/publish-post.mjs', selected.path]];
@@ -235,6 +271,7 @@ export async function createDashboardServer({ port = 4179, openBrowser = true, q
       return setTimeout(() => server.close(), 100);
     } else return sendJSON(response, 400, { error: '未知操作。' });
 
+    if (selected && !new Set(['open-article']).has(action)) syncFromWritingVault(selected);
     activeOperation = action;
     const result = await runProcess(command[0], command[1]);
     activeOperation = null;
@@ -242,8 +279,13 @@ export async function createDashboardServer({ port = 4179, openBrowser = true, q
     if (action === 'new' && result.ok) {
       const createdPath = result.output.match(/^已创建：(.+)$/m)?.[1]?.trim();
       const createdRelative = createdPath ? relative(workspace, resolve(createdPath)).replaceAll('\\', '/') : '';
-      obsidianUrl = listPosts().find((post) => post.path === createdRelative)?.obsidianUrl;
+      const created = listPosts().find((post) => post.path === createdRelative);
+      if (created && writingVault) {
+        const target = syncToWritingVault(created, true);
+        obsidianUrl = obsidianFileURL(writingVault, target);
+      }
     }
+    if (writingVault && selected && result.ok && new Set(['check', 'preview', 'publish', 'wechat', 'wechat-push']).has(action)) syncToWritingVault(selected, true);
     return sendJSON(response, result.ok ? 200 : 400, { ...result, obsidianUrl });
   };
 

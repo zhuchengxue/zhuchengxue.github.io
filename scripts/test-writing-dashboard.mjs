@@ -1,6 +1,8 @@
 import assert from 'node:assert/strict';
 import { Script } from 'node:vm';
-import { createDashboardServer } from './writing-dashboard.mjs';
+
+process.env.WRITING_VAULT_DISABLED = '1';
+const { createDashboardServer } = await import('./writing-dashboard.mjs');
 
 const dashboard = await createDashboardServer({ port: 0, openBrowser: false, quiet: true });
 try {
@@ -8,7 +10,10 @@ try {
   assert.equal(page.status, 200);
   assert.match(page.headers.get('content-security-policy') || '', /frame-ancestors 'none'/);
   const html = await page.text();
-  assert.match(html, /学语思.*写作控制台/s);
+  assert.match(html, /写一次，发布到博客和公众号/);
+  assert.match(html, /打开写作/);
+  assert.match(html, /<details><summary>设置与工具<\/summary>/);
+  assert.doesNotMatch(html, /<h2>积压文章<\/h2>/);
   const clientScript = html.match(/<script nonce="[^"]+">([\s\S]*?)<\/script>/)?.[1];
   assert.ok(clientScript);
   assert.doesNotThrow(() => new Script(clientScript));
