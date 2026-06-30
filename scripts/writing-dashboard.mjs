@@ -120,12 +120,12 @@ function runProcess(command, args, timeoutMs = 30 * 60 * 1000) {
 }
 
 function openExternal(target) {
-  const options = { detached: true, stdio: 'ignore', windowsHide: true };
+  const hiddenOptions = { detached: true, stdio: 'ignore', windowsHide: true };
   const child = process.platform === 'win32'
-    ? spawn('rundll32.exe', ['url.dll,FileProtocolHandler', target], options)
+    ? spawn('rundll32.exe', ['url.dll,FileProtocolHandler', target], hiddenOptions)
     : process.platform === 'darwin'
-      ? spawn('open', [target], options)
-      : spawn('xdg-open', [target], options);
+      ? spawn('open', [target], hiddenOptions)
+      : spawn('xdg-open', [target], hiddenOptions);
   child.unref();
 }
 
@@ -145,10 +145,10 @@ function dashboardHTML(token, nonce) {
 <body><main class="shell">
   <header><h1><span>学语思</span></h1><p class="subtitle">写一次，发布到博客和公众号。</p><div id="status" class="status"></div></header>
   <section class="card">
-    <form id="new-form"><label for="title">新文章</label><div class="new-row"><input id="title" required maxlength="100" placeholder="输入标题"><button type="submit">开始写作</button></div></form>
+    <form id="new-form"><label for="title">新文章</label><div class="new-row"><input id="title" required maxlength="100" placeholder="输入标题"><button type="submit">新建并打开 Obsidian</button></div></form>
     <div class="divider"></div>
     <label for="article">我的文章</label><select id="article"></select>
-    <div class="actions"><button data-action="open-article">打开写作</button><button class="secondary" data-action="publish">发布博客</button><button class="secondary" data-action="wechat-push">推送公众号</button></div>
+    <div class="actions"><button data-action="open-article">打开 Obsidian 写作</button><button class="secondary" data-action="publish">发布博客</button><button class="secondary" data-action="wechat-push">推送公众号</button></div>
     <p class="hint">文章保存在 Dropbox；公众号只推送到草稿箱，不会自动群发。</p>
   </section>
   <div class="result"><pre id="output">正在准备…</pre></div>
@@ -246,8 +246,8 @@ export async function createDashboardServer({ port = 4179, openBrowser = true, q
       command = ['node', ['scripts/new-post.mjs', title, ...(slug ? [slug] : [])]];
     } else if (action === 'open-article') {
       const target = syncToWritingVault(selected);
-      openExternal(obsidianFileURL(writingVault, target));
-      return sendJSON(response, 200, { ok: true, output: `已在 Dropbox 写作库中打开：${target}` });
+      const editorURL = obsidianFileURL(writingVault, target);
+      return sendJSON(response, 200, { ok: true, output: `正在打开 Obsidian：${target}`, obsidianUrl: editorURL });
     } else if (action === 'check') command = ['node', ['scripts/check-post-ready.mjs', selected.path]];
     else if (action === 'preview') command = ['node', ['scripts/publish-post.mjs', selected.path, '--dry-run']];
     else if (action === 'publish') command = ['node', ['scripts/publish-post.mjs', selected.path]];

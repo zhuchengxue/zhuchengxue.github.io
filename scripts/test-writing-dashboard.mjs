@@ -17,7 +17,8 @@ try {
   assert.match(page.headers.get('content-security-policy') || '', /frame-ancestors 'none'/);
   const html = await page.text();
   assert.match(html, /写一次，发布到博客和公众号/);
-  assert.match(html, /打开写作/);
+  assert.match(html, /打开 Obsidian 写作/);
+  assert.match(readFileSync('scripts/writing-dashboard.mjs', 'utf8'), /obsidianUrl: editorURL/);
   assert.match(html, /<details><summary>设置与工具<\/summary>/);
   assert.doesNotMatch(html, /<h2>积压文章<\/h2>/);
   const clientScript = html.match(/<script nonce="[^"]+">([\s\S]*?)<\/script>/)?.[1];
