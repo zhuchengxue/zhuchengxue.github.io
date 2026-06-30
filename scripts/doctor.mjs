@@ -1,12 +1,14 @@
 import { existsSync, readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { spawnSync } from 'node:child_process';
+import { contentCounts } from './lib/content-count.mjs';
 
 const args = process.argv.slice(2);
 const online = args.includes('--online');
 const allowDirty = args.includes('--allow-dirty');
 const siteURL = (process.env.SITE_URL || 'https://zhuchengxue.github.io').replace(/\/$/, '');
 const results = [];
+const counts = contentCounts();
 
 function check(label, ok, detail = '') {
   results.push({ label, ok, detail });
@@ -44,7 +46,7 @@ async function fetchText(path, { timeout = 15000, attempts = 2 } = {}) {
 }
 
 const packageJson = readJSON('package.json');
-for (const script of ['dev', 'dashboard', 'new', 'prepare', 'ready', 'publish', 'handoff', 'wechat', 'wechat:all', 'wechat:draft', 'wechat:push', 'import:wechat', 'import:dropbox', 'test:wechat-import', 'test:wechat-draft', 'test:dropbox-import', 'test:publish-worktree', 'test:dashboard', 'mirror', 'config:services', 'services:check', 'status', 'og:images', 'build', 'build:ci', 'audit', 'doctor']) {
+for (const script of ['dev', 'dashboard', 'new', 'prepare', 'ready', 'publish', 'publish:dropbox', 'handoff', 'wechat', 'wechat:all', 'wechat:draft', 'wechat:push', 'import:wechat', 'import:dropbox', 'test:wechat-import', 'test:wechat-draft', 'test:dropbox-import', 'test:publish-worktree', 'test:dashboard', 'mirror', 'config:services', 'services:check', 'status', 'og:images', 'build', 'build:ci', 'audit', 'doctor']) {
   check(`npm script: ${script}`, Boolean(packageJson.scripts?.[script]));
 }
 
@@ -70,7 +72,9 @@ for (const path of [
   'scripts/check-post-ready.mjs',
   'scripts/writing-dashboard.mjs',
   'scripts/lib/obsidian-vault.mjs',
+  'scripts/lib/content-count.mjs',
   'scripts/import-dropbox-posts.mjs',
+  'scripts/publish-dropbox-archive.mjs',
   'scripts/test-dropbox-import.mjs',
   'scripts/test-writing-dashboard.mjs',
   '打开写作助手.cmd',
@@ -127,7 +131,7 @@ if (distExists) {
   check('全文搜索索引产物', existsSync(searchIndexPath));
   if (existsSync(searchIndexPath)) {
     const search = readFileSync(searchIndexPath, 'utf8');
-    check('全文搜索索引数量', JSON.parse(search).length === 71, `${JSON.parse(search).length} 篇`);
+    check('全文搜索索引数量', JSON.parse(search).length === counts.total, `${JSON.parse(search).length} 篇`);
     check('全文搜索包含正文关键词', search.includes('Chrome'));
   }
   check('Sitemap 产物', existsSync(resolve('dist/sitemap.xml')));
@@ -149,7 +153,7 @@ if (online) {
     ['/rss.xml', '<rss'],
     ['/feed.json', 'jsonfeed.org/version/1.1'],
     ['/opensearch.xml', 'OpenSearchDescription'],
-    ['/llms.txt', '## Articles (71)'],
+    ['/llms.txt', `## Articles (${counts.total})`],
     ['/humans.txt', '/* TEAM */'],
     ['/sitemap.xml', '<urlset'],
     ['/posts/2026-06-24-welcome/', '/og/posts/2026-06-24-welcome/index.png'],
@@ -173,7 +177,7 @@ if (online) {
     const { response, text } = await fetchText('/search.json', { timeout: 30000, attempts: 3 });
     check('线上访问: /search.json', response.ok, `${response.status} ${response.statusText}`);
     const search = JSON.parse(text);
-    check('线上全文搜索数量', Array.isArray(search) && search.length === 71, `${Array.isArray(search) ? search.length : 0} 篇`);
+    check('线上全文搜索数量', Array.isArray(search) && search.length === counts.total, `${Array.isArray(search) ? search.length : 0} 篇`);
     check('线上全文搜索包含正文关键词', text.includes('Chrome'));
   } catch (error) {
     check('线上访问: /search.json', false, error.message);

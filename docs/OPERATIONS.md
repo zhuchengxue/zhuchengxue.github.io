@@ -12,6 +12,8 @@ Windows 双击 `打开写作助手.cmd`，Mac 双击 `打开写作助手.command
 
 已有文章无需手工搬运：展开“设置与工具 → Dropbox 旧文章”，先“扫描”，再“全部导入为草稿”。系统读取 Vault 根目录和 `已发布/`，自动补齐博客标题、摘要、日期和 `公众号归档` 标签；导入不会直接上线。
 
+确认归档内容后可点击“发布‘已发布’目录”。系统仅发布 Dropbox `已发布/` 中的文章，排除《写作风格》和 Vault 根目录草稿；全部文章只构建一次、合并为一次 Git 提交并推送。
+
 以下命令行内容主要保留给故障排查和自动化使用。
 
 ## 0. 一键体检
@@ -28,7 +30,7 @@ npm run doctor
 npm run doctor -- --online
 ```
 
-线上体检会同时检查首页、文章页、RSS、JSON Feed、OpenSearch、llms.txt、humans.txt、sitemap、Manifest、示例文章和 `/search.json`，确认全文搜索索引已发布且包含 71 篇文章。
+线上体检会同时检查首页、文章页、RSS、JSON Feed、OpenSearch、llms.txt、humans.txt、sitemap、Manifest、示例文章和 `/search.json`，并按当前已发布内容动态核对文章数量。
 
 如果正在改代码、还没提交：
 

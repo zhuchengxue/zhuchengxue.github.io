@@ -1,8 +1,10 @@
 import { existsSync, readFileSync, readdirSync, statSync } from 'node:fs';
 import { join, resolve } from 'node:path';
 import sharp from 'sharp';
+import { contentCounts } from './lib/content-count.mjs';
 
 const legacyPosts = JSON.parse(readFileSync(resolve('src/content/legacy-posts.json'), 'utf8'));
+const counts = contentCounts();
 const failures = [];
 
 function plainText(html) {
@@ -64,7 +66,7 @@ for (const file of walk(resolve('dist')).filter((path) => path.endsWith('.html')
 }
 
 const articlesPage = resolve('dist/articles/index.html');
-if (!existsSync(articlesPage) || !readFileSync(articlesPage, 'utf8').includes('共 71 篇')) {
+if (!existsSync(articlesPage) || !readFileSync(articlesPage, 'utf8').includes(`共 ${counts.total} 篇`)) {
   failures.push('/articles/: 统一文章页数量不正确');
 }
 if (!readFileSync(articlesPage, 'utf8').includes('/search.json')) {
@@ -79,7 +81,7 @@ if (!existsSync(searchIndex)) {
   failures.push('/search.json: 全文搜索索引未生成');
 } else {
   const search = JSON.parse(readFileSync(searchIndex, 'utf8'));
-  if (search.length !== 71) {
+  if (search.length !== counts.total) {
     failures.push(`/search.json: 搜索索引数量不正确，当前 ${search.length} 篇`);
   }
   if (!search.some((post) => `${post.title} ${post.description} ${post.tags?.join(' ')} ${post.text}`.includes('Chrome'))) {
@@ -98,7 +100,7 @@ if (!existsSync(openSearch) || !readFileSync(openSearch, 'utf8').includes('/arti
 }
 
 const llmsText = resolve('dist/llms.txt');
-if (!existsSync(llmsText) || !readFileSync(llmsText, 'utf8').includes('## Articles (71)')) {
+if (!existsSync(llmsText) || !readFileSync(llmsText, 'utf8').includes(`## Articles (${counts.total})`)) {
   failures.push('/llms.txt: 机器可读站点说明未生成或文章数量不正确');
 }
 
@@ -107,11 +109,7 @@ if (!existsSync(humansText) || !readFileSync(humansText, 'utf8').includes('Built
   failures.push('/humans.txt: 人类可读站点说明未生成或内容不正确');
 }
 
-const publishedNewPostCount = readdirSync(resolve('src/content/posts'))
-  .filter((name) => name.endsWith('.md'))
-  .map((name) => readFileSync(resolve('src/content/posts', name), 'utf8'))
-  .filter((content) => !/^draft:\s*true\s*$/m.test(content))
-  .length;
+const publishedNewPostCount = counts.published;
 
 const jsonFeed = resolve('dist/feed.json');
 if (!existsSync(jsonFeed)) {
@@ -145,7 +143,7 @@ if (!existsSync(firstLegacyOg)) {
 }
 
 const articleOgImages = walk(resolve('dist/og')).filter((path) => path.endsWith('index.png'));
-if (articleOgImages.length !== 71) {
+if (articleOgImages.length !== counts.total) {
   failures.push(`/og/: 文章级 PNG 分享图数量不正确，当前 ${articleOgImages.length} 张`);
 }
 

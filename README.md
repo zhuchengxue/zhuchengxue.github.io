@@ -15,7 +15,7 @@
 
 - 首页、统一文章页、标签页、关于页和 404 页面
 - 深色模式、移动端排版和打印/PDF 友好样式
-- 71 篇新旧文章统一 Astro 风格
+- 所有新旧文章统一 Astro 风格，数量自动校验
 - 静态全文搜索、OpenSearch 站内搜索发现、上一篇/下一篇导航
 - RSS、Atom、JSON Feed 和 sitemap
 - 自动生成 1200×630 压缩 PNG 文章级 Open Graph 分享图、文章结构化数据、`llms.txt` 与 `humans.txt`
@@ -183,7 +183,7 @@ npm run preview
 npm run doctor -- --online
 ```
 
-它会检查首页、文章页、RSS、JSON Feed、OpenSearch、llms.txt、humans.txt、sitemap、Manifest、示例文章，以及线上 `/search.json` 是否包含 71 篇全文搜索索引。
+它会检查首页、文章页、RSS、JSON Feed、OpenSearch、llms.txt、humans.txt、sitemap、Manifest、示例文章，并按当前已发布内容动态核对线上全文搜索索引数量。
 
 想快速查看四阶段完成度和还缺哪些外部配置，可以运行：
 

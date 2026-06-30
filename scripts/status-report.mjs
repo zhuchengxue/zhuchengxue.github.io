@@ -1,9 +1,11 @@
 import { existsSync, readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
+import { contentCounts } from './lib/content-count.mjs';
 
 const args = process.argv.slice(2);
 const online = args.includes('--online');
 const siteURL = (process.env.SITE_URL || 'https://zhuchengxue.github.io').replace(/\/$/, '');
+const counts = contentCounts();
 
 function exists(path) {
   return existsSync(resolve(path));
@@ -97,7 +99,7 @@ const phase3 = [
 const configText = exists('src/config.ts') ? read('src/config.ts') : '';
 const baseLayout = exists('src/layouts/BaseLayout.astro') ? read('src/layouts/BaseLayout.astro') : '';
 const phase4 = [
-  ['搜索', Boolean(scripts['search:index']) && exists('scripts/generate-search-index.mjs') && exists('src/pages/opensearch.xml.ts') && (!distReady || searchCount === 71)],
+  ['搜索', Boolean(scripts['search:index']) && exists('scripts/generate-search-index.mjs') && exists('src/pages/opensearch.xml.ts') && (!distReady || searchCount === counts.total)],
   ['评论入口', configText.includes('PUBLIC_GISCUS_REPO')],
   ['访问统计入口', configText.includes('PUBLIC_UMAMI_SCRIPT')],
   ['SEO / Open Graph', baseLayout.includes('og:image') && exists('scripts/generate-og-images.mjs') && exists('src/pages/llms.txt.ts') && exists('src/pages/humans.txt.ts')],
@@ -123,7 +125,7 @@ function printPhase(title, items) {
 
 console.log('博客状态报告');
 console.log(`站点：${siteURL}`);
-console.log(`文章：${legacyCount + 1} 篇（新文章 1 篇，旧文章 ${legacyCount} 篇）`);
+console.log(`文章：${counts.total} 篇（新系统文章 ${counts.published} 篇，旧文章 ${counts.legacy} 篇，草稿 ${counts.drafts} 篇）`);
 console.log(`构建产物：${distReady ? '已存在' : '未生成，请运行 npm run build'}`);
 
 printPhase('第一阶段：最小可用博客', phase1);
@@ -145,7 +147,7 @@ if (online) {
     ['RSS', '/rss.xml', '<rss'],
     ['JSON Feed', '/feed.json', 'jsonfeed.org/version/1.1'],
     ['OpenSearch', '/opensearch.xml', 'OpenSearchDescription'],
-    ['llms.txt', '/llms.txt', '## Articles (71)'],
+    ['llms.txt', '/llms.txt', `## Articles (${counts.total})`],
     ['humans.txt', '/humans.txt', '/* TEAM */'],
     ['Sitemap', '/sitemap.xml', '<urlset'],
     ['搜索索引', '/search.json', 'Chrome'],

@@ -1,7 +1,9 @@
 import { existsSync, readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
+import { contentCounts } from './lib/content-count.mjs';
 
 const failures = [];
+const counts = contentCounts();
 
 function mustExist(path, label) {
   if (!existsSync(resolve(path))) failures.push(`${label}: 缺少 ${path}`);
@@ -36,7 +38,7 @@ function mustNotInclude(path, pattern, label) {
 }
 
 const packageJson = JSON.parse(readFileSync(resolve('package.json'), 'utf8'));
-for (const script of ['dashboard', 'new', 'prepare', 'ready', 'publish', 'handoff', 'wechat', 'wechat:all', 'wechat:draft', 'wechat:push', 'import:wechat', 'import:dropbox', 'test:wechat-import', 'test:wechat-draft', 'test:dropbox-import', 'test:publish-worktree', 'test:dashboard', 'mirror', 'config:services', 'services:check', 'status', 'search:index', 'og:images', 'build', 'build:ci', 'audit', 'doctor']) {
+for (const script of ['dashboard', 'new', 'prepare', 'ready', 'publish', 'publish:dropbox', 'handoff', 'wechat', 'wechat:all', 'wechat:draft', 'wechat:push', 'import:wechat', 'import:dropbox', 'test:wechat-import', 'test:wechat-draft', 'test:dropbox-import', 'test:publish-worktree', 'test:dashboard', 'mirror', 'config:services', 'services:check', 'status', 'search:index', 'og:images', 'build', 'build:ci', 'audit', 'doctor']) {
   if (!packageJson.scripts?.[script]) failures.push(`package.json: 缺少 npm script ${script}`);
 }
 
@@ -67,7 +69,9 @@ for (const [path, label] of [
   ['scripts/publish-post.mjs', '一键发布脚本'],
   ['scripts/writing-dashboard.mjs', '本地写作控制台'],
   ['scripts/lib/obsidian-vault.mjs', 'Dropbox Obsidian Vault 自动识别'],
+  ['scripts/lib/content-count.mjs', '动态文章数量统计'],
   ['scripts/import-dropbox-posts.mjs', 'Dropbox 文章导入'],
+  ['scripts/publish-dropbox-archive.mjs', 'Dropbox 已发布文章批量发布'],
   ['scripts/test-dropbox-import.mjs', 'Dropbox 文章导入测试'],
   ['scripts/test-writing-dashboard.mjs', '本地写作控制台测试'],
   ['打开写作助手.cmd', 'Windows 双击启动入口'],
@@ -126,6 +130,8 @@ mustInclude('scripts/writing-dashboard.mjs', 'x-writing-token', '写作控制台
 mustInclude('scripts/writing-dashboard.mjs', "resolve(writingVault, '博客网站')", 'Dropbox 写作目录同步');
 mustInclude('scripts/lib/obsidian-vault.mjs', 'obsidian://open', 'Obsidian Vault 文件链接');
 mustInclude('scripts/import-dropbox-posts.mjs', "resolve(vault, '已发布')", 'Dropbox 已发布文章扫描');
+mustInclude('scripts/publish-dropbox-archive.mjs', "entry.name !== '写作风格.md'", '批量发布排除内部写作规范');
+mustInclude('scripts/check-built-site.mjs', 'counts.total', '构建文章数量动态校验');
 mustInclude('scripts/writing-dashboard.mjs', 'dropbox-import', '写作控制台 Dropbox 导入入口');
 mustInclude('scripts/publish-post.mjs', 'isAllowedBacklogChange', '一键发布隔离积压草稿');
 mustInclude('scripts/handoff.mjs', '私密迁移包', '换电脑私密资料迁移');
@@ -172,7 +178,7 @@ if (existsSync(resolve('dist/index.html'))) {
   mustInclude('dist/rss.xml', '<rss', 'RSS 产物');
   mustInclude('dist/feed.json', 'jsonfeed.org/version/1.1', 'JSON Feed 产物');
   mustInclude('dist/opensearch.xml', '/articles/?q={searchTerms}', 'OpenSearch 产物');
-  mustInclude('dist/llms.txt', '## Articles (71)', 'llms.txt 产物');
+  mustInclude('dist/llms.txt', `## Articles (${counts.total})`, 'llms.txt 产物');
   mustInclude('dist/humans.txt', 'Built with Astro and GitHub Pages', 'humans.txt 产物');
   mustInclude('dist/search.json', 'Chrome', '全文搜索索引产物');
   mustExist('dist/og/posts/2026-06-24-welcome/index.png', '文章级 PNG 分享图产物');

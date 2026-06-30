@@ -10,6 +10,7 @@
     "prepare": "node scripts/prepare-post.mjs",
     "ready": "node scripts/check-post-ready.mjs",
     "publish": "node scripts/publish-post.mjs",
+    "publish:dropbox": "node scripts/publish-dropbox-archive.mjs",
     "handoff": "node scripts/handoff.mjs",
     "wechat": "node scripts/generate-wechat.mjs",
     "wechat:all": "node scripts/generate-wechat-all.mjs",
