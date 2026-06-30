@@ -47,10 +47,14 @@ console.log(`待发布：${candidates.length} 篇`);
 for (const post of candidates) console.log(`- ${post.title}`);
 
 function run(command, args, { capture = false, allowFailure = false } = {}) {
-  const executable = process.platform === 'win32' && command === 'npm' ? 'npm.cmd' : command;
-  const commandArgs = command === 'git'
+  let executable = command;
+  let commandArgs = command === 'git'
     ? ['-c', `safe.directory=${projectRoot.replaceAll('\\', '/')}`, ...args]
     : args;
+  if (process.platform === 'win32' && command === 'npm') {
+    executable = process.env.ComSpec || 'C:\\Windows\\System32\\cmd.exe';
+    commandArgs = ['/d', '/s', '/c', 'npm.cmd', ...args];
+  }
   const result = spawnSync(executable, commandArgs, {
     cwd: projectRoot,
     encoding: 'utf8',
@@ -59,11 +63,12 @@ function run(command, args, { capture = false, allowFailure = false } = {}) {
     env: { ...process.env, ASTRO_TELEMETRY_DISABLED: '1' }
   });
   if (result.status !== 0 && !allowFailure) {
+    if (result.error) console.error(result.error.message);
     if (capture) process.stderr.write(result.stderr || result.stdout || '');
     throw new Error(`${command} 执行失败，退出码 ${result.status ?? 1}`);
   }
   return capture
-    ? { ok: result.status === 0, output: `${result.stdout || ''}${result.stderr || ''}`.trim() }
+    ? { ok: result.status === 0, output: `${result.stdout || ''}${result.stderr || ''}${result.error?.message || ''}`.trim() }
     : result.status === 0;
 }
 
