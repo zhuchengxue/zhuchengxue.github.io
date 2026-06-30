@@ -62,12 +62,14 @@ function run(command, args, { capture = false, allowFailure = false } = {}) {
     if (capture) process.stderr.write(result.stderr || result.stdout || '');
     throw new Error(`${command} 执行失败，退出码 ${result.status ?? 1}`);
   }
-  return capture ? (result.stdout || '').trim() : result.status === 0;
+  return capture
+    ? { ok: result.status === 0, output: `${result.stdout || ''}${result.stderr || ''}`.trim() }
+    : result.status === 0;
 }
 
 const candidatePaths = new Set(candidates.map((post) => relative(projectRoot, post.path).replaceAll('\\', '/')));
 const backlog = collectDraftBacklog(postsDirectory, projectRoot);
-const status = run('git', ['status', '--porcelain=v1', '-z'], { capture: true }).split('\0').filter(Boolean);
+const status = run('git', ['status', '--porcelain=v1', '-z'], { capture: true }).output.split('\0').filter(Boolean);
 const unrelated = status.filter((line) => {
   const path = line.slice(3).replaceAll('\\', '/').replace(/^"|"$/g, '');
   return !candidatePaths.has(path) && !isAllowedBacklogChange(line, backlog);
@@ -79,8 +81,15 @@ if (unrelated.length) {
 }
 
 for (const post of candidates) {
-  run('node', ['scripts/prepare-post.mjs', post.path, ...(dryRun ? ['--dry-run'] : [])]);
-  run('node', ['scripts/check-post-ready.mjs', post.path]);
+  const prepared = run('node', ['scripts/prepare-post.mjs', post.path, ...(dryRun ? ['--dry-run'] : [])], { capture: true, allowFailure: true });
+  const checked = prepared.ok
+    ? run('node', ['scripts/check-post-ready.mjs', post.path], { capture: true, allowFailure: true })
+    : { ok: false, output: '' };
+  if (!prepared.ok || !checked.ok) {
+    console.error(prepared.output || checked.output);
+    process.exit(1);
+  }
+  console.log(`✓ ${post.title}`);
 }
 
 if (dryRun) {
@@ -97,7 +106,11 @@ try {
   for (const post of candidates) {
     writeFileSync(post.path, originals.get(post.path).replace(/^draft:\s*true\s*$/m, 'draft: false'), 'utf8');
   }
-  if (!run('npm', ['run', 'build'], { allowFailure: true })) throw new Error('批量构建失败');
+  const build = run('npm', ['run', 'build'], { capture: true, allowFailure: true });
+  if (!build.ok) {
+    console.error(build.output.slice(-12000));
+    throw new Error('批量构建失败');
+  }
   run('git', ['add', '--', ...[...candidatePaths]]);
   run('git', ['commit', '-m', `Publish Dropbox archive (${candidates.length} posts)`]);
 } catch (error) {
