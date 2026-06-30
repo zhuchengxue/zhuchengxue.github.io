@@ -106,11 +106,7 @@ try {
   for (const post of candidates) {
     writeFileSync(post.path, originals.get(post.path).replace(/^draft:\s*true\s*$/m, 'draft: false'), 'utf8');
   }
-  const build = run('npm', ['run', 'build'], { capture: true, allowFailure: true });
-  if (!build.ok) {
-    console.error(build.output.slice(-12000));
-    throw new Error('批量构建失败');
-  }
+  if (!run('npm', ['run', 'build'], { allowFailure: true })) throw new Error('批量构建失败');
   run('git', ['add', '--', ...[...candidatePaths]]);
   run('git', ['commit', '-m', `Publish Dropbox archive (${candidates.length} posts)`]);
 } catch (error) {
