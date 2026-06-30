@@ -79,6 +79,7 @@ for (const path of [
   'scripts/test-writing-dashboard.mjs',
   '打开写作助手.cmd',
   'open-writing-dashboard.cmd',
+  'scripts/launch-writing-dashboard.vbs',
   '打开写作助手.command',
   'scripts/handoff.mjs',
   'scripts/lib/publish-worktree.mjs',

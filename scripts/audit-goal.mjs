@@ -76,6 +76,7 @@ for (const [path, label] of [
   ['scripts/test-writing-dashboard.mjs', '本地写作控制台测试'],
   ['打开写作助手.cmd', 'Windows 双击启动入口'],
   ['open-writing-dashboard.cmd', 'Windows 兼容启动逻辑'],
+  ['scripts/launch-writing-dashboard.vbs', 'Windows 隐藏后台启动器'],
   ['打开写作助手.command', 'macOS 双击启动入口'],
   ['scripts/handoff.mjs', '换电脑迁移脚本'],
   ['scripts/lib/publish-worktree.mjs', '积压草稿隔离模块'],
@@ -127,6 +128,7 @@ mustInclude('scripts/check-post-ready.mjs', '公众号 HTML 转换预检通过',
 mustInclude('scripts/publish-post.mjs', 'scripts/check-post-ready.mjs', '一键发布复用完整体检');
 mustInclude('scripts/writing-dashboard.mjs', "server.listen(port, '127.0.0.1'", '写作控制台仅监听本机');
 mustInclude('scripts/writing-dashboard.mjs', 'x-writing-token', '写作控制台本机会话验证');
+mustInclude('open-writing-dashboard.cmd', 'wscript.exe //nologo', 'Windows 写作控制台隐藏启动');
 mustInclude('scripts/writing-dashboard.mjs', "resolve(writingVault, '博客网站')", 'Dropbox 写作目录同步');
 mustInclude('scripts/lib/obsidian-vault.mjs', 'obsidian://open', 'Obsidian Vault 文件链接');
 mustInclude('scripts/import-dropbox-posts.mjs', "resolve(vault, '已发布')", 'Dropbox 已发布文章扫描');

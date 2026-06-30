@@ -3,7 +3,7 @@ cd /d "%~dp0"
 where node.exe >nul 2>nul
 if errorlevel 1 goto no_node
 if "%~1"=="--foreground" goto foreground
-start "" /min node.exe scripts\writing-dashboard.mjs
+wscript.exe //nologo "%~dp0scripts\launch-writing-dashboard.vbs" "%~dp0"
 exit /b 0
 
 :foreground

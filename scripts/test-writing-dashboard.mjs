@@ -1,8 +1,14 @@
 import assert from 'node:assert/strict';
 import { Script } from 'node:vm';
+import { readFileSync } from 'node:fs';
 
 process.env.WRITING_VAULT_DISABLED = '1';
 const { createDashboardServer } = await import('./writing-dashboard.mjs');
+
+const windowsLauncher = readFileSync('open-writing-dashboard.cmd', 'utf8');
+const hiddenLauncher = readFileSync('scripts/launch-writing-dashboard.vbs', 'utf8');
+assert.match(windowsLauncher, /wscript\.exe \/\/nologo/);
+assert.match(hiddenLauncher, /shell\.Run "node\.exe scripts\\writing-dashboard\.mjs", 0, False/);
 
 const dashboard = await createDashboardServer({ port: 0, openBrowser: false, quiet: true });
 try {
