@@ -49,4 +49,4 @@ Git 仓库必须放在 Dropbox 之外。Dropbox 中旧的 `博客网站/` 目录
 - 仓库：https://github.com/zhuchengxue/zhuchengxue.github.io
 - GitHub Actions：https://github.com/zhuchengxue/zhuchengxue.github.io/actions
 
-项目仍保留旧文章导入、站点诊断、独立域名、评论、统计和国内访问镜像等维护能力，但它们不会出现在日常发布界面。
+仓库只保留网站构建、Dropbox 发布器和公众号草稿链路，不再包含旧写作控制台、批量导入、迁移包或镜像发布工具。

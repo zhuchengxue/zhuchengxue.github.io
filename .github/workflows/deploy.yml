@@ -20,13 +20,6 @@ jobs:
     env:
       ASTRO_TELEMETRY_DISABLED: 1
       SITE_URL: ${{ vars.SITE_URL }}
-      CUSTOM_DOMAIN: ${{ vars.CUSTOM_DOMAIN }}
-      PUBLIC_GISCUS_REPO: ${{ vars.PUBLIC_GISCUS_REPO }}
-      PUBLIC_GISCUS_REPO_ID: ${{ vars.PUBLIC_GISCUS_REPO_ID }}
-      PUBLIC_GISCUS_CATEGORY: ${{ vars.PUBLIC_GISCUS_CATEGORY }}
-      PUBLIC_GISCUS_CATEGORY_ID: ${{ vars.PUBLIC_GISCUS_CATEGORY_ID }}
-      PUBLIC_UMAMI_SCRIPT: ${{ vars.PUBLIC_UMAMI_SCRIPT }}
-      PUBLIC_UMAMI_WEBSITE_ID: ${{ vars.PUBLIC_UMAMI_WEBSITE_ID }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v6
@@ -43,18 +36,8 @@ jobs:
         run: npx astro check
       - name: Check content
         run: npm run check:content
-      - name: Test WeChat importer
-        run: npm run test:wechat-import
-
-      - name: Test WeChat draft pipeline
-        run: npm run test:wechat-draft
-
-      - name: Test Dropbox source and article conversion
-        run: npm run test:article-source
-      - name: Test lightweight sync
-        run: npm run test:sync
-      - name: Test local article publisher
-        run: npm run test:publisher
+      - name: Test publishing workflow
+        run: npm test
       - name: Generate search index
         run: npm run search:index
       - name: Generate OG images
@@ -63,13 +46,6 @@ jobs:
         run: npx astro build
       - name: Check built site
         run: npm run check:build
-      - name: Audit goal deliverables
-        run: npm run audit
-      - name: Report blog status
-        run: npm run status
-      - name: Write custom domain
-        if: ${{ vars.CUSTOM_DOMAIN != '' }}
-        run: printf '%s\n' "$CUSTOM_DOMAIN" > dist/CNAME
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v4
         with:

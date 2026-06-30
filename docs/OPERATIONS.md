@@ -40,4 +40,4 @@ GitHub Pages 通常需要一两分钟。到 [GitHub Actions](https://github.com/
 
 ## 高级维护
 
-项目诊断仍可运行 `npm run doctor -- --online`，完整本地构建可运行 `npm run build`。这些只用于开发或排障，不属于日常写作流程。
+完整本地验证可运行 `npm test` 和 `npm run build`。这些只用于开发或排障，不属于日常写作流程。
