@@ -2,6 +2,7 @@
 title: "分享国行Mac开启Apple Intelegence功能"
 description: "国行Mac开启Apple Intelegence功能"
 pubDate: 2025-10-19
+sourceId: "分享国行Mac开启Apple Intelegence功能.md"
 tags:
   - 公众号归档
 draft: false

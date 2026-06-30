@@ -1,5 +1,5 @@
 import { existsSync, mkdirSync, readFileSync, readdirSync, rmSync, statSync, writeFileSync } from 'node:fs';
-import { basename, dirname, extname, relative, resolve } from 'node:path';
+import { basename, dirname, extname, isAbsolute, relative, resolve } from 'node:path';
 import matter from 'gray-matter';
 import sharp from 'sharp';
 import { cleanMarkdownText } from './dropbox-articles.mjs';
@@ -34,8 +34,9 @@ function existingPosts(postsDirectory) {
 }
 
 function findExistingTarget(article, postsDirectory) {
-  return existingPosts(postsDirectory).find((item) =>
-    String(item.parsed.data.title || '').trim() === article.title);
+  const posts = existingPosts(postsDirectory);
+  return posts.find((item) => String(item.parsed.data.sourceId || '').normalize('NFC') === article.sourceId)
+    || posts.find((item) => String(item.parsed.data.title || '').trim() === article.title);
 }
 
 function imageIndex(vaultPath) {
@@ -43,7 +44,10 @@ function imageIndex(vaultPath) {
   const pending = [vaultPath];
   while (pending.length) {
     const directory = pending.pop();
-    for (const entry of readdirSync(directory, { withFileTypes: true })) {
+    let entries;
+    try { entries = readdirSync(directory, { withFileTypes: true }); }
+    catch { continue; }
+    for (const entry of entries) {
       if (entry.name.startsWith('.') || entry.name === '博客网站') continue;
       const path = resolve(directory, entry.name);
       if (entry.isDirectory()) pending.push(path);
@@ -56,7 +60,7 @@ function imageIndex(vaultPath) {
   return index;
 }
 
-function findImage(reference, article, vaultPath, indexedImages) {
+function findImage(reference, article, vaultPath, getIndexedImages) {
   let decoded;
   try { decoded = decodeURIComponent(reference); } catch { decoded = reference; }
   const normalized = decoded.replaceAll('\\', '/').split('#')[0].trim();
@@ -65,10 +69,13 @@ function findImage(reference, article, vaultPath, indexedImages) {
     resolve(vaultPath, normalized),
     resolve(vaultPath, 'attachments', basename(normalized)),
     resolve(vaultPath, '附件', basename(normalized))
-  ];
-  return candidates.find((path) => existsSync(path) && statSync(path).isFile())
-    || indexedImages.get(basename(normalized).toLocaleLowerCase('zh-CN'))
-    || null;
+  ].filter((path) => {
+    const fromVault = relative(vaultPath, path);
+    return !fromVault.startsWith('..') && !isAbsolute(fromVault);
+  });
+  const direct = candidates.find((path) => existsSync(path) && statSync(path).isFile());
+  if (direct) return direct;
+  return getIndexedImages().get(basename(normalized).toLocaleLowerCase('zh-CN')) || null;
 }
 
 function tagsFor(article, existing) {
@@ -94,13 +101,17 @@ export async function transformDropboxArticle(article, options = {}) {
   const filename = existing?.filename || `${pubDate}-${slug}.md`;
   const targetPath = resolve(postsDirectory, filename);
   const imageDirectory = resolve(projectRoot, 'public/images', slug);
-  const indexedImages = imageIndex(vaultPath);
+  let indexedImages;
+  const getIndexedImages = () => {
+    indexedImages ??= imageIndex(vaultPath);
+    return indexedImages;
+  };
   const imageOperations = [];
   let imageNumber = 0;
 
   async function rewriteImage(reference, alt, original) {
     if (/^(?:https?:|data:)/i.test(reference)) return original;
-    const sourcePath = findImage(reference, article, vaultPath, indexedImages);
+    const sourcePath = findImage(reference, article, vaultPath, getIndexedImages);
     if (!sourcePath) throw new Error(`找不到文章图片：${reference}`);
     imageNumber += 1;
     const extension = extname(sourcePath).toLowerCase() === '.svg' ? '.svg' : '.webp';
@@ -138,6 +149,7 @@ export async function transformDropboxArticle(article, options = {}) {
     `title: ${JSON.stringify(article.title)}`,
     `description: ${JSON.stringify(description)}`,
     `pubDate: ${pubDate}`,
+    `sourceId: ${JSON.stringify(article.sourceId)}`,
     'tags:',
     ...tags.map((tag) => `  - ${JSON.stringify(tag)}`),
     'draft: false',
@@ -149,25 +161,8 @@ export async function transformDropboxArticle(article, options = {}) {
     ''
   ].join('\n');
 
-  if (!options.dryRun) {
-    mkdirSync(postsDirectory, { recursive: true });
-    if (existsSync(imageDirectory)) rmSync(imageDirectory, { recursive: true, force: true });
-    if (imageOperations.length) mkdirSync(imageDirectory, { recursive: true });
-    for (const operation of imageOperations) {
-      if (operation.extension === '.svg') {
-        writeFileSync(operation.outputPath, readFileSync(operation.sourcePath));
-      } else {
-        await sharp(operation.sourcePath, { animated: true })
-          .rotate()
-          .resize({ width: 1600, withoutEnlargement: true })
-          .webp({ quality: 82, effort: 3 })
-          .toFile(operation.outputPath);
-      }
-    }
-    writeFileSync(targetPath, output, 'utf8');
-  }
-
-  return {
+  const transformed = {
+    sourceId: article.sourceId,
     title: article.title,
     description,
     pubDate,
@@ -179,8 +174,31 @@ export async function transformDropboxArticle(article, options = {}) {
     imageDirectory,
     relativeImageDirectory: relative(projectRoot, imageDirectory).replaceAll('\\', '/'),
     imageCount: imageOperations.length,
+    imageOperations,
     body,
     output,
     existed: Boolean(existing)
   };
+  if (!options.dryRun) await writeTransformedArticle(transformed);
+  return transformed;
+}
+
+export async function writeTransformedArticle(transformed) {
+  mkdirSync(dirname(transformed.targetPath), { recursive: true });
+  if (existsSync(transformed.imageDirectory)) {
+    rmSync(transformed.imageDirectory, { recursive: true, force: true });
+  }
+  if (transformed.imageOperations.length) mkdirSync(transformed.imageDirectory, { recursive: true });
+  for (const operation of transformed.imageOperations) {
+    if (operation.extension === '.svg') {
+      writeFileSync(operation.outputPath, readFileSync(operation.sourcePath));
+    } else {
+      await sharp(operation.sourcePath, { animated: true })
+        .rotate()
+        .resize({ width: 1600, withoutEnlargement: true })
+        .webp({ quality: 82, effort: 3 })
+        .toFile(operation.outputPath);
+    }
+  }
+  writeFileSync(transformed.targetPath, transformed.output, 'utf8');
 }

@@ -14,41 +14,50 @@ const token = randomBytes(24).toString('hex');
 const defaultPort = Number(process.argv.find((arg) => arg.startsWith('--port='))?.split('=')[1] || 4180);
 const noOpen = process.argv.includes('--no-open');
 
-function existingTitles() {
+function existingArticles() {
   const directory = resolve(projectRoot, 'src/content/posts');
-  if (!existsSync(directory)) return new Map();
-  return new Map(readdirSync(directory, { withFileTypes: true })
+  if (!existsSync(directory)) return { byTitle: new Map(), bySourceId: new Map() };
+  const records = readdirSync(directory, { withFileTypes: true })
     .filter((entry) => entry.isFile() && entry.name.endsWith('.md'))
     .map((entry) => {
       try {
         const parsed = matter(readFileSync(resolve(directory, entry.name), 'utf8'));
-        return [String(parsed.data.title || '').trim(), {
+        return {
+          title: String(parsed.data.title || '').trim(),
+          sourceId: String(parsed.data.sourceId || '').normalize('NFC'),
           filename: entry.name,
           published: parsed.data.draft === false
-        }];
+        };
       } catch {
-        return ['', null];
+        return null;
       }
-    }).filter(([title]) => title));
+    }).filter(Boolean);
+  return {
+    byTitle: new Map(records.filter((item) => item.title).map((item) => [item.title, item])),
+    bySourceId: new Map(records.filter((item) => item.sourceId).map((item) => [item.sourceId, item]))
+  };
 }
 
 function publicState(vaultPath) {
   const localEnv = readLocalEnv();
   const collection = listDropboxArticles({ vaultPath });
-  const targets = existingTitles();
+  const targets = existingArticles();
   return {
     vaultPath: collection.vaultPath,
     wechatConfigured: wechatIsConfigured(),
     wechatAppId: localEnv.WECHAT_APP_ID || process.env.WECHAT_APP_ID || '',
-    articles: collection.articles.map((article) => ({
-      id: article.id,
-      title: article.title,
-      relativePath: article.relativePath,
-      archived: article.archived,
-      modifiedAt: article.modifiedAt,
-      published: Boolean(targets.get(article.title)?.published),
-      targetFilename: targets.get(article.title)?.filename || ''
-    })).sort((a, b) => Number(a.published) - Number(b.published)
+    articles: collection.articles.map((article) => {
+      const target = targets.bySourceId.get(article.sourceId) || targets.byTitle.get(article.title);
+      return {
+        id: article.id,
+        title: article.title,
+        relativePath: article.relativePath,
+        archived: article.archived,
+        modifiedAt: article.modifiedAt,
+        published: Boolean(target?.published),
+        targetFilename: target?.filename || ''
+      };
+    }).sort((a, b) => Number(a.published) - Number(b.published)
       || Number(a.archived) - Number(b.archived)
       || b.modifiedAt.localeCompare(a.modifiedAt))
   };
@@ -57,7 +66,9 @@ function publicState(vaultPath) {
 function json(response, status, value) {
   response.writeHead(status, {
     'Content-Type': 'application/json; charset=utf-8',
-    'Cache-Control': 'no-store'
+    'Cache-Control': 'no-store',
+    'X-Content-Type-Options': 'nosniff',
+    'Referrer-Policy': 'no-referrer'
   });
   response.end(JSON.stringify(value));
 }
@@ -177,6 +188,9 @@ export function createPublisherServer(options = {}) {
   const server = http.createServer(async (request, response) => {
     clearTimeout(inactivityTimer);
     inactivityTimer = setTimeout(() => server.close(), options.inactivityMs || 10 * 60 * 1000);
+    if (!/^(?:127\.0\.0\.1|localhost)(?::\d+)?$/i.test(request.headers.host || '')) {
+      return json(response, 403, { error: '发布器只接受本机请求。' });
+    }
     const url = new URL(request.url, 'http://127.0.0.1');
     if (url.pathname !== '/' && request.headers['x-publisher-token'] !== token) {
       return json(response, 403, { error: '本机会话已失效，请重新打开发布器。' });
@@ -185,7 +199,14 @@ export function createPublisherServer(options = {}) {
       if (request.method === 'GET' && url.pathname === '/') {
         const state = publicState(vaultPath);
         vaultPath = state.vaultPath;
-        response.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8', 'Cache-Control': 'no-store' });
+        response.writeHead(200, {
+          'Content-Type': 'text/html; charset=utf-8',
+          'Cache-Control': 'no-store',
+          'Content-Security-Policy': "default-src 'none'; style-src 'unsafe-inline'; script-src 'unsafe-inline'; connect-src 'self'; base-uri 'none'; frame-ancestors 'none'",
+          'X-Content-Type-Options': 'nosniff',
+          'X-Frame-Options': 'DENY',
+          'Referrer-Policy': 'no-referrer'
+        });
         return response.end(renderPage(state));
       }
       if (request.method === 'GET' && url.pathname === '/api/progress') return json(response, 200, { message: progress });

@@ -24,6 +24,7 @@ export function readDropboxArticle(sourcePath, vaultPath) {
   const title = cleanMarkdownText(parsed.data.title || h1?.[1] || basename(sourcePath, '.md'));
   const body = h1 ? parsed.content.replace(h1[0], '').trim() : parsed.content.trim();
   const relativePath = relative(vaultPath, sourcePath).replaceAll('\\', '/');
+  const sourceId = relativePath.replace(/^已发布\//, '').normalize('NFC');
   const modifiedDate = statSync(sourcePath).mtime.toISOString().slice(0, 10);
   const frontmatterDate = parsed.data.pubDate instanceof Date
     ? parsed.data.pubDate.toISOString().slice(0, 10)
@@ -33,6 +34,7 @@ export function readDropboxArticle(sourcePath, vaultPath) {
   return {
     id: relativePath,
     sourcePath,
+    sourceId,
     relativePath,
     title,
     body,
@@ -52,7 +54,7 @@ export function listDropboxArticles(options = {}) {
   }
   const vaultPath = resolve(candidate);
 
-  const articles = INCLUDED_DIRECTORIES.flatMap((directory) => {
+  const scanned = INCLUDED_DIRECTORIES.flatMap((directory) => {
     const sourceDirectory = resolve(vaultPath, directory);
     if (!existsSync(sourceDirectory)) return [];
     return readdirSync(sourceDirectory, { withFileTypes: true })
@@ -61,9 +63,17 @@ export function listDropboxArticles(options = {}) {
       .map((entry) => readDropboxArticle(resolve(sourceDirectory, entry.name), vaultPath));
   });
 
+  const unique = new Map();
+  for (const article of scanned) {
+    const current = unique.get(article.sourceId);
+    if (!current || (!article.archived && current.archived) || article.modifiedAt > current.modifiedAt) {
+      unique.set(article.sourceId, article);
+    }
+  }
+
   return {
     vaultPath,
-    articles: articles.sort((a, b) =>
+    articles: [...unique.values()].sort((a, b) =>
       b.modifiedAt.localeCompare(a.modifiedAt) || a.title.localeCompare(b.title, 'zh-CN'))
   };
 }

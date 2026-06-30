@@ -2,6 +2,7 @@ import assert from 'node:assert/strict';
 import { mkdtempSync, mkdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { resolve } from 'node:path';
+import { request as httpRequest } from 'node:http';
 
 process.env.WRITING_VAULT_DISABLED = '1';
 const { createPublisherServer } = await import('./article-publisher.mjs');
@@ -20,6 +21,8 @@ try {
   const response = await fetch(`http://127.0.0.1:${port}/`);
   const html = await response.text();
   assert.equal(response.status, 200);
+  assert.match(response.headers.get('content-security-policy') || '', /frame-ancestors 'none'/);
+  assert.equal(response.headers.get('x-frame-options'), 'DENY');
   assert.match(html, /发布文章/);
   assert.match(html, /同步到博客/);
   assert.match(html, /一篇文章/);
@@ -27,6 +30,15 @@ try {
   const inlineScript = html.match(/<script>([\s\S]*?)<\/script>/)?.[1];
   assert.ok(inlineScript);
   assert.doesNotThrow(() => new Function(inlineScript));
+  const blockedStatus = await new Promise((resolveStatus, rejectStatus) => {
+    const request = httpRequest({ hostname: '127.0.0.1', port, path: '/', headers: { Host: 'publisher.example' } }, (blocked) => {
+      blocked.resume();
+      resolveStatus(blocked.statusCode);
+    });
+    request.on('error', rejectStatus);
+    request.end();
+  });
+  assert.equal(blockedStatus, 403);
   console.log('极简发布器界面测试通过。');
 } finally {
   server.close();

@@ -1,9 +1,9 @@
 import { cpSync, existsSync, mkdtempSync, rmSync } from 'node:fs';
 import { basename, resolve } from 'node:path';
-import { spawnSync } from 'node:child_process';
+import { spawn } from 'node:child_process';
 import { tmpdir } from 'node:os';
 import { findDropboxArticle } from './dropbox-articles.mjs';
-import { transformDropboxArticle } from './article-transform.mjs';
+import { transformDropboxArticle, writeTransformedArticle } from './article-transform.mjs';
 import { loadLocalEnv } from './local-env.mjs';
 
 const SITE_ORIGIN = (process.env.SITE_URL || 'https://zhuchengxue.github.io').replace(/\/$/, '');
@@ -14,20 +14,46 @@ function run(command, args, options = {}) {
   const commandArgs = command === 'git'
     ? ['-c', `safe.directory=${projectRoot.replaceAll('\\', '/')}`, ...args]
     : args;
-  const result = spawnSync(executable, commandArgs, {
-    cwd: projectRoot,
-    encoding: 'utf8',
-    stdio: 'pipe',
-    shell: false,
-    env: { ...process.env, ...options.env, ASTRO_TELEMETRY_DISABLED: '1' }
+  return new Promise((resolveRun, rejectRun) => {
+    const child = spawn(executable, commandArgs, {
+      cwd: projectRoot,
+      stdio: ['ignore', 'pipe', 'pipe'],
+      shell: false,
+      windowsHide: true,
+      env: { ...process.env, ...options.env, ASTRO_TELEMETRY_DISABLED: '1' }
+    });
+    let stdout = '';
+    let stderr = '';
+    let settled = false;
+    child.stdout.setEncoding('utf8');
+    child.stderr.setEncoding('utf8');
+    child.stdout.on('data', (chunk) => { stdout += chunk; });
+    child.stderr.on('data', (chunk) => { stderr += chunk; });
+    const finish = (callback, value) => {
+      if (settled) return;
+      settled = true;
+      clearTimeout(timeout);
+      callback(value);
+    };
+    const timeout = setTimeout(() => {
+      child.kill();
+      const error = new Error(`${command} 执行超时，请检查网络后重试。`);
+      error.command = `${command} ${args.join(' ')}`;
+      finish(rejectRun, error);
+    }, options.timeoutMs || 180_000);
+    child.on('error', (error) => finish(rejectRun, error));
+    child.on('close', (status) => {
+      const output = `${stdout}${stderr}`.trim();
+      const result = { ok: status === 0, output, status };
+      if (status !== 0 && !options.allowFailure) {
+        const error = new Error(output || `${command} 执行失败`);
+        error.command = `${command} ${args.join(' ')}`;
+        finish(rejectRun, error);
+      } else {
+        finish(resolveRun, result);
+      }
+    });
   });
-  const output = `${result.stdout || ''}${result.stderr || ''}`.trim();
-  if (result.status !== 0 && !options.allowFailure) {
-    const error = new Error(output || `${command} 执行失败`);
-    error.command = `${command} ${args.join(' ')}`;
-    throw error;
-  }
-  return { ok: result.status === 0, output, status: result.status };
 }
 
 function validateArticle(transformed) {
@@ -38,12 +64,31 @@ function validateArticle(transformed) {
   if (!transformed.description) throw new Error('无法生成文章摘要。');
 }
 
-function ensureCleanTrackedFiles(projectRoot) {
-  const unstaged = run('git', ['diff', '--quiet'], { projectRoot, allowFailure: true });
-  const staged = run('git', ['diff', '--cached', '--quiet'], { projectRoot, allowFailure: true });
+async function ensureCleanTrackedFiles(projectRoot) {
+  const [unstaged, staged] = await Promise.all([
+    run('git', ['diff', '--quiet'], { projectRoot, allowFailure: true }),
+    run('git', ['diff', '--cached', '--quiet'], { projectRoot, allowFailure: true })
+  ]);
   if (!unstaged.ok || !staged.ok) {
     throw new Error('博客程序本身有尚未保存的改动。为避免误提交，本次同步已停止。Dropbox 里的文章不会受影响。');
   }
+}
+
+async function pushWithConcurrentRetry(projectRoot, notify) {
+  const pushArgs = ['-c', 'http.version=HTTP/1.1', 'push'];
+  const first = await run('git', pushArgs, { projectRoot, allowFailure: true });
+  if (first.ok) return;
+  if (!/(?:rejected|fetch first|non-fast-forward)/i.test(first.output)) {
+    throw new Error(first.output || 'GitHub 推送失败，请检查网络和登录状态。');
+  }
+
+  notify('检测到另一台电脑刚刚发布，正在自动合并…');
+  const pull = await run('git', ['pull', '--rebase'], { projectRoot, allowFailure: true });
+  if (!pull.ok) {
+    await run('git', ['rebase', '--abort'], { projectRoot, allowFailure: true });
+    throw new Error('另一台电脑同时修改了同一篇文章，自动合并未成功。Dropbox 原稿安全，请稍后重试或用 GitHub Desktop 处理冲突。');
+  }
+  await run('git', pushArgs, { projectRoot });
 }
 
 function snapshotOutput(transformed) {
@@ -86,34 +131,34 @@ export async function syncArticle(options) {
   });
 
   notify('正在获取博客的最新版本…');
-  ensureCleanTrackedFiles(projectRoot);
-  run('git', ['pull', '--rebase'], { projectRoot });
+  await ensureCleanTrackedFiles(projectRoot);
+  await run('git', ['pull', '--rebase'], { projectRoot });
 
   notify('正在检查文章与图片…');
   const preview = await transformDropboxArticle(article, { vaultPath, projectRoot, dryRun: true });
   validateArticle(preview);
   const snapshot = snapshotOutput(preview);
-  let transformed;
+  const transformed = preview;
   let committed = false;
   try {
     notify('正在整理文章与图片…');
-    transformed = await transformDropboxArticle(article, { vaultPath, projectRoot });
+    await writeTransformedArticle(transformed);
     notify('正在提交文章到 GitHub…');
     const addPaths = [transformed.relativeTarget];
-    const trackedImages = run('git', ['ls-files', '--', transformed.relativeImageDirectory], { projectRoot }).output;
+    const trackedImages = (await run('git', ['ls-files', '--', transformed.relativeImageDirectory], { projectRoot })).output;
     if (transformed.imageCount || trackedImages) addPaths.push(transformed.relativeImageDirectory);
-    run('git', ['add', '-A', '--', ...addPaths], { projectRoot });
-    const staged = run('git', ['diff', '--cached', '--name-only'], { projectRoot }).output;
+    await run('git', ['add', '-A', '--', ...addPaths], { projectRoot });
+    const staged = (await run('git', ['diff', '--cached', '--name-only'], { projectRoot })).output;
     if (staged) {
-      run('git', ['commit', '-m', `Publish: ${transformed.title}`], { projectRoot });
+      await run('git', ['commit', '-m', `Publish: ${transformed.title}`], { projectRoot });
       committed = true;
     }
     notify('正在推送到 GitHub Pages…');
-    run('git', ['-c', 'http.version=HTTP/1.1', 'push'], { projectRoot });
+    await pushWithConcurrentRetry(projectRoot, notify);
     snapshot.cleanup();
   } catch (error) {
     if (!committed) {
-      run('git', ['reset', '--', preview.relativeTarget, preview.relativeImageDirectory], { projectRoot, allowFailure: true });
+      await run('git', ['reset', '--', preview.relativeTarget, preview.relativeImageDirectory], { projectRoot, allowFailure: true });
       snapshot.restore();
     } else {
       snapshot.cleanup();
@@ -127,11 +172,11 @@ export async function syncArticle(options) {
     try {
       notify('正在生成公众号版本…');
       const wechatEnv = { WECHAT_OUTPUT_DIRECTORY: wechatOutput };
-      run(process.execPath, ['scripts/generate-wechat.mjs', transformed.targetPath], { projectRoot, env: wechatEnv });
+      await run(process.execPath, ['scripts/generate-wechat.mjs', transformed.targetPath], { projectRoot, env: wechatEnv });
       const metadataPath = resolve(wechatOutput, `${basename(transformed.filename, '.md')}.json`);
       if (!existsSync(metadataPath)) throw new Error('公众号版本生成失败。');
       notify('正在创建公众号草稿…');
-      run(process.execPath, ['scripts/create-wechat-draft.mjs', metadataPath], { projectRoot, env: wechatEnv });
+      await run(process.execPath, ['scripts/create-wechat-draft.mjs', metadataPath], { projectRoot, env: wechatEnv });
       wechatCreated = true;
     } catch (error) {
       const articleUrl = `${SITE_ORIGIN}/posts/${encodeURIComponent(basename(transformed.filename, '.md'))}/`;
