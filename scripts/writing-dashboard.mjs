@@ -4,6 +4,7 @@ import { basename, dirname, relative, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { randomBytes } from 'node:crypto';
 import { spawn } from 'node:child_process';
+import matter from 'gray-matter';
 import { readLocalEnv, updateLocalEnv } from './lib/local-env.mjs';
 import { findObsidianVault, obsidianFileURL } from './lib/obsidian-vault.mjs';
 
@@ -20,12 +21,13 @@ function parsePost(file) {
   const mirror = writingDirectory ? resolve(writingDirectory, file) : null;
   const sourcePath = mirror && existsSync(mirror) && statSync(mirror).mtimeMs > statSync(path).mtimeMs ? mirror : path;
   const source = readFileSync(sourcePath, 'utf8');
-  const field = (name) => source.match(new RegExp(`^${name}:\\s*(.*?)\\s*$`, 'm'))?.[1]?.trim().replace(/^['"]|['"]$/g, '') ?? '';
+  const data = matter(source).data;
+  const pubDate = data.pubDate instanceof Date ? data.pubDate.toISOString().slice(0, 10) : String(data.pubDate || '');
   return {
     path: relative(workspace, path).replaceAll('\\', '/'),
-    title: field('title') || basename(file, '.md'),
-    pubDate: field('pubDate'),
-    draft: field('draft') === 'true'
+    title: String(data.title || basename(file, '.md')),
+    pubDate,
+    draft: data.draft === true
   };
 }
 
@@ -153,7 +155,7 @@ function dashboardHTML(token, nonce) {
   <details><summary>设置与工具</summary><div class="tools">
     <div class="tool-section"><h3>文章工具</h3><div class="row"><button class="secondary" data-action="check">检查</button><button class="secondary" data-action="preview">预发布</button><button class="secondary" data-action="wechat">导出公众号 HTML</button></div></div>
     <div class="tool-section"><h3>公众号连接</h3><form id="wechat-form"><input id="wechat-app-id" autocomplete="off" placeholder="AppID"><label for="wechat-app-secret">AppSecret</label><input id="wechat-app-secret" type="password" autocomplete="new-password" placeholder="只保存在本机"><div class="row"><button type="submit">保存连接</button></div></form><p id="wechat-status" class="hint">正在检查配置…</p></div>
-    <div class="tool-section"><h3>旧文章</h3><div class="row"><button class="secondary" data-action="open-imports">打开导入目录</button><button class="secondary" data-action="import-preview">预览导入</button><button class="secondary" data-action="import">批量导入</button></div></div>
+    <div class="tool-section"><h3>Dropbox 旧文章</h3><div class="row"><button class="secondary" data-action="dropbox-import-preview">扫描</button><button class="secondary" data-action="dropbox-import">全部导入为草稿</button></div><p class="hint">自动读取写作库根目录和“已发布”文件夹；不会直接上线。</p></div>
     <div class="tool-section"><h3>系统</h3><div class="row"><button class="secondary" data-action="doctor">体检</button><button class="secondary" data-action="handoff">换电脑盘点</button><button class="secondary" data-action="install">修复依赖</button><button class="secondary" data-action="refresh">刷新</button><button class="secondary" data-action="shutdown">关闭</button><a class="link-button secondary" href="https://zhuchengxue.github.io/" target="_blank" rel="noreferrer">查看博客</a></div></div>
   </div></details>
 </main>
@@ -166,7 +168,7 @@ async function refresh(){try{render(await request('/api/state'));if(firstLoad){o
 async function action(name,payload={}){if(busy)return;setBusy(true);output.textContent='正在执行，请稍候…';try{const result=await request('/api/action',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({action:name,...payload})});output.textContent=result.output||'操作完成。';await refresh();if(result.obsidianUrl)location.href=result.obsidianUrl;if(name==='shutdown')output.textContent='控制台已关闭，可以关闭这个页面。'}catch(error){output.textContent=(error.data?.output?error.data.output+String.fromCharCode(10,10):'')+error.message}finally{setBusy(false)}}
 document.querySelector('#new-form').addEventListener('submit',event=>{event.preventDefault();action('new',{title:document.querySelector('#title').value})});
 document.querySelector('#wechat-form').addEventListener('submit',event=>{event.preventDefault();const appId=document.querySelector('#wechat-app-id').value.trim();const appSecret=document.querySelector('#wechat-app-secret').value.trim();if(!appId||!appSecret){output.textContent='请同时填写 AppID 和 AppSecret。';return}action('wechat-config',{appId,appSecret});document.querySelector('#wechat-app-secret').value=''});
-document.querySelectorAll('[data-action]').forEach(button=>button.addEventListener('click',()=>{const name=button.dataset.action;if(name==='refresh')return refresh();const article=articleSelect.value;if(['open-article','check','preview','wechat'].includes(name))return action(name,{article});if(name==='wechat-push'){if(confirm('确定把这篇文章上传到公众号草稿箱吗？不会自动群发。'))return action(name,{article,confirmation:article});return}if(name==='publish'){if(confirm('确定正式发布这篇文章吗？这会提交并推送到博客。'))return action(name,{article,confirmation:article});return}if(name==='import'){if(confirm('确定把导入目录中的文件批量转换为草稿吗？'))return action(name,{confirmation:'import'});return}if(name==='install'){if(confirm('确定安装或修复项目依赖吗？需要访问 npm 软件源。'))return action(name,{confirmation:'install'});return}action(name)}));refresh();
+document.querySelectorAll('[data-action]').forEach(button=>button.addEventListener('click',()=>{const name=button.dataset.action;if(name==='refresh')return refresh();const article=articleSelect.value;if(['open-article','check','preview','wechat'].includes(name))return action(name,{article});if(name==='wechat-push'){if(confirm('确定把这篇文章上传到公众号草稿箱吗？不会自动群发。'))return action(name,{article,confirmation:article});return}if(name==='publish'){if(confirm('确定正式发布这篇文章吗？这会提交并推送到博客。'))return action(name,{article,confirmation:article});return}if(name==='dropbox-import'){if(confirm('确定把 Dropbox 写作库中的文章全部导入为本地草稿吗？不会上线。'))return action(name,{confirmation:'dropbox-import'});return}if(name==='install'){if(confirm('确定安装或修复项目依赖吗？需要访问 npm 软件源。'))return action(name,{confirmation:'install'});return}action(name)}));refresh();
 </script></body></html>`;
 }
 
@@ -231,6 +233,7 @@ export async function createDashboardServer({ port = 4179, openBrowser = true, q
     if (articleActions.has(action) && !selected) return sendJSON(response, 400, { error: '请选择有效文章。' });
     if (action === 'publish' && payload.confirmation !== selected.path) return sendJSON(response, 400, { error: '正式发布确认失败。' });
     if (action === 'wechat-push' && payload.confirmation !== selected.path) return sendJSON(response, 400, { error: '公众号草稿推送确认失败。' });
+    if (action === 'dropbox-import' && payload.confirmation !== 'dropbox-import') return sendJSON(response, 400, { error: 'Dropbox 批量导入确认失败。' });
     if (action === 'import' && payload.confirmation !== 'import') return sendJSON(response, 400, { error: '批量导入确认失败。' });
     if (action === 'install' && payload.confirmation !== 'install') return sendJSON(response, 400, { error: '依赖安装确认失败。' });
 
@@ -249,6 +252,8 @@ export async function createDashboardServer({ port = 4179, openBrowser = true, q
     else if (action === 'publish') command = ['node', ['scripts/publish-post.mjs', selected.path]];
     else if (action === 'wechat') command = ['node', ['scripts/generate-wechat.mjs', selected.path]];
     else if (action === 'wechat-push') command = ['node', ['scripts/push-wechat.mjs', selected.path]];
+    else if (action === 'dropbox-import-preview') command = ['node', ['scripts/import-dropbox-posts.mjs', '--dry-run']];
+    else if (action === 'dropbox-import') command = ['node', ['scripts/import-dropbox-posts.mjs']];
     else if (action === 'wechat-config') {
       const appId = String(payload.appId || '').trim();
       const appSecret = String(payload.appSecret || '').trim();

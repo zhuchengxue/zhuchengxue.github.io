@@ -44,7 +44,7 @@ async function fetchText(path, { timeout = 15000, attempts = 2 } = {}) {
 }
 
 const packageJson = readJSON('package.json');
-for (const script of ['dev', 'dashboard', 'new', 'prepare', 'ready', 'publish', 'handoff', 'wechat', 'wechat:all', 'wechat:draft', 'wechat:push', 'import:wechat', 'test:wechat-import', 'test:wechat-draft', 'test:publish-worktree', 'test:dashboard', 'mirror', 'config:services', 'services:check', 'status', 'og:images', 'build', 'build:ci', 'audit', 'doctor']) {
+for (const script of ['dev', 'dashboard', 'new', 'prepare', 'ready', 'publish', 'handoff', 'wechat', 'wechat:all', 'wechat:draft', 'wechat:push', 'import:wechat', 'import:dropbox', 'test:wechat-import', 'test:wechat-draft', 'test:dropbox-import', 'test:publish-worktree', 'test:dashboard', 'mirror', 'config:services', 'services:check', 'status', 'og:images', 'build', 'build:ci', 'audit', 'doctor']) {
   check(`npm script: ${script}`, Boolean(packageJson.scripts?.[script]));
 }
 
@@ -70,6 +70,8 @@ for (const path of [
   'scripts/check-post-ready.mjs',
   'scripts/writing-dashboard.mjs',
   'scripts/lib/obsidian-vault.mjs',
+  'scripts/import-dropbox-posts.mjs',
+  'scripts/test-dropbox-import.mjs',
   'scripts/test-writing-dashboard.mjs',
   '打开写作助手.cmd',
   'open-writing-dashboard.cmd',

@@ -48,6 +48,9 @@ jobs:
 
       - name: Test WeChat draft pipeline
         run: npm run test:wechat-draft
+
+      - name: Test Dropbox article import
+        run: npm run test:dropbox-import
       - name: Test publishing isolation
         run: npm run test:publish-worktree
       - name: Test local writing dashboard

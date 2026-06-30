@@ -36,7 +36,7 @@ function mustNotInclude(path, pattern, label) {
 }
 
 const packageJson = JSON.parse(readFileSync(resolve('package.json'), 'utf8'));
-for (const script of ['dashboard', 'new', 'prepare', 'ready', 'publish', 'handoff', 'wechat', 'wechat:all', 'wechat:draft', 'wechat:push', 'import:wechat', 'test:wechat-import', 'test:wechat-draft', 'test:publish-worktree', 'test:dashboard', 'mirror', 'config:services', 'services:check', 'status', 'search:index', 'og:images', 'build', 'build:ci', 'audit', 'doctor']) {
+for (const script of ['dashboard', 'new', 'prepare', 'ready', 'publish', 'handoff', 'wechat', 'wechat:all', 'wechat:draft', 'wechat:push', 'import:wechat', 'import:dropbox', 'test:wechat-import', 'test:wechat-draft', 'test:dropbox-import', 'test:publish-worktree', 'test:dashboard', 'mirror', 'config:services', 'services:check', 'status', 'search:index', 'og:images', 'build', 'build:ci', 'audit', 'doctor']) {
   if (!packageJson.scripts?.[script]) failures.push(`package.json: 缺少 npm script ${script}`);
 }
 
@@ -67,6 +67,8 @@ for (const [path, label] of [
   ['scripts/publish-post.mjs', '一键发布脚本'],
   ['scripts/writing-dashboard.mjs', '本地写作控制台'],
   ['scripts/lib/obsidian-vault.mjs', 'Dropbox Obsidian Vault 自动识别'],
+  ['scripts/import-dropbox-posts.mjs', 'Dropbox 文章导入'],
+  ['scripts/test-dropbox-import.mjs', 'Dropbox 文章导入测试'],
   ['scripts/test-writing-dashboard.mjs', '本地写作控制台测试'],
   ['打开写作助手.cmd', 'Windows 双击启动入口'],
   ['open-writing-dashboard.cmd', 'Windows 兼容启动逻辑'],
@@ -123,6 +125,8 @@ mustInclude('scripts/writing-dashboard.mjs', "server.listen(port, '127.0.0.1'", 
 mustInclude('scripts/writing-dashboard.mjs', 'x-writing-token', '写作控制台本机会话验证');
 mustInclude('scripts/writing-dashboard.mjs', "resolve(writingVault, '博客网站')", 'Dropbox 写作目录同步');
 mustInclude('scripts/lib/obsidian-vault.mjs', 'obsidian://open', 'Obsidian Vault 文件链接');
+mustInclude('scripts/import-dropbox-posts.mjs', "resolve(vault, '已发布')", 'Dropbox 已发布文章扫描');
+mustInclude('scripts/writing-dashboard.mjs', 'dropbox-import', '写作控制台 Dropbox 导入入口');
 mustInclude('scripts/publish-post.mjs', 'isAllowedBacklogChange', '一键发布隔离积压草稿');
 mustInclude('scripts/handoff.mjs', '私密迁移包', '换电脑私密资料迁移');
 mustInclude('docs/MIGRATION.md', '新 Mac', '跨平台迁移说明');
@@ -143,6 +147,7 @@ mustInclude('scripts/lib/wechat-import.mjs', "getAttribute(tag, 'data-src')", '�
 mustInclude('scripts/test-wechat-import.mjs', '页脚不应进入正文', '旧公众号正文范围测试');
 mustInclude('.github/workflows/deploy.yml', 'npm run test:wechat-import', '旧公众号迁移 CI 测试');
 mustInclude('.github/workflows/deploy.yml', 'npm run test:wechat-draft', '公众号草稿链路 CI 测试');
+mustInclude('.github/workflows/deploy.yml', 'npm run test:dropbox-import', 'Dropbox 文章导入 CI 测试');
 mustInclude('.github/workflows/deploy.yml', 'npm run test:publish-worktree', '积压草稿隔离 CI 测试');
 mustInclude('.github/workflows/deploy.yml', 'npm run test:dashboard', '本地写作控制台 CI 测试');
 mustInclude('scripts/deploy-mirror.mjs', 'MIRROR_REPO', '国内访问镜像发布');

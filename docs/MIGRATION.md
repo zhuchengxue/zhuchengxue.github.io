@@ -7,6 +7,8 @@
 
 写作控制台会优先自动识别 Obsidian 已登记的 Dropbox Vault，并把网站文章同步到 Vault 内的 `博客网站/`。新电脑只需等待 Dropbox 同步完成，再用 Obsidian 打开该 Vault。
 
+若新电脑的本地 Git 仓库尚未包含 Dropbox 旧稿，可在写作控制台的“设置与工具”中执行一次“Dropbox 旧文章 → 全部导入为草稿”；重复执行会按标题跳过已存在文章。
+
 `draft: true` 只是不生成网页；如果把草稿提交到公开 GitHub 仓库，任何人仍可读取源码。因此未发布内容不要执行 `git add .`。
 
 ## 离开旧电脑前
