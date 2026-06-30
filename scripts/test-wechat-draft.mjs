@@ -1,13 +1,13 @@
 import assert from 'node:assert/strict';
 import { createServer } from 'node:http';
-import { existsSync, mkdirSync, rmSync, writeFileSync } from 'node:fs';
+import { existsSync, mkdtempSync, rmSync, writeFileSync } from 'node:fs';
+import { tmpdir } from 'node:os';
 import { resolve } from 'node:path';
 import { spawn } from 'node:child_process';
 
-const outputDirectory = resolve('exports/wechat');
+const outputDirectory = mkdtempSync(resolve(tmpdir(), 'xueyusi-wechat-test-'));
 const metadataPath = resolve(outputDirectory, '__wechat-api-test.json');
 const receiptPath = resolve(outputDirectory, '__wechat-api-test.result.json');
-mkdirSync(outputDirectory, { recursive: true });
 writeFileSync(metadataPath, `${JSON.stringify({
   title: '公众号接口测试',
   author: 'test',
@@ -57,6 +57,7 @@ try {
         WECHAT_APP_SECRET: 'test-app-secret',
         WECHAT_THUMB_MEDIA_ID: '',
         NODE_ENV: 'test',
+        WECHAT_OUTPUT_DIRECTORY: outputDirectory,
         WECHAT_API_ORIGIN: `http://127.0.0.1:${port}`
       },
       stdio: ['ignore', 'pipe', 'pipe']
@@ -76,6 +77,5 @@ try {
   console.log('微信公众号草稿测试通过：正文图片、封面和草稿均已走完整接口链路。');
 } finally {
   await new Promise((resolveClose) => server.close(resolveClose));
-  rmSync(metadataPath, { force: true });
-  rmSync(receiptPath, { force: true });
+  rmSync(outputDirectory, { recursive: true, force: true });
 }

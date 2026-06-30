@@ -8,17 +8,17 @@ loadLocalEnv();
 const args = process.argv.slice(2);
 const dryRun = args.includes('--dry-run');
 const metadataArgument = args.find((arg) => arg !== '--dry-run');
-const outputDirectory = resolve('exports/wechat');
+const outputDirectory = resolve(process.env.WECHAT_OUTPUT_DIRECTORY || 'exports/wechat');
 
 if (!metadataArgument) {
-  console.error('用法：npm run wechat:draft -- "exports/wechat/文章.json" [--dry-run]');
+  console.error('缺少公众号草稿元数据，请使用“发布文章”入口。');
   process.exit(1);
 }
 
 const metadataPath = resolve(metadataArgument);
 const relativeMetadata = relative(outputDirectory, metadataPath);
 if (relativeMetadata.startsWith('..') || isAbsolute(relativeMetadata) || !metadataPath.endsWith('.json')) {
-  console.error('只能读取 exports/wechat 下的 JSON 草稿元数据。');
+  console.error('只能读取发布器临时目录中的 JSON 草稿元数据。');
   process.exit(1);
 }
 if (!existsSync(metadataPath)) {

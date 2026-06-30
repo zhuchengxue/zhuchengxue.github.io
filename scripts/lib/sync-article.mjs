@@ -19,7 +19,7 @@ function run(command, args, options = {}) {
     encoding: 'utf8',
     stdio: 'pipe',
     shell: false,
-    env: { ...process.env, ASTRO_TELEMETRY_DISABLED: '1' }
+    env: { ...process.env, ...options.env, ASTRO_TELEMETRY_DISABLED: '1' }
   });
   const output = `${result.stdout || ''}${result.stderr || ''}`.trim();
   if (result.status !== 0 && !options.allowFailure) {
@@ -123,17 +123,21 @@ export async function syncArticle(options) {
 
   let wechatCreated = false;
   if (withWechat) {
+    const wechatOutput = mkdtempSync(resolve(tmpdir(), 'xueyusi-wechat-'));
     try {
       notify('正在生成公众号版本…');
-      run(process.execPath, ['scripts/generate-wechat.mjs', transformed.targetPath], { projectRoot });
-      const metadataPath = resolve(projectRoot, 'exports/wechat', `${basename(transformed.filename, '.md')}.json`);
+      const wechatEnv = { WECHAT_OUTPUT_DIRECTORY: wechatOutput };
+      run(process.execPath, ['scripts/generate-wechat.mjs', transformed.targetPath], { projectRoot, env: wechatEnv });
+      const metadataPath = resolve(wechatOutput, `${basename(transformed.filename, '.md')}.json`);
       if (!existsSync(metadataPath)) throw new Error('公众号版本生成失败。');
       notify('正在创建公众号草稿…');
-      run(process.execPath, ['scripts/create-wechat-draft.mjs', metadataPath], { projectRoot });
+      run(process.execPath, ['scripts/create-wechat-draft.mjs', metadataPath], { projectRoot, env: wechatEnv });
       wechatCreated = true;
     } catch (error) {
       const articleUrl = `${SITE_ORIGIN}/posts/${encodeURIComponent(basename(transformed.filename, '.md'))}/`;
       throw new Error(`博客已经推送成功，但公众号草稿创建失败：${error.message}\n博客地址：${articleUrl}`);
+    } finally {
+      rmSync(wechatOutput, { recursive: true, force: true });
     }
   }
 

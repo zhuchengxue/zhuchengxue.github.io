@@ -5,13 +5,13 @@ import { marked } from 'marked';
 
 const SITE_ORIGIN = (process.env.SITE_URL ?? 'https://zhuchengxue.github.io').replace(/\/$/, '');
 const postsDirectory = resolve('src/content/posts');
-const outputDirectory = resolve('exports/wechat');
+const outputDirectory = resolve(process.env.WECHAT_OUTPUT_DIRECTORY || 'exports/wechat');
 const args = process.argv.slice(2);
 const dryRun = args.includes('--dry-run');
 const articleArgument = args.find((arg) => arg !== '--dry-run');
 
 if (!articleArgument) {
-  console.error('用法：npm run wechat -- "src/content/posts/文章.md" [--dry-run]');
+  console.error('缺少网站文章路径，请使用“发布文章”入口。');
   process.exit(1);
 }
 
