@@ -46,7 +46,7 @@ async function fetchText(path, { timeout = 15000, attempts = 2 } = {}) {
 }
 
 const packageJson = readJSON('package.json');
-for (const script of ['dev', 'dashboard', 'new', 'prepare', 'ready', 'publish', 'publish:dropbox', 'handoff', 'wechat', 'wechat:all', 'wechat:draft', 'wechat:push', 'import:wechat', 'import:dropbox', 'test:wechat-import', 'test:wechat-draft', 'test:dropbox-import', 'test:publish-worktree', 'test:dashboard', 'mirror', 'config:services', 'services:check', 'status', 'og:images', 'build', 'build:ci', 'audit', 'doctor']) {
+for (const script of ['dev', 'publisher', 'dashboard', 'new', 'prepare', 'ready', 'publish', 'publish:dropbox', 'handoff', 'wechat', 'wechat:all', 'wechat:draft', 'wechat:push', 'import:wechat', 'import:dropbox', 'test:wechat-import', 'test:wechat-draft', 'test:article-source', 'test:sync', 'test:publisher', 'mirror', 'config:services', 'services:check', 'status', 'og:images', 'build', 'build:ci', 'audit', 'doctor']) {
   check(`npm script: ${script}`, Boolean(packageJson.scripts?.[script]));
 }
 
@@ -70,17 +70,22 @@ for (const path of [
   'scripts/generate-wechat.mjs',
   'scripts/generate-wechat-all.mjs',
   'scripts/check-post-ready.mjs',
-  'scripts/writing-dashboard.mjs',
+  'scripts/article-publisher.mjs',
+  'scripts/lib/dropbox-articles.mjs',
+  'scripts/lib/article-transform.mjs',
+  'scripts/lib/sync-article.mjs',
   'scripts/lib/obsidian-vault.mjs',
   'scripts/lib/content-count.mjs',
   'scripts/import-dropbox-posts.mjs',
   'scripts/publish-dropbox-archive.mjs',
   'scripts/test-dropbox-import.mjs',
-  'scripts/test-writing-dashboard.mjs',
-  '打开写作助手.cmd',
-  'open-writing-dashboard.cmd',
-  'scripts/launch-writing-dashboard.vbs',
-  '打开写作助手.command',
+  'scripts/test-article-source.mjs',
+  'scripts/test-sync-article.mjs',
+  'scripts/test-article-publisher.mjs',
+  '发布文章.cmd',
+  'open-article-publisher.cmd',
+  'scripts/launch-article-publisher.vbs',
+  '发布文章.command',
   'scripts/handoff.mjs',
   'scripts/lib/publish-worktree.mjs',
   'scripts/test-publish-worktree.mjs',

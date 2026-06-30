@@ -1,2 +1,2 @@
 @echo off
-call "%~dp0open-writing-dashboard.cmd" %*
+call "%~dp0open-article-publisher.cmd" %*

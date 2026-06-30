@@ -24,11 +24,11 @@
 
 | 要求 | 状态 | 证据 |
 | --- | --- | --- |
-| 配置 Obsidian Vault | 已完成 | `.obsidian/app.json`、`.obsidian/templates.json` |
-| 统一文章模板 | 已完成 | `templates/article.md` |
-| 统一图片目录和文件命名 | 已完成 | `scripts/prepare-post.mjs`、`public/images/inbox/.gitkeep` |
-| 添加一键发布脚本 | 已完成 | `scripts/publish-post.mjs`、`npm run publish` |
-| 无命令行写作控制台 | 已完成 | `scripts/writing-dashboard.mjs`、Windows/macOS 双击启动入口、`npm run test:dashboard` |
+| 自动识别 Obsidian Dropbox Vault | 已完成 | `scripts/lib/obsidian-vault.mjs`，支持 Windows 各盘符和 macOS Dropbox 标准目录 |
+| 直接读取普通 Markdown | 已完成 | `scripts/lib/dropbox-articles.mjs`，不要求专用模板或复制原稿 |
+| 自动整理图片和网站格式 | 已完成 | `scripts/lib/article-transform.mjs`，不修改 Dropbox 原图与原稿 |
+| 轻量 GitHub 发布 | 已完成 | `scripts/lib/sync-article.mjs`，本机不构建全站 |
+| 无命令行极简发布器 | 已完成 | `scripts/article-publisher.mjs`、Windows/macOS 双击入口、`npm run test:publisher` |
 
 ## 第三阶段：公众号分发
 
@@ -37,7 +37,7 @@
 | 生成适合公众号的 HTML | 已完成 | `scripts/generate-wechat.mjs`、`npm run wechat` |
 | 自动处理正文图片和封面 | 已完成 | `scripts/create-wechat-draft.mjs` 上传正文图片并替换 URL，自动上传文章封面或默认封面 |
 | 保留博客原文链接 | 已完成 | `content_source_url`、文末原文地址 |
-| 视接口权限自动创建草稿 | 可选启用 | 写作控制台“推送到公众号草稿箱”、`npm run wechat:push`；需要 `WECHAT_APP_ID`、`WECHAT_APP_SECRET` 和 IP 白名单 |
+| 视接口权限自动创建草稿 | 可选启用 | 发布器一次同步；需要 `WECHAT_APP_ID`、`WECHAT_APP_SECRET` 和 IP 白名单 |
 
 ## 第四阶段：完善
 

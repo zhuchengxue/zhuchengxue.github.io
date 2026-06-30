@@ -38,7 +38,7 @@ function mustNotInclude(path, pattern, label) {
 }
 
 const packageJson = JSON.parse(readFileSync(resolve('package.json'), 'utf8'));
-for (const script of ['dashboard', 'new', 'prepare', 'ready', 'publish', 'publish:dropbox', 'handoff', 'wechat', 'wechat:all', 'wechat:draft', 'wechat:push', 'import:wechat', 'import:dropbox', 'test:wechat-import', 'test:wechat-draft', 'test:dropbox-import', 'test:publish-worktree', 'test:dashboard', 'mirror', 'config:services', 'services:check', 'status', 'search:index', 'og:images', 'build', 'build:ci', 'audit', 'doctor']) {
+for (const script of ['publisher', 'dashboard', 'new', 'prepare', 'ready', 'publish', 'publish:dropbox', 'handoff', 'wechat', 'wechat:all', 'wechat:draft', 'wechat:push', 'import:wechat', 'import:dropbox', 'test:wechat-import', 'test:wechat-draft', 'test:article-source', 'test:sync', 'test:publisher', 'mirror', 'config:services', 'services:check', 'status', 'search:index', 'og:images', 'build', 'build:ci', 'audit', 'doctor']) {
   if (!packageJson.scripts?.[script]) failures.push(`package.json: 缺少 npm script ${script}`);
 }
 
@@ -67,17 +67,22 @@ for (const [path, label] of [
   ['scripts/prepare-post.mjs', '图片整理脚本'],
   ['scripts/check-post-ready.mjs', '文章发布前体检脚本'],
   ['scripts/publish-post.mjs', '一键发布脚本'],
-  ['scripts/writing-dashboard.mjs', '本地写作控制台'],
+  ['scripts/article-publisher.mjs', '极简文章发布器'],
+  ['scripts/lib/dropbox-articles.mjs', 'Dropbox 唯一原稿读取'],
+  ['scripts/lib/article-transform.mjs', '文章转换模块'],
+  ['scripts/lib/sync-article.mjs', '轻量同步模块'],
   ['scripts/lib/obsidian-vault.mjs', 'Dropbox Obsidian Vault 自动识别'],
   ['scripts/lib/content-count.mjs', '动态文章数量统计'],
   ['scripts/import-dropbox-posts.mjs', 'Dropbox 文章导入'],
   ['scripts/publish-dropbox-archive.mjs', 'Dropbox 已发布文章批量发布'],
   ['scripts/test-dropbox-import.mjs', 'Dropbox 文章导入测试'],
-  ['scripts/test-writing-dashboard.mjs', '本地写作控制台测试'],
-  ['打开写作助手.cmd', 'Windows 双击启动入口'],
-  ['open-writing-dashboard.cmd', 'Windows 兼容启动逻辑'],
-  ['scripts/launch-writing-dashboard.vbs', 'Windows 隐藏后台启动器'],
-  ['打开写作助手.command', 'macOS 双击启动入口'],
+  ['scripts/test-article-source.mjs', 'Dropbox 原稿转换测试'],
+  ['scripts/test-sync-article.mjs', '轻量同步测试'],
+  ['scripts/test-article-publisher.mjs', '极简发布器测试'],
+  ['发布文章.cmd', 'Windows 双击启动入口'],
+  ['open-article-publisher.cmd', 'Windows 启动逻辑'],
+  ['scripts/launch-article-publisher.vbs', 'Windows 隐藏启动器'],
+  ['发布文章.command', 'macOS 双击启动入口'],
   ['scripts/handoff.mjs', '换电脑迁移脚本'],
   ['scripts/lib/publish-worktree.mjs', '积压草稿隔离模块'],
   ['scripts/test-publish-worktree.mjs', '积压草稿隔离测试'],
@@ -126,15 +131,17 @@ mustInclude('src/config.ts', 'PUBLIC_GISCUS_REPO', '可选评论');
 mustInclude('src/config.ts', 'PUBLIC_UMAMI_SCRIPT', '可选统计');
 mustInclude('scripts/check-post-ready.mjs', '公众号 HTML 转换预检通过', '文章发布前体检');
 mustInclude('scripts/publish-post.mjs', 'scripts/check-post-ready.mjs', '一键发布复用完整体检');
-mustInclude('scripts/writing-dashboard.mjs', "server.listen(port, '127.0.0.1'", '写作控制台仅监听本机');
-mustInclude('scripts/writing-dashboard.mjs', 'x-writing-token', '写作控制台本机会话验证');
-mustInclude('open-writing-dashboard.cmd', 'wscript.exe //nologo', 'Windows 写作控制台隐藏启动');
-mustInclude('scripts/writing-dashboard.mjs', "resolve(writingVault, '博客网站')", 'Dropbox 写作目录同步');
+mustInclude('scripts/article-publisher.mjs', "server.listen(defaultPort, '127.0.0.1'", '发布器仅监听本机');
+mustInclude('scripts/article-publisher.mjs', 'x-publisher-token', '发布器本机会话验证');
+mustInclude('open-article-publisher.cmd', 'wscript.exe //nologo', 'Windows 发布器隐藏启动');
+mustNotInclude('scripts/article-publisher.mjs', "resolve(writingVault, '博客网站')", '发布器不再维护 Dropbox 镜像目录');
 mustInclude('scripts/lib/obsidian-vault.mjs', 'obsidian://open', 'Obsidian Vault 文件链接');
 mustInclude('scripts/import-dropbox-posts.mjs', "resolve(vault, '已发布')", 'Dropbox 已发布文章扫描');
 mustInclude('scripts/publish-dropbox-archive.mjs', "entry.name !== '写作风格.md'", '批量发布排除内部写作规范');
 mustInclude('scripts/check-built-site.mjs', 'counts.total', '构建文章数量动态校验');
-mustInclude('scripts/writing-dashboard.mjs', 'dropbox-import', '写作控制台 Dropbox 导入入口');
+mustInclude('scripts/lib/dropbox-articles.mjs', "'已发布'", 'Dropbox 原稿目录扫描');
+mustInclude('scripts/lib/sync-article.mjs', "['pull', '--rebase']", '发布前拉取 GitHub 最新版本');
+mustNotInclude('scripts/lib/sync-article.mjs', 'npm run build', '本机同步不执行全站构建');
 mustInclude('scripts/publish-post.mjs', 'isAllowedBacklogChange', '一键发布隔离积压草稿');
 mustInclude('scripts/handoff.mjs', '私密迁移包', '换电脑私密资料迁移');
 mustInclude('docs/MIGRATION.md', '新 Mac', '跨平台迁移说明');
@@ -148,16 +155,16 @@ mustInclude('scripts/create-wechat-draft.mjs', 'draft/add', '公众号草稿 API
 mustInclude('scripts/create-wechat-draft.mjs', 'media/uploadimg', '公众号正文图片上传');
 mustInclude('scripts/create-wechat-draft.mjs', 'material/add_material', '公众号封面上传');
 mustInclude('scripts/create-wechat-draft.mjs', 'WECHAT_APP_SECRET', '公众号凭据环境变量');
-mustInclude('scripts/writing-dashboard.mjs', 'wechat-push', '写作控制台公众号草稿按钮');
+mustInclude('scripts/lib/sync-article.mjs', 'scripts/create-wechat-draft.mjs', '发布器公众号草稿链路');
 mustInclude('scripts/import-wechat.mjs', 'draft: true', '旧公众号导入为草稿');
 mustInclude('scripts/import-wechat.mjs', 'wechat-import-report.json', '旧公众号导入报告');
 mustInclude('scripts/lib/wechat-import.mjs', "getAttribute(tag, 'data-src')", '旧公众号懒加载图片迁移');
 mustInclude('scripts/test-wechat-import.mjs', '页脚不应进入正文', '旧公众号正文范围测试');
 mustInclude('.github/workflows/deploy.yml', 'npm run test:wechat-import', '旧公众号迁移 CI 测试');
 mustInclude('.github/workflows/deploy.yml', 'npm run test:wechat-draft', '公众号草稿链路 CI 测试');
-mustInclude('.github/workflows/deploy.yml', 'npm run test:dropbox-import', 'Dropbox 文章导入 CI 测试');
-mustInclude('.github/workflows/deploy.yml', 'npm run test:publish-worktree', '积压草稿隔离 CI 测试');
-mustInclude('.github/workflows/deploy.yml', 'npm run test:dashboard', '本地写作控制台 CI 测试');
+mustInclude('.github/workflows/deploy.yml', 'npm run test:article-source', 'Dropbox 原稿转换 CI 测试');
+mustInclude('.github/workflows/deploy.yml', 'npm run test:sync', '轻量同步 CI 测试');
+mustInclude('.github/workflows/deploy.yml', 'npm run test:publisher', '极简发布器 CI 测试');
 mustInclude('scripts/deploy-mirror.mjs', 'MIRROR_REPO', '国内访问镜像发布');
 mustInclude('scripts/deploy-mirror.mjs', 'feed.json', '国内访问镜像 JSON Feed 完整性');
 mustInclude('scripts/deploy-mirror.mjs', 'opensearch.xml', '国内访问镜像 OpenSearch 完整性');

@@ -49,12 +49,12 @@ jobs:
       - name: Test WeChat draft pipeline
         run: npm run test:wechat-draft
 
-      - name: Test Dropbox article import
-        run: npm run test:dropbox-import
-      - name: Test publishing isolation
-        run: npm run test:publish-worktree
-      - name: Test local writing dashboard
-        run: npm run test:dashboard
+      - name: Test Dropbox source and article conversion
+        run: npm run test:article-source
+      - name: Test lightweight sync
+        run: npm run test:sync
+      - name: Test local article publisher
+        run: npm run test:publisher
       - name: Generate search index
         run: npm run search:index
       - name: Generate OG images

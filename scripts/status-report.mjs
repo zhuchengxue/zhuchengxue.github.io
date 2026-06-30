@@ -84,7 +84,7 @@ const phase2 = [
   ['统一图片目录', exists('public/images/inbox/.gitkeep') && exists('scripts/prepare-post.mjs')],
   ['发布前体检脚本', Boolean(scripts.ready) && exists('scripts/check-post-ready.mjs')],
   ['一键发布脚本', Boolean(scripts.publish) && exists('scripts/publish-post.mjs')],
-  ['无命令行写作控制台', Boolean(scripts.dashboard) && exists('scripts/writing-dashboard.mjs') && exists('打开写作助手.cmd') && exists('打开写作助手.command')]
+  ['Dropbox 唯一原稿与极简发布器', Boolean(scripts.publisher) && exists('scripts/article-publisher.mjs') && exists('发布文章.cmd') && exists('发布文章.command')]
 ];
 
 const wechatScript = exists('scripts/generate-wechat.mjs') ? read('scripts/generate-wechat.mjs') : '';
@@ -166,6 +166,6 @@ if (online) {
 }
 
 console.log('\n建议下一步：');
-console.log('  1. 日常写作：npm run new → Obsidian 编辑 → npm run ready → npm run publish');
-console.log('  2. 发公众号：双击打开写作助手，选文章后推送到公众号草稿箱，再到后台预览群发');
+console.log('  1. 日常写作：直接在 Dropbox 的 Obsidian 写作库中写 Markdown');
+console.log('  2. 发布：双击“发布文章”，选择文章后一次同步到博客和公众号草稿箱');
 console.log('  3. 需要外部服务时运行 npm run config:services 生成配置清单');

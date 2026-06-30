@@ -15,16 +15,30 @@ export function findObsidianVault() {
   if (configured && existsSync(configured)) return resolve(configured);
 
   const configPath = obsidianConfigPath();
-  if (!existsSync(configPath)) return null;
-  try {
-    const config = JSON.parse(readFileSync(configPath, 'utf8'));
-    const vaults = Object.values(config.vaults || {})
-      .filter((vault) => vault?.path && existsSync(vault.path))
-      .sort((a, b) => Number(Boolean(b.open)) - Number(Boolean(a.open)) || (b.ts || 0) - (a.ts || 0));
-    return vaults[0]?.path ? resolve(vaults[0].path) : null;
-  } catch {
-    return null;
+  if (existsSync(configPath)) {
+    try {
+      const config = JSON.parse(readFileSync(configPath, 'utf8'));
+      const vaults = Object.values(config.vaults || {})
+        .filter((vault) => vault?.path && existsSync(vault.path))
+        .sort((a, b) => Number(Boolean(b.open)) - Number(Boolean(a.open)) || (b.ts || 0) - (a.ts || 0));
+      if (vaults[0]?.path) return resolve(vaults[0].path);
+    } catch {
+      // Continue with standard Dropbox locations.
+    }
   }
+
+  const candidates = process.platform === 'win32'
+    ? [
+        ...'CDEFGHIJKLMNOPQRSTUVWXYZ'.split('').map((drive) => `${drive}:\\Dropbox\\公众号文章`),
+        resolve(homedir(), 'Dropbox/公众号文章')
+      ]
+    : process.platform === 'darwin'
+      ? [
+          resolve(homedir(), 'Library/CloudStorage/Dropbox/公众号文章'),
+          resolve(homedir(), 'Dropbox/公众号文章')
+        ]
+      : [resolve(homedir(), 'Dropbox/公众号文章')];
+  return candidates.find((path) => existsSync(path)) || null;
 }
 
 export function obsidianFileURL(vaultPath, filePath) {
