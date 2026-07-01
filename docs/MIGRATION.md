@@ -11,7 +11,6 @@
 5. 安装 Node.js LTS。
 6. 双击仓库中的 `首次安装.cmd`（Windows）或 `首次安装.command`（macOS）。
 7. 双击“发布文章”，确认能看到 Dropbox 文章列表。
-8. 展开“本机设置”，重新填写公众号 AppID 和 AppSecret。
 
 之后两台电脑完全相同：Obsidian 写作，双击发布器同步。每次发布前程序都会先拉取 GitHub 最新版本，因此家里 Mac 和工作 Windows 可以交替使用。
 
@@ -25,9 +24,8 @@
 
 - GitHub Desktop 登录。
 - Node.js 和首次安装依赖。
-- 公众号 AppID、AppSecret、当前网络 IP 白名单。
 
-这些凭据刻意不进入 Dropbox 或 GitHub，避免工作电脑、家用电脑和公开仓库之间泄露。
+公众号自动草稿暂时不属于换机流程，因此 Windows 和 Mac 都不需要配置白名单。
 
 ## 尚未上线的文章
 

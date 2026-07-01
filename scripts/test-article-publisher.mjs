@@ -24,9 +24,10 @@ try {
   assert.match(response.headers.get('content-security-policy') || '', /frame-ancestors 'none'/);
   assert.equal(response.headers.get('x-frame-options'), 'DENY');
   assert.match(html, /发布文章/);
-  assert.match(html, /同步到博客/);
+  assert.match(html, /发布到博客/);
   assert.match(html, /一篇文章/);
   assert.match(html, /博客网址（以后可替换为独立域名）/);
+  assert.doesNotMatch(html, /公众号 AppID|公众号 AppSecret|公众号 ·/);
   assert.doesNotMatch(html, /新建文章|预发布|批量导入|打开写作/);
   const inlineScript = html.match(/<script>([\s\S]*?)<\/script>/)?.[1];
   assert.ok(inlineScript);

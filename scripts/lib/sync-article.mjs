@@ -120,12 +120,12 @@ export function wechatIsConfigured() {
 export async function syncArticle(options) {
   const projectRoot = resolve(options.projectRoot || '.');
   const notify = options.onProgress || (() => {});
-  const withWechat = Boolean(options.wechat);
+  const wechatRequested = Boolean(options.wechat);
   loadLocalEnv();
-
-  if (withWechat && !wechatIsConfigured()) {
-    throw new Error('公众号尚未连接。请先在“本机设置”中保存 AppID 和 AppSecret。');
-  }
+  const withWechat = wechatRequested && wechatIsConfigured();
+  let wechatWarning = wechatRequested && !withWechat
+    ? '公众号未连接，本次仅发布博客。'
+    : '';
 
   notify('正在读取 Dropbox 原稿…');
   const { vaultPath, article } = findDropboxArticle(options.articleId, {
@@ -181,8 +181,7 @@ export async function syncArticle(options) {
       await run(process.execPath, ['scripts/create-wechat-draft.mjs', metadataPath], { projectRoot, env: wechatEnv });
       wechatCreated = true;
     } catch (error) {
-      const articleUrl = `${siteOrigin()}/posts/${encodeURIComponent(basename(transformed.filename, '.md'))}/`;
-      throw new Error(`博客已经推送成功，但公众号草稿创建失败：${error.message}\n博客地址：${articleUrl}`);
+      wechatWarning = `公众号草稿未创建：${error.message}`;
     } finally {
       rmSync(wechatOutput, { recursive: true, force: true });
     }
@@ -206,6 +205,7 @@ export async function syncArticle(options) {
     imageCount: transformed.imageCount,
     committed,
     wechatCreated,
+    wechatWarning,
     archiveWarning
   };
 }

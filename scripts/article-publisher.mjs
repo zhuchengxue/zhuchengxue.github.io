@@ -7,7 +7,7 @@ import { pathToFileURL } from 'node:url';
 import matter from 'gray-matter';
 import { listDropboxArticles } from './lib/dropbox-articles.mjs';
 import { readLocalEnv, updateLocalEnv } from './lib/local-env.mjs';
-import { syncArticle, wechatIsConfigured } from './lib/sync-article.mjs';
+import { syncArticle } from './lib/sync-article.mjs';
 
 const projectRoot = resolve('.');
 const token = randomBytes(24).toString('hex');
@@ -44,8 +44,6 @@ function publicState(vaultPath) {
   const targets = existingArticles();
   return {
     vaultPath: collection.vaultPath,
-    wechatConfigured: wechatIsConfigured(),
-    wechatAppId: localEnv.WECHAT_APP_ID || process.env.WECHAT_APP_ID || '',
     siteUrl: localEnv.SITE_URL || process.env.SITE_URL || 'https://zhuchengxue.github.io',
     articles: collection.articles.map((article) => {
       const target = targets.bySourceId.get(article.sourceId) || targets.byTitle.get(article.title);
@@ -117,13 +115,13 @@ function renderPage(state) {
 </head>
 <body>
 <main>
-  <header><h1>发布文章</h1><p>从 Dropbox 选择，一次同步到博客和公众号草稿箱。</p></header>
+  <header><h1>发布文章</h1><p>从 Dropbox 选择，发布到个人博客。</p></header>
   <section class="card">
     <div id="picker">
       <label for="article">Dropbox 文章</label>
       <select id="article"></select>
-      <button id="publish">同步到博客</button>
-      <div class="hint"><span id="vaultStatus">Dropbox · 已连接</span><span class="dot">·</span><span id="wechatStatus"></span></div>
+      <button id="publish">发布到博客</button>
+      <div class="hint"><span id="vaultStatus">Dropbox · 已连接</span></div>
       <div id="message"></div>
     </div>
     <details>
@@ -131,9 +129,7 @@ function renderPage(state) {
       <form class="settings" id="settings">
         <div><label for="vault">Dropbox 写作库</label><input id="vault" autocomplete="off"></div>
         <div><label for="siteUrl">博客网址（以后可替换为独立域名）</label><input id="siteUrl" type="url" autocomplete="url" placeholder="https://你的域名"></div>
-        <div><label for="appId">公众号 AppID</label><input id="appId" autocomplete="off"></div>
-        <div><label for="appSecret">公众号 AppSecret</label><input id="appSecret" type="password" autocomplete="new-password" placeholder="已保存则留空"></div>
-        <p class="small">这些信息只保存在当前电脑，不会进入 Dropbox 或 GitHub。</p>
+        <p class="small">设置只保存在当前电脑，不会进入 Dropbox 或 GitHub。</p>
         <button type="submit">保存本机设置</button>
       </form>
     </details>
@@ -151,9 +147,8 @@ function renderPage(state) {
     current=state; article.innerHTML='';
     for(const item of state.articles){const option=document.createElement('option');option.value=item.id;option.textContent=item.title+(item.published?' · 已发布':' · 未发布');article.append(option)}
     article.disabled=!state.articles.length; publish.disabled=!state.articles.length;
-    publish.textContent=state.wechatConfigured?'同步到博客和公众号草稿箱':'同步到博客';
-    document.querySelector('#wechatStatus').textContent=state.wechatConfigured?'公众号 · 已连接':'公众号 · 未连接';
-    document.querySelector('#vault').value=state.vaultPath||''; document.querySelector('#siteUrl').value=state.siteUrl||''; document.querySelector('#appId').value=state.wechatAppId||'';
+    publish.textContent='发布到博客';
+    document.querySelector('#vault').value=state.vaultPath||''; document.querySelector('#siteUrl').value=state.siteUrl||'';
     if(!state.articles.length) show('Dropbox 写作库中还没有 Markdown 文章。',true);
   }
   function show(html,error=false){message.innerHTML=html;message.className='show'+(error?' error':'')}
@@ -164,14 +159,14 @@ function renderPage(state) {
     let polling;
     try{
       polling=setInterval(async()=>{try{const p=await api('/api/progress');if(p.message)show(p.message)}catch{}},900);
-      const result=await api('/api/sync',{articleId:article.value,wechat:current.wechatConfigured});clearInterval(polling);
-      const wechat=result.wechatCreated?'，并已进入公众号草稿箱':'';
+      const result=await api('/api/sync',{articleId:article.value});clearInterval(polling);
+      const wechat=result.wechatWarning?'<br><span style="color:#6c7a74">'+safe(result.wechatWarning)+'</span>':'';
       const archive=result.archiveWarning?'<br><span style="color:#a73b32">'+safe(result.archiveWarning)+'</span>':'';
-      show('同步完成'+wechat+'。<br><a href="'+result.articleUrl+'" target="_blank" rel="noreferrer">查看博客文章</a>'+archive+'<br><span style="color:#6c7a74">GitHub Pages 通常需要一两分钟上线；发布器会自动退出。</span>');
-      publish.textContent='同步完成';
+      show('博客发布完成。<br><a href="'+result.articleUrl+'" target="_blank" rel="noreferrer">查看博客文章</a>'+wechat+archive+'<br><span style="color:#6c7a74">GitHub Pages 通常需要一两分钟上线；发布器会自动退出。</span>');
+      publish.textContent='发布完成';
     }catch(error){clearInterval(polling);show(safe(error.message).replace(/\\n/g,'<br>'),true);publish.disabled=false;article.disabled=false}
   });
-  settings.addEventListener('submit',async(event)=>{event.preventDefault();const button=settings.querySelector('button');button.disabled=true;try{const state=await api('/api/settings',{vaultPath:document.querySelector('#vault').value.trim(),siteUrl:document.querySelector('#siteUrl').value.trim(),appId:document.querySelector('#appId').value.trim(),appSecret:document.querySelector('#appSecret').value});document.querySelector('#appSecret').value='';render(state);show('本机设置已保存。')}catch(error){show(error.message,true)}finally{button.disabled=false}});
+  settings.addEventListener('submit',async(event)=>{event.preventDefault();const button=settings.querySelector('button');button.disabled=true;try{const state=await api('/api/settings',{vaultPath:document.querySelector('#vault').value.trim(),siteUrl:document.querySelector('#siteUrl').value.trim()});render(state);show('本机设置已保存。')}catch(error){show(error.message,true)}finally{button.disabled=false}});
   render(initial);
 </script>
 </body></html>`;
@@ -221,8 +216,6 @@ export function createPublisherServer(options = {}) {
           if (!/^https:\/\/[^\s]+$/i.test(body.siteUrl)) throw new Error('博客网址必须是完整的 https:// 地址。');
           updates.SITE_URL = body.siteUrl.replace(/\/$/, '');
         }
-        updates.WECHAT_APP_ID = body.appId || '';
-        if (body.appSecret) updates.WECHAT_APP_SECRET = body.appSecret;
         updateLocalEnv(updates);
         Object.assign(process.env, updates);
         vaultPath = body.vaultPath || vaultPath;
@@ -234,7 +227,7 @@ export function createPublisherServer(options = {}) {
         progress = '正在开始同步…';
         currentJob = syncArticle({
           articleId: body.articleId,
-          wechat: Boolean(body.wechat),
+          wechat: false,
           vaultPath,
           projectRoot,
           onProgress: (message) => { progress = message; }
