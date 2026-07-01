@@ -2,11 +2,13 @@ import { cpSync, existsSync, mkdtempSync, rmSync } from 'node:fs';
 import { basename, resolve } from 'node:path';
 import { spawn } from 'node:child_process';
 import { tmpdir } from 'node:os';
-import { findDropboxArticle } from './dropbox-articles.mjs';
+import { archiveDropboxArticle, findDropboxArticle } from './dropbox-articles.mjs';
 import { transformDropboxArticle, writeTransformedArticle } from './article-transform.mjs';
 import { loadLocalEnv } from './local-env.mjs';
 
-const SITE_ORIGIN = (process.env.SITE_URL || 'https://zhuchengxue.github.io').replace(/\/$/, '');
+function siteOrigin() {
+  return (process.env.SITE_URL || 'https://zhuchengxue.github.io').replace(/\/$/, '');
+}
 
 function run(command, args, options = {}) {
   const executable = process.platform === 'win32' && command === 'npm' ? 'npm.cmd' : command;
@@ -179,14 +181,23 @@ export async function syncArticle(options) {
       await run(process.execPath, ['scripts/create-wechat-draft.mjs', metadataPath], { projectRoot, env: wechatEnv });
       wechatCreated = true;
     } catch (error) {
-      const articleUrl = `${SITE_ORIGIN}/posts/${encodeURIComponent(basename(transformed.filename, '.md'))}/`;
+      const articleUrl = `${siteOrigin()}/posts/${encodeURIComponent(basename(transformed.filename, '.md'))}/`;
       throw new Error(`博客已经推送成功，但公众号草稿创建失败：${error.message}\n博客地址：${articleUrl}`);
     } finally {
       rmSync(wechatOutput, { recursive: true, force: true });
     }
   }
 
-  const articleUrl = `${SITE_ORIGIN}/posts/${encodeURIComponent(basename(transformed.filename, '.md'))}/`;
+  let archiveWarning = '';
+  try {
+    const archived = archiveDropboxArticle(article, vaultPath);
+    archiveWarning = archived.warning || '';
+    if (archived.archived && !article.archived) notify('Dropbox 原稿已移入“已发布”。');
+  } catch (error) {
+    archiveWarning = `Dropbox 原稿自动归档失败：${error.message}`;
+  }
+
+  const articleUrl = `${siteOrigin()}/posts/${encodeURIComponent(basename(transformed.filename, '.md'))}/`;
   notify('同步完成。');
   return {
     title: transformed.title,
@@ -194,6 +205,7 @@ export async function syncArticle(options) {
     articleUrl,
     imageCount: transformed.imageCount,
     committed,
-    wechatCreated
+    wechatCreated,
+    archiveWarning
   };
 }

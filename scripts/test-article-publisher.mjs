@@ -26,6 +26,7 @@ try {
   assert.match(html, /发布文章/);
   assert.match(html, /同步到博客/);
   assert.match(html, /一篇文章/);
+  assert.match(html, /博客网址（以后可替换为独立域名）/);
   assert.doesNotMatch(html, /新建文章|预发布|批量导入|打开写作/);
   const inlineScript = html.match(/<script>([\s\S]*?)<\/script>/)?.[1];
   assert.ok(inlineScript);

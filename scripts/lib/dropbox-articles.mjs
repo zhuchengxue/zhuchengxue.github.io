@@ -1,4 +1,4 @@
-import { existsSync, readFileSync, readdirSync, statSync } from 'node:fs';
+import { existsSync, mkdirSync, readFileSync, readdirSync, renameSync, rmSync, statSync } from 'node:fs';
 import { basename, relative, resolve } from 'node:path';
 import matter from 'gray-matter';
 import { findObsidianVault } from './obsidian-vault.mjs';
@@ -83,4 +83,20 @@ export function findDropboxArticle(id, options = {}) {
   const article = collection.articles.find((item) => item.id === id);
   if (!article) throw new Error(`Dropbox 中找不到这篇文章：${id}`);
   return { ...collection, article };
+}
+
+export function archiveDropboxArticle(article, vaultPath) {
+  if (article.archived) return { archived: true, path: article.sourcePath };
+  const archiveDirectory = resolve(vaultPath, '已发布');
+  const destination = resolve(archiveDirectory, basename(article.sourcePath));
+  mkdirSync(archiveDirectory, { recursive: true });
+  if (existsSync(destination)) {
+    if (readFileSync(article.sourcePath).equals(readFileSync(destination))) {
+      rmSync(article.sourcePath, { force: true });
+      return { archived: true, path: destination };
+    }
+    return { archived: false, warning: '“已发布”目录存在同名但内容不同的文件，请手动确认。' };
+  }
+  renameSync(article.sourcePath, destination);
+  return { archived: true, path: destination };
 }

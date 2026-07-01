@@ -30,7 +30,7 @@ const appId = process.env.WECHAT_APP_ID;
 const appSecret = process.env.WECHAT_APP_SECRET;
 const defaultThumbMediaId = process.env.WECHAT_THUMB_MEDIA_ID;
 const metadata = JSON.parse(readFileSync(metadataPath, 'utf8'));
-const defaultCover = process.env.WECHAT_DEFAULT_COVER || 'public/og-default.png';
+const defaultCover = process.env.WECHAT_DEFAULT_COVER || 'public/wechat-cover.svg';
 const apiOrigin = process.env.WECHAT_API_ORIGIN || 'https://api.weixin.qq.com';
 if (apiOrigin !== 'https://api.weixin.qq.com' && process.env.NODE_ENV !== 'test') {
   throw new Error('WECHAT_API_ORIGIN 只允许在测试环境中覆盖。');
@@ -101,6 +101,7 @@ function mimeType(pathOrUrl) {
   if (extension === '.jpg' || extension === '.jpeg') return 'image/jpeg';
   if (extension === '.gif') return 'image/gif';
   if (extension === '.webp') return 'image/webp';
+  if (extension === '.svg') return 'image/svg+xml';
   return 'image/png';
 }
 

@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="900" height="383" viewBox="0 0 900 383">
+  <rect width="900" height="383" fill="#f7f6f1"/>
+  <circle cx="820" cy="30" r="170" fill="#e6ece7"/>
+  <circle cx="20" cy="420" r="155" fill="#e6ece7"/>
+  <rect x="70" y="112" width="62" height="6" rx="3" fill="#276749"/>
+  <text x="70" y="205" fill="#20211f" font-size="84" font-weight="700" font-family="PingFang SC, Microsoft YaHei, sans-serif">学语思</text>
+  <text x="72" y="266" fill="#6f726c" font-size="28" font-family="PingFang SC, Microsoft YaHei, sans-serif">非学无以广才，非志无以成学。</text>
+  <text x="73" y="323" fill="#276749" font-size="18" letter-spacing="4" font-family="PingFang SC, Microsoft YaHei, sans-serif">写作 · 思考 · 生活</text>
+</svg>

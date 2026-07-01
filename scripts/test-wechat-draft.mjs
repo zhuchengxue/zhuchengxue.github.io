@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import { createServer } from 'node:http';
-import { existsSync, mkdtempSync, rmSync, writeFileSync } from 'node:fs';
+import { existsSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { resolve } from 'node:path';
 import { spawn } from 'node:child_process';
@@ -15,7 +15,7 @@ writeFileSync(metadataPath, `${JSON.stringify({
   content: '<p>正文</p><img src="https://example.invalid/body.png">',
   content_source_url: 'https://example.invalid/post/',
   thumb_media_id: '',
-  cover: { localPath: 'public/og-default.png', publicUrl: 'https://example.invalid/cover.png' },
+  cover: null,
   images: [{ localPath: 'public/og-default.png', publicUrl: 'https://example.invalid/body.png' }]
 }, null, 2)}\n`, 'utf8');
 
@@ -56,6 +56,7 @@ try {
         WECHAT_APP_ID: 'test-app-id',
         WECHAT_APP_SECRET: 'test-app-secret',
         WECHAT_THUMB_MEDIA_ID: '',
+        WECHAT_DEFAULT_COVER: 'public/wechat-cover.svg',
         NODE_ENV: 'test',
         WECHAT_OUTPUT_DIRECTORY: outputDirectory,
         WECHAT_API_ORIGIN: `http://127.0.0.1:${port}`
@@ -74,6 +75,7 @@ try {
   assert.match(draftPayload.articles[0].content, /https:\/\/mmbiz\.qpic\.cn\/body\.png/);
   assert.doesNotMatch(draftPayload.articles[0].content, /example\.invalid\/body/);
   assert.equal(existsSync(receiptPath), true);
+  assert.match(readFileSync('scripts/generate-wechat.mjs', 'utf8'), /WECHAT_AUTHOR \|\| '学语思'/);
   console.log('微信公众号草稿测试通过：正文图片、封面和草稿均已走完整接口链路。');
 } finally {
   await new Promise((resolveClose) => server.close(resolveClose));

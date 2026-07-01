@@ -11,6 +11,8 @@ const remote = resolve(root, 'remote.git');
 const project = resolve(root, 'repo');
 const competitor = resolve(root, 'other-computer');
 const vault = resolve(root, 'Dropbox', '公众号文章');
+const previousSiteUrl = process.env.SITE_URL;
+process.env.SITE_URL = 'https://blog.example';
 
 function git(cwd, ...args) {
   const result = spawnSync('git', args, { cwd, encoding: 'utf8', stdio: 'pipe' });
@@ -45,18 +47,22 @@ try {
     onProgress: (message) => firstProgress.push(message)
   });
   assert.equal(first.committed, true);
+  assert.match(first.articleUrl, /^https:\/\/blog\.example\/posts\//);
   assert.match(firstProgress.join('\n'), /正在提交文章到 GitHub/);
   assert.equal(readdirSync(resolve(project, 'src/content/posts')).filter((file) => file.endsWith('.md')).length, 1);
   const stableFilename = first.filename;
+  assert.equal(first.archiveWarning, '');
+  assert.equal(readdirSync(vault).includes('文章.md'), false);
+  assert.equal(readdirSync(resolve(vault, '已发布')).includes('文章.md'), true);
   assert.equal(matter(readFileSync(resolve(project, 'src/content/posts', stableFilename), 'utf8')).data.sourceId, '文章.md');
 
   git(root, 'clone', remote, competitor);
   configure(competitor);
-  writeFileSync(resolve(vault, '文章.md'), '# 改过的标题\n\n标题发生变化，但应继续更新原文章，并保留第一次生成的网址。\n', 'utf8');
+  writeFileSync(resolve(vault, '已发布', '文章.md'), '# 改过的标题\n\n标题发生变化，但应继续更新原文章，并保留第一次生成的网址。\n', 'utf8');
   let competitorPushed = false;
   const secondProgress = [];
   const second = await syncArticle({
-    articleId: '文章.md',
+    articleId: '已发布/文章.md',
     vaultPath: vault,
     projectRoot: project,
     wechat: false,
@@ -80,5 +86,7 @@ try {
   assert.equal(git(project, 'status', '--porcelain'), '');
   console.log('轻量同步端到端测试通过：稳定网址、异步 Git 与跨电脑并发重试均正常。');
 } finally {
+  if (previousSiteUrl === undefined) delete process.env.SITE_URL;
+  else process.env.SITE_URL = previousSiteUrl;
   rmSync(root, { recursive: true, force: true });
 }

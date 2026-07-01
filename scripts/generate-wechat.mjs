@@ -115,7 +115,7 @@ const finalHTML = `<section style="max-width:677px;margin:0 auto;font-family:-ap
 
 const metadata = {
   title: parsed.data.title ?? filename,
-  author: 'zhuchengxue',
+  author: process.env.WECHAT_AUTHOR || '学语思',
   digest: parsed.data.description ?? '',
   content: finalHTML,
   content_source_url: sourceURL,

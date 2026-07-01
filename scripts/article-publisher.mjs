@@ -46,6 +46,7 @@ function publicState(vaultPath) {
     vaultPath: collection.vaultPath,
     wechatConfigured: wechatIsConfigured(),
     wechatAppId: localEnv.WECHAT_APP_ID || process.env.WECHAT_APP_ID || '',
+    siteUrl: localEnv.SITE_URL || process.env.SITE_URL || 'https://zhuchengxue.github.io',
     articles: collection.articles.map((article) => {
       const target = targets.bySourceId.get(article.sourceId) || targets.byTitle.get(article.title);
       return {
@@ -129,6 +130,7 @@ function renderPage(state) {
       <summary>本机设置</summary>
       <form class="settings" id="settings">
         <div><label for="vault">Dropbox 写作库</label><input id="vault" autocomplete="off"></div>
+        <div><label for="siteUrl">博客网址（以后可替换为独立域名）</label><input id="siteUrl" type="url" autocomplete="url" placeholder="https://你的域名"></div>
         <div><label for="appId">公众号 AppID</label><input id="appId" autocomplete="off"></div>
         <div><label for="appSecret">公众号 AppSecret</label><input id="appSecret" type="password" autocomplete="new-password" placeholder="已保存则留空"></div>
         <p class="small">这些信息只保存在当前电脑，不会进入 Dropbox 或 GitHub。</p>
@@ -151,7 +153,7 @@ function renderPage(state) {
     article.disabled=!state.articles.length; publish.disabled=!state.articles.length;
     publish.textContent=state.wechatConfigured?'同步到博客和公众号草稿箱':'同步到博客';
     document.querySelector('#wechatStatus').textContent=state.wechatConfigured?'公众号 · 已连接':'公众号 · 未连接';
-    document.querySelector('#vault').value=state.vaultPath||''; document.querySelector('#appId').value=state.wechatAppId||'';
+    document.querySelector('#vault').value=state.vaultPath||''; document.querySelector('#siteUrl').value=state.siteUrl||''; document.querySelector('#appId').value=state.wechatAppId||'';
     if(!state.articles.length) show('Dropbox 写作库中还没有 Markdown 文章。',true);
   }
   function show(html,error=false){message.innerHTML=html;message.className='show'+(error?' error':'')}
@@ -164,11 +166,12 @@ function renderPage(state) {
       polling=setInterval(async()=>{try{const p=await api('/api/progress');if(p.message)show(p.message)}catch{}},900);
       const result=await api('/api/sync',{articleId:article.value,wechat:current.wechatConfigured});clearInterval(polling);
       const wechat=result.wechatCreated?'，并已进入公众号草稿箱':'';
-      show('同步完成'+wechat+'。<br><a href="'+result.articleUrl+'" target="_blank" rel="noreferrer">查看博客文章</a><br><span style="color:#6c7a74">GitHub Pages 通常需要一两分钟上线；发布器会自动退出。</span>');
+      const archive=result.archiveWarning?'<br><span style="color:#a73b32">'+safe(result.archiveWarning)+'</span>':'';
+      show('同步完成'+wechat+'。<br><a href="'+result.articleUrl+'" target="_blank" rel="noreferrer">查看博客文章</a>'+archive+'<br><span style="color:#6c7a74">GitHub Pages 通常需要一两分钟上线；发布器会自动退出。</span>');
       publish.textContent='同步完成';
     }catch(error){clearInterval(polling);show(safe(error.message).replace(/\\n/g,'<br>'),true);publish.disabled=false;article.disabled=false}
   });
-  settings.addEventListener('submit',async(event)=>{event.preventDefault();const button=settings.querySelector('button');button.disabled=true;try{const state=await api('/api/settings',{vaultPath:document.querySelector('#vault').value.trim(),appId:document.querySelector('#appId').value.trim(),appSecret:document.querySelector('#appSecret').value});document.querySelector('#appSecret').value='';render(state);show('本机设置已保存。')}catch(error){show(error.message,true)}finally{button.disabled=false}});
+  settings.addEventListener('submit',async(event)=>{event.preventDefault();const button=settings.querySelector('button');button.disabled=true;try{const state=await api('/api/settings',{vaultPath:document.querySelector('#vault').value.trim(),siteUrl:document.querySelector('#siteUrl').value.trim(),appId:document.querySelector('#appId').value.trim(),appSecret:document.querySelector('#appSecret').value});document.querySelector('#appSecret').value='';render(state);show('本机设置已保存。')}catch(error){show(error.message,true)}finally{button.disabled=false}});
   render(initial);
 </script>
 </body></html>`;
@@ -214,6 +217,10 @@ export function createPublisherServer(options = {}) {
         const body = await readBody(request);
         const updates = {};
         if (body.vaultPath) updates.WRITING_VAULT = body.vaultPath;
+        if (body.siteUrl) {
+          if (!/^https:\/\/[^\s]+$/i.test(body.siteUrl)) throw new Error('博客网址必须是完整的 https:// 地址。');
+          updates.SITE_URL = body.siteUrl.replace(/\/$/, '');
+        }
         updates.WECHAT_APP_ID = body.appId || '';
         if (body.appSecret) updates.WECHAT_APP_SECRET = body.appSecret;
         updateLocalEnv(updates);
