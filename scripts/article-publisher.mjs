@@ -5,7 +5,14 @@ import { resolve } from 'node:path';
 import { spawn } from 'node:child_process';
 import { pathToFileURL } from 'node:url';
 import matter from 'gray-matter';
-import { listDropboxArticles } from './lib/dropbox-articles.mjs';
+import {
+  ARCHIVE_DIRECTORY,
+  DAILY_NOTE,
+  IDEAS_NOTE,
+  PENDING_DIRECTORY,
+  ensureWritingStructure,
+  listDropboxArticles
+} from './lib/dropbox-articles.mjs';
 import { readLocalEnv, updateLocalEnv } from './lib/local-env.mjs';
 import { syncArticle } from './lib/sync-article.mjs';
 
@@ -41,24 +48,35 @@ function existingArticles() {
 function publicState(vaultPath) {
   const localEnv = readLocalEnv();
   const collection = listDropboxArticles({ vaultPath });
+  const structure = ensureWritingStructure(collection.vaultPath);
   const targets = existingArticles();
+  const articles = collection.articles.map((article) => {
+    const target = targets.bySourceId.get(article.sourceId) || targets.byTitle.get(article.title);
+    return {
+      id: article.id,
+      title: article.title,
+      relativePath: article.relativePath,
+      archived: article.archived,
+      pending: article.pending,
+      modifiedAt: article.modifiedAt,
+      published: Boolean(target?.published),
+      targetFilename: target?.filename || ''
+    };
+  }).sort((a, b) => Number(b.pending) - Number(a.pending)
+    || Number(a.archived) - Number(b.archived)
+    || Number(a.published) - Number(b.published)
+    || b.modifiedAt.localeCompare(a.modifiedAt));
   return {
     vaultPath: collection.vaultPath,
     siteUrl: localEnv.SITE_URL || process.env.SITE_URL || 'https://zhuchengxue.github.io',
-    articles: collection.articles.map((article) => {
-      const target = targets.bySourceId.get(article.sourceId) || targets.byTitle.get(article.title);
-      return {
-        id: article.id,
-        title: article.title,
-        relativePath: article.relativePath,
-        archived: article.archived,
-        modifiedAt: article.modifiedAt,
-        published: Boolean(target?.published),
-        targetFilename: target?.filename || ''
-      };
-    }).sort((a, b) => Number(a.published) - Number(b.published)
-      || Number(a.archived) - Number(b.archived)
-      || b.modifiedAt.localeCompare(a.modifiedAt))
+    dailyNote: DAILY_NOTE,
+    ideasNote: IDEAS_NOTE,
+    pendingDirectory: PENDING_DIRECTORY,
+    archiveDirectory: ARCHIVE_DIRECTORY,
+    dailyPath: structure.dailyPath,
+    pendingCount: articles.filter((article) => article.pending).length,
+    archiveCount: articles.filter((article) => article.archived).length,
+    articles
   };
 }
 
@@ -98,30 +116,41 @@ function renderPage(state) {
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
-  <title>发布文章 · 学语思</title>
+  <title>今日写作 · 学语思</title>
   <style>
     :root{color-scheme:light;--ink:#17362b;--muted:#6c7a74;--line:#dfe7e2;--paper:#fff;--wash:#f5f8f6;--green:#246b4d;--green2:#1d593f;--soft:#eaf2ed;--error:#a73b32}
     *{box-sizing:border-box} body{margin:0;background:var(--wash);color:var(--ink);font:16px/1.6 -apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif}
-    main{width:min(680px,calc(100% - 32px));margin:9vh auto 48px} header{text-align:center;margin-bottom:30px} h1{font-size:clamp(30px,6vw,46px);line-height:1.15;margin:0 0 10px;letter-spacing:-.04em} header p{margin:0;color:var(--muted)}
-    .card{background:var(--paper);border:1px solid var(--line);border-radius:20px;padding:clamp(22px,5vw,38px);box-shadow:0 18px 50px rgba(26,65,49,.07)}
+    main{width:min(720px,calc(100% - 32px));margin:8vh auto 48px} header{text-align:center;margin-bottom:28px} h1{font-size:clamp(32px,6vw,52px);line-height:1.1;margin:0 0 10px;letter-spacing:-.05em} header p{margin:0;color:var(--muted)}
+    .card{background:var(--paper);border:1px solid var(--line);border-radius:22px;padding:clamp(22px,5vw,38px);box-shadow:0 18px 50px rgba(26,65,49,.07)}
+    .card+.card{margin-top:16px}.section-title{margin:0 0 12px;font-size:18px}.muted{color:var(--muted);font-size:14px;margin:0 0 16px}
     label{display:block;font-size:14px;color:var(--muted);margin-bottom:8px} select,input{width:100%;height:52px;border:1px solid #cfdbd4;border-radius:12px;background:#fff;color:var(--ink);font:inherit;padding:0 14px;outline:none} select:focus,input:focus{border-color:var(--green);box-shadow:0 0 0 3px rgba(36,107,77,.1)}
-    button{width:100%;height:54px;margin-top:18px;border:0;border-radius:12px;background:var(--green);color:#fff;font:700 16px/1 inherit;cursor:pointer} button:hover{background:var(--green2)} button:disabled{opacity:.55;cursor:wait}
-    .hint{display:flex;justify-content:center;gap:8px;flex-wrap:wrap;margin:16px 0 0;color:var(--muted);font-size:13px}.dot{color:#b4beb8}
+    button{width:100%;height:54px;margin-top:16px;border:0;border-radius:12px;background:var(--green);color:#fff;font:700 16px/1 inherit;cursor:pointer} button:hover{background:var(--green2)} button:disabled{opacity:.55;cursor:wait}
+    .secondary{background:#edf3ef;color:var(--green)}.secondary:hover{background:#e3ece7}.row{display:grid;grid-template-columns:1fr 1fr;gap:12px}.hint{display:flex;justify-content:center;gap:8px;flex-wrap:wrap;margin:16px 0 0;color:var(--muted);font-size:13px}.dot{color:#b4beb8}
     #message{display:none;margin-top:18px;padding:13px 15px;border-radius:12px;background:var(--soft);font-size:14px} #message.show{display:block} #message.error{background:#fbefed;color:var(--error)} #message a{color:var(--green);font-weight:650}
     details{margin-top:18px;border-top:1px solid var(--line);padding-top:16px;color:var(--muted)} summary{cursor:pointer;font-size:14px;list-style:none} summary::-webkit-details-marker{display:none} summary:before{content:"›";display:inline-block;margin-right:7px;transition:.15s} details[open] summary:before{transform:rotate(90deg)}
     .settings{display:grid;gap:14px;margin-top:18px}.settings button{height:44px;margin-top:2px;background:#edf3ef;color:var(--green)}.small{font-size:12px;color:var(--muted);margin:-7px 0 0}.empty{padding:24px;text-align:center;color:var(--muted)}
-    @media(max-width:520px){main{margin-top:32px}.card{border-radius:16px}}
+    @media(max-width:520px){main{margin-top:32px}.card{border-radius:16px}.row{grid-template-columns:1fr}}
   </style>
 </head>
 <body>
 <main>
-  <header><h1>发布文章</h1><p>从 Dropbox 选择，发布到个人博客。</p></header>
+  <header><h1>今日写作</h1><p>先写，再发布。每天只从这里开始。</p></header>
   <section class="card">
+    <h2 class="section-title">开始</h2>
+    <p class="muted">打开 <span id="dailyName"></span>，想到什么先写进去；写成文章后，另存到 <span id="pendingName"></span>。</p>
+    <div class="row">
+      <button id="startWriting">打开今日写作</button>
+      <button class="secondary" id="openPending">打开待发布文件夹</button>
+    </div>
+    <div class="hint"><span id="vaultStatus">Dropbox · 已连接</span><span class="dot">·</span><span id="counts"></span></div>
+  </section>
+  <section class="card">
+    <h2 class="section-title">发布</h2>
+    <p class="muted">只发布 <span id="pendingName2"></span> 里的文章；已发布文章也可以重新选择更新。</p>
     <div id="picker">
-      <label for="article">Dropbox 文章</label>
+      <label for="article">选择文章</label>
       <select id="article"></select>
       <button id="publish">发布到博客</button>
-      <div class="hint"><span id="vaultStatus">Dropbox · 已连接</span></div>
       <div id="message"></div>
     </div>
     <details>
@@ -140,20 +169,28 @@ function renderPage(state) {
   const auth=${JSON.stringify(token)};
   const article=document.querySelector('#article');
   const publish=document.querySelector('#publish');
+  const startWriting=document.querySelector('#startWriting');
+  const openPending=document.querySelector('#openPending');
   const message=document.querySelector('#message');
   const settings=document.querySelector('#settings');
   let current=initial;
   function render(state){
     current=state; article.innerHTML='';
-    for(const item of state.articles){const option=document.createElement('option');option.value=item.id;option.textContent=item.title+(item.published?' · 已发布':' · 未发布');article.append(option)}
+    document.querySelector('#dailyName').textContent=state.dailyNote;
+    document.querySelector('#pendingName').textContent=state.pendingDirectory+'/';
+    document.querySelector('#pendingName2').textContent=state.pendingDirectory+'/';
+    document.querySelector('#counts').textContent='待发布 '+state.pendingCount+' 篇，已发布 '+state.archiveCount+' 篇';
+    for(const item of state.articles){const option=document.createElement('option');option.value=item.id;const where=item.pending?'待发布':item.archived?'已发布':'文章';option.textContent=where+' · '+item.title+(item.published?' · 已上线':' · 未上线');article.append(option)}
     article.disabled=!state.articles.length; publish.disabled=!state.articles.length;
     publish.textContent='发布到博客';
     document.querySelector('#vault').value=state.vaultPath||''; document.querySelector('#siteUrl').value=state.siteUrl||'';
-    if(!state.articles.length) show('Dropbox 写作库中还没有 Markdown 文章。',true);
+    if(!state.articles.length) show('待发布里还没有文章。先点“打开今日写作”，写完后另存到 '+state.pendingDirectory+'/。',false);
   }
   function show(html,error=false){message.innerHTML=html;message.className='show'+(error?' error':'')}
   function safe(value){return String(value).replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;').replaceAll('"','&quot;')}
   async function api(path,body){const response=await fetch(path,{method:body?'POST':'GET',headers:{'Content-Type':'application/json','x-publisher-token':auth},body:body?JSON.stringify(body):undefined});const data=await response.json();if(!response.ok)throw new Error(data.error||'操作失败');return data}
+  startWriting.addEventListener('click',async()=>{startWriting.disabled=true;try{await api('/api/start-writing',{});show('已打开今日写作。先写，不急着发布。')}catch(error){show(safe(error.message),true)}finally{startWriting.disabled=false}});
+  openPending.addEventListener('click',async()=>{openPending.disabled=true;try{await api('/api/open-pending',{});show('已打开待发布文件夹。写好的 Markdown 放这里。')}catch(error){show(safe(error.message),true)}finally{openPending.disabled=false}});
   publish.addEventListener('click',async()=>{
     publish.disabled=true;article.disabled=true;show('正在同步，请稍候…');
     let polling;
@@ -175,6 +212,13 @@ function renderPage(state) {
 function openURL(url) {
   const command = process.platform === 'win32' ? 'explorer.exe' : process.platform === 'darwin' ? 'open' : 'xdg-open';
   const child = spawn(command, [url], { detached: true, stdio: 'ignore', windowsHide: true });
+  child.unref();
+}
+
+function openLocalPath(targetPath) {
+  const command = process.platform === 'win32' ? 'cmd.exe' : process.platform === 'darwin' ? 'open' : 'xdg-open';
+  const args = process.platform === 'win32' ? ['/c', 'start', '', targetPath] : [targetPath];
+  const child = spawn(command, args, { detached: true, stdio: 'ignore', windowsHide: true });
   child.unref();
 }
 
@@ -208,6 +252,19 @@ export function createPublisherServer(options = {}) {
         return response.end(renderPage(state));
       }
       if (request.method === 'GET' && url.pathname === '/api/progress') return json(response, 200, { message: progress });
+      if (request.method === 'POST' && url.pathname === '/api/start-writing') {
+        const state = publicState(vaultPath);
+        vaultPath = state.vaultPath;
+        openLocalPath(state.dailyPath);
+        return json(response, 200, { opened: state.dailyPath });
+      }
+      if (request.method === 'POST' && url.pathname === '/api/open-pending') {
+        const state = publicState(vaultPath);
+        vaultPath = state.vaultPath;
+        const structure = ensureWritingStructure(state.vaultPath);
+        openLocalPath(structure.pendingDirectory);
+        return json(response, 200, { opened: structure.pendingDirectory });
+      }
       if (request.method === 'POST' && url.pathname === '/api/settings') {
         const body = await readBody(request);
         const updates = {};

@@ -37,10 +37,11 @@ try {
   git(project, 'commit', '-m', 'Initial');
   git(project, 'push', '-u', 'origin', 'master');
 
-  writeFileSync(resolve(vault, '文章.md'), '# 第一版标题\n\n这是用于端到端测试的完整文章正文，发布后应当进入远端仓库。\n', 'utf8');
+  mkdirSync(resolve(vault, '02-待发布'), { recursive: true });
+  writeFileSync(resolve(vault, '02-待发布', '文章.md'), '# 第一版标题\n\n这是用于端到端测试的完整文章正文，发布后应当进入远端仓库。\n', 'utf8');
   const firstProgress = [];
   const first = await syncArticle({
-    articleId: '文章.md',
+    articleId: '02-待发布/文章.md',
     vaultPath: vault,
     projectRoot: project,
     wechat: false,
@@ -52,17 +53,17 @@ try {
   assert.equal(readdirSync(resolve(project, 'src/content/posts')).filter((file) => file.endsWith('.md')).length, 1);
   const stableFilename = first.filename;
   assert.equal(first.archiveWarning, '');
-  assert.equal(readdirSync(vault).includes('文章.md'), false);
-  assert.equal(readdirSync(resolve(vault, '已发布')).includes('文章.md'), true);
+  assert.equal(readdirSync(resolve(vault, '02-待发布')).includes('文章.md'), false);
+  assert.equal(readdirSync(resolve(vault, '03-已发布')).includes('文章.md'), true);
   assert.equal(matter(readFileSync(resolve(project, 'src/content/posts', stableFilename), 'utf8')).data.sourceId, '文章.md');
 
   git(root, 'clone', remote, competitor);
   configure(competitor);
-  writeFileSync(resolve(vault, '已发布', '文章.md'), '# 改过的标题\n\n标题发生变化，但应继续更新原文章，并保留第一次生成的网址。\n', 'utf8');
+  writeFileSync(resolve(vault, '03-已发布', '文章.md'), '# 改过的标题\n\n标题发生变化，但应继续更新原文章，并保留第一次生成的网址。\n', 'utf8');
   let competitorPushed = false;
   const secondProgress = [];
   const second = await syncArticle({
-    articleId: '已发布/文章.md',
+    articleId: '03-已发布/文章.md',
     vaultPath: vault,
     projectRoot: project,
     wechat: false,
