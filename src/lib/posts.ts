@@ -83,6 +83,20 @@ export function getAllPosts(): PostSummary[] {
     .sort((a, b) => b.pubDate.valueOf() - a.pubDate.valueOf());
 }
 
+export function isTutorialPost(post: PostSummary) {
+  const searchable = [
+    post.title,
+    post.description ?? '',
+    ...post.tags
+  ].join(' ');
+
+  return /教程|指南|攻略|方法|技巧|工作流/.test(searchable);
+}
+
+export function getTutorialPosts(): PostSummary[] {
+  return getAllPosts().filter(isTutorialPost);
+}
+
 export function getTags() {
   const counts = new Map<string, number>();
   for (const post of getAllPosts()) {

@@ -1,0 +1,48 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { getTutorialPosts } from '../lib/posts';
+
+const base = import.meta.env.BASE_URL.replace(/\/$/, '');
+const posts = getTutorialPosts();
+---
+
+<BaseLayout title="教程" description={`系统整理学语思中的教程、指南、攻略、方法和工作流文章，共 ${posts.length} 篇。`}>
+  <section class="page archive-page">
+    <header class="page-header">
+      <p class="eyebrow">TUTORIALS</p>
+      <h1>教程</h1>
+      <p class="summary">
+        把可复用的方法、工具折腾、操作步骤和工作流单独放在这里，方便以后回头查。
+      </p>
+    </header>
+
+    {posts.length ? (
+      <ol class="archive-list">
+        {posts.map((post) => (
+          <li>
+            <time datetime={post.pubDate.toISOString()}>
+              {post.pubDate.toLocaleDateString('zh-CN', { year: 'numeric', month: '2-digit', day: '2-digit' })}
+            </time>
+            <div>
+              <a href={`${base}${post.href}`}>{post.title}</a>
+              {post.legacy && <span class="legacy-badge">旧文</span>}
+              {post.description && <p>{post.description}</p>}
+              {post.tags.length > 0 && (
+                <div class="inline-tags" aria-label="文章标签">
+                  {post.tags.map((tag) => (
+                    <span>{tag}</span>
+                  ))}
+                </div>
+              )}
+            </div>
+          </li>
+        ))}
+      </ol>
+    ) : (
+      <div class="empty-state">
+        <p>还没有教程文章。</p>
+        <p>以后给文章添加 <code>教程</code> 标签，或在标题中使用“指南 / 攻略 / 方法 / 技巧 / 工作流”，就会自动出现在这里。</p>
+      </div>
+    )}
+  </section>
+</BaseLayout>

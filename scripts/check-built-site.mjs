@@ -76,6 +76,19 @@ if (!readFileSync(articlesPage, 'utf8').includes('URLSearchParams(window.locatio
   failures.push('/articles/: 未支持 q 查询参数');
 }
 
+const tutorialsPage = resolve('dist/tutorials/index.html');
+if (!existsSync(tutorialsPage)) {
+  failures.push('/tutorials/: 教程栏目未生成');
+} else {
+  const tutorialsHtml = readFileSync(tutorialsPage, 'utf8');
+  if (!tutorialsHtml.includes('TUTORIALS') || !tutorialsHtml.includes('教程')) {
+    failures.push('/tutorials/: 教程栏目标题不正确');
+  }
+  if (!tutorialsHtml.includes('Chrome不完全指南') && !tutorialsHtml.includes('51元最低成本成功办理2张港卡详细攻略')) {
+    failures.push('/tutorials/: 未收录预期教程文章');
+  }
+}
+
 const searchIndex = resolve('dist/search.json');
 if (!existsSync(searchIndex)) {
   failures.push('/search.json: 全文搜索索引未生成');
