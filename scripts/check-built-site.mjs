@@ -112,6 +112,8 @@ if (!existsSync(humansText) || !readFileSync(humansText, 'utf8').includes('Built
 const publishedNewPostCount = counts.published;
 
 const jsonFeed = resolve('dist/feed.json');
+let latestPostPath = '';
+let latestPostTitle = '';
 if (!existsSync(jsonFeed)) {
   failures.push('/feed.json: JSON Feed 未生成');
 } else {
@@ -122,18 +124,24 @@ if (!existsSync(jsonFeed)) {
   if (!Array.isArray(feed.items) || feed.items.length !== publishedNewPostCount) {
     failures.push(`/feed.json: JSON Feed items 数量不正确，当前 ${Array.isArray(feed.items) ? feed.items.length : 0} 篇`);
   }
-  if (!feed.items?.[0]?.url?.includes('/posts/2026-06-24-welcome/')) {
-    failures.push('/feed.json: JSON Feed 未包含示例新文章');
+  latestPostTitle = feed.items?.[0]?.title || '';
+  try {
+    latestPostPath = decodeURIComponent(new URL(feed.items?.[0]?.url || '').pathname);
+  } catch {
+    latestPostPath = '';
+  }
+  if (!latestPostPath.startsWith('/posts/')) {
+    failures.push('/feed.json: JSON Feed 最新文章地址不正确');
   }
 }
 
-const welcomeOg = resolve('dist/og/posts/2026-06-24-welcome/index.png');
-if (!existsSync(welcomeOg)) {
-  failures.push('/og/posts/2026-06-24-welcome/index.png: 新文章分享图未生成');
+const latestOg = latestPostPath ? resolve('dist/og', latestPostPath.slice(1), 'index.png') : '';
+if (!latestOg || !existsSync(latestOg)) {
+  failures.push(`${latestPostPath || '/posts/'}: 新文章分享图未生成`);
 } else {
-  const metadata = await sharp(welcomeOg).metadata();
+  const metadata = await sharp(latestOg).metadata();
   if (metadata.format !== 'png' || metadata.width !== 1200 || metadata.height !== 630) {
-    failures.push('/og/posts/2026-06-24-welcome/index.png: 分享图不是 1200×630 PNG');
+    failures.push(`${latestPostPath}: 分享图不是 1200×630 PNG`);
   }
 }
 
@@ -147,27 +155,33 @@ if (articleOgImages.length !== counts.total) {
   failures.push(`/og/: 文章级 PNG 分享图数量不正确，当前 ${articleOgImages.length} 张`);
 }
 
-const welcomePage = resolve('dist/posts/2026-06-24-welcome/index.html');
-if (!readFileSync(welcomePage, 'utf8').includes('/og/posts/2026-06-24-welcome/index.png')) {
-  failures.push('/posts/2026-06-24-welcome/: 未引用文章级 Open Graph 分享图');
-}
-if (!readFileSync(welcomePage, 'utf8').includes('property="og:image:alt" content="博客开始营业"')) {
-  failures.push('/posts/2026-06-24-welcome/: 分享图替代文本未使用文章标题');
-}
-if (!readFileSync(welcomePage, 'utf8').includes('property="og:image:type" content="image/png"')) {
-  failures.push('/posts/2026-06-24-welcome/: 分享图未声明 image/png 类型');
-}
-if (!/[\d,]+ 字 · 约 \d+ 分钟/.test(readFileSync(welcomePage, 'utf8'))) {
-  failures.push('/posts/2026-06-24-welcome/: 未展示统一阅读字数和预计阅读时间');
+const latestPostPage = latestPostPath ? resolve('dist', latestPostPath.slice(1), 'index.html') : '';
+if (!latestPostPage || !existsSync(latestPostPage)) {
+  failures.push(`${latestPostPath || '/posts/'}: 最新文章页面未生成`);
+} else {
+  const latestPostHtml = readFileSync(latestPostPage, 'utf8');
+  const expectedOgPath = `/og${latestPostPath}index.png`;
+  if (!latestPostHtml.includes(expectedOgPath) && !latestPostHtml.includes(encodeURI(expectedOgPath))) {
+    failures.push(`${latestPostPath}: 未引用文章级 Open Graph 分享图`);
+  }
+  if (latestPostTitle && !latestPostHtml.includes(`property="og:image:alt" content="${latestPostTitle}"`)) {
+    failures.push(`${latestPostPath}: 分享图替代文本未使用文章标题`);
+  }
+  if (!latestPostHtml.includes('property="og:image:type" content="image/png"')) {
+    failures.push(`${latestPostPath}: 分享图未声明 image/png 类型`);
+  }
+  if (!/[\d,]+ 字 · 约 \d+ 分钟/.test(latestPostHtml)) {
+    failures.push(`${latestPostPath}: 未展示统一阅读字数和预计阅读时间`);
+  }
 }
 
 const tagIndex = resolve('dist/tags/index.html');
-const blogTag = resolve('dist/tags/博客/index.html');
+const publicAccountTag = resolve('dist/tags/公众号归档/index.html');
 if (!existsSync(tagIndex) || !readFileSync(tagIndex, 'utf8').includes('class="tag-cloud"')) {
   failures.push('/tags/: 标签索引未正确生成');
 }
-if (!existsSync(blogTag) || !readFileSync(blogTag, 'utf8').includes('博客开始营业')) {
-  failures.push('/tags/博客/: 标签文章列表未正确生成');
+if (!existsSync(publicAccountTag) || !readFileSync(publicAccountTag, 'utf8').includes('公众号归档')) {
+  failures.push('/tags/公众号归档/: 标签文章列表未正确生成');
 }
 
 const homePage = readFileSync(resolve('dist/index.html'), 'utf8');
