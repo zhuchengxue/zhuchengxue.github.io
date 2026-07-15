@@ -5,7 +5,7 @@ export function GET(context: { site?: URL }) {
   const base = import.meta.env.BASE_URL.replace(/\/$/, '');
   const contentPaths = [...getNewPosts(), ...getLegacyPosts()].map((post) => post.href);
   const tagPaths = getTags().map((tag) => `/tags/${encodeURIComponent(tag.name)}/`);
-  const paths = ['/', '/about/', '/articles/', '/tags/', ...tagPaths, ...contentPaths];
+  const paths = ['/', '/about/', '/articles/', '/tutorials/', '/tags/', ...tagPaths, ...contentPaths];
   const urls = paths
     .map((path) => `  <url><loc>${new URL(`${base}${path}`, `${origin}/`).toString()}</loc></url>`)
     .join('\n');

@@ -15,6 +15,7 @@ export function GET(context: { site?: URL }) {
     '## Site',
     `- Home: ${siteURL}/`,
     `- Articles: ${siteURL}/articles/`,
+    `- Tutorials: ${siteURL}/tutorials/`,
     `- Tags: ${siteURL}/tags/`,
     `- About: ${siteURL}/about/`,
     '',

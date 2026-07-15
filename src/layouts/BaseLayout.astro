@@ -1,6 +1,6 @@
 ---
 import '../styles/global.css';
-import { ANALYTICS, SITE } from '../config';
+import { ADS, ANALYTICS, SITE } from '../config';
 
 interface Props {
   title?: string;
@@ -47,6 +47,7 @@ const navItems = [
   { href: `${base}/rss.xml`, label: 'RSS' }
 ];
 const analyticsEnabled = Boolean(ANALYTICS.umamiScript && ANALYTICS.umamiWebsiteId);
+const adsenseEnabled = Boolean(ADS.enabled && ADS.provider === 'adsense' && ADS.adsenseClient);
 const websiteStructuredData = {
   '@context': 'https://schema.org',
   '@type': 'WebSite',
@@ -106,6 +107,14 @@ const websiteStructuredData = {
         defer
         src={ANALYTICS.umamiScript}
         data-website-id={ANALYTICS.umamiWebsiteId}
+      />
+    )}
+    {adsenseEnabled && (
+      <script
+        is:inline
+        async
+        src={`https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${ADS.adsenseClient}`}
+        crossorigin="anonymous"
       />
     )}
     <slot name="head" />

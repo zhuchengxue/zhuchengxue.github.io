@@ -1,0 +1,35 @@
+---
+import { ADS } from '../config';
+
+interface Props {
+  name: keyof typeof ADS.slots;
+  label?: string;
+}
+
+const { name, label = '广告' } = Astro.props;
+const slot = ADS.slots[name];
+const showAdsense = ADS.enabled && ADS.provider === 'adsense' && ADS.adsenseClient && slot;
+const showCustom = ADS.enabled && ADS.provider === 'custom' && ADS.customHtml;
+---
+
+{(showAdsense || showCustom) && (
+  <section class="ad-slot" aria-label={label}>
+    <div class="ad-label">{label}</div>
+    {showAdsense && (
+      <>
+        <ins
+          class="adsbygoogle"
+          style="display:block"
+          data-ad-client={ADS.adsenseClient}
+          data-ad-slot={slot}
+          data-ad-format="auto"
+          data-full-width-responsive="true"
+        />
+        <script is:inline>
+          (window.adsbygoogle = window.adsbygoogle || []).push({});
+        </script>
+      </>
+    )}
+    {showCustom && <div class="custom-ad" set:html={ADS.customHtml} />}
+  </section>
+)}

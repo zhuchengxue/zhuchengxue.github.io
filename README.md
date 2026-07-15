@@ -56,6 +56,18 @@ Git 仓库必须放在 Dropbox 之外。Dropbox 中旧的 `博客网站/` 目录
 - 博客发布成功后，Dropbox 原稿会自动移入 `03-已发布/`；博客失败时留在原处，方便重试。
 - 公众号推送与博客彻底解耦；在固定出口 IP 方案启用前，不影响写作、发布或归档。
 
+## 广告预留
+
+广告系统默认关闭，不会影响当前阅读体验。以后申请到 Google AdSense 或国内广告联盟后，只需要配置环境变量即可启用。
+
+- `PUBLIC_ADS_ENABLED=true`：开启广告。
+- `PUBLIC_AD_PROVIDER=adsense`：使用 Google AdSense。
+- `PUBLIC_ADSENSE_CLIENT`：填写 `ca-pub-...` 客户端 ID。
+- `PUBLIC_ADSENSE_SLOT_ARTICLE_BOTTOM`：文章底部广告位。
+- `PUBLIC_ADSENSE_SLOT_LIST_BOTTOM`：全部文章页底部广告位。
+- `PUBLIC_ADSENSE_SLOT_TUTORIAL_TOP` / `PUBLIC_ADSENSE_SLOT_TUTORIAL_BOTTOM`：教程页广告位。
+- `PUBLIC_AD_PROVIDER=custom` + `PUBLIC_AD_CUSTOM_HTML`：预留给国内广告代码；启用前确认代码来源可信。
+
 ## 维护与故障排查
 
 日常说明见 [运维手册](docs/OPERATIONS.md)，换电脑见 [迁移手册](docs/MIGRATION.md)。

@@ -394,6 +394,26 @@ footer {
   font-size: 1.05rem;
 }
 
+.ad-slot {
+  margin: 2.5rem 0;
+  padding: 1rem 0;
+  border-top: 1px solid var(--line);
+  border-bottom: 1px solid var(--line);
+}
+
+.ad-label {
+  margin-bottom: 0.55rem;
+  color: var(--muted);
+  font-family: system-ui, sans-serif;
+  font-size: 0.72rem;
+  letter-spacing: 0.08em;
+  text-align: center;
+}
+
+.custom-ad {
+  overflow-x: auto;
+}
+
 .tags {
   display: flex;
   flex-wrap: wrap;
@@ -636,6 +656,7 @@ footer {
   .skip-link,
   .search-box,
   #search-status,
+  .ad-slot,
   .comments,
   .post-navigation,
   .back-to-archive {

@@ -32,6 +32,12 @@
 
 公众号自动草稿暂时停用，不进入博客发布流程。以后具备固定出口 IP 时可以重新启用；现阶段公众号内容请在后台手动处理。
 
+## 广告
+
+广告位已预留，但默认关闭。没有配置 `PUBLIC_ADS_ENABLED=true` 时，页面不会加载任何广告脚本，也不会显示空白广告框。
+
+以后接入 Google AdSense 时，填写 `PUBLIC_ADSENSE_CLIENT` 和对应广告位 Slot；如果接国内广告，可使用 `PUBLIC_AD_PROVIDER=custom` 与 `PUBLIC_AD_CUSTOM_HTML` 作为临时接入口。
+
 ## 常见问题
 
 ### 博客没有立刻更新

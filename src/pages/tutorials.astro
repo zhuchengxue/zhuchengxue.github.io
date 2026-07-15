@@ -1,5 +1,6 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
+import AdSlot from '../components/AdSlot.astro';
 import { getTutorialPosts } from '../lib/posts';
 
 const base = import.meta.env.BASE_URL.replace(/\/$/, '');
@@ -15,6 +16,8 @@ const posts = getTutorialPosts();
         把可复用的方法、工具折腾、操作步骤和工作流单独放在这里，方便以后回头查。
       </p>
     </header>
+
+    <AdSlot name="tutorialTop" label="教程顶部广告" />
 
     {posts.length ? (
       <ol class="archive-list">
@@ -44,5 +47,7 @@ const posts = getTutorialPosts();
         <p>以后给文章添加 <code>教程</code> 标签，或在标题中使用“指南 / 攻略 / 方法 / 技巧 / 工作流”，就会自动出现在这里。</p>
       </div>
     )}
+
+    <AdSlot name="tutorialBottom" label="教程底部广告" />
   </section>
 </BaseLayout>

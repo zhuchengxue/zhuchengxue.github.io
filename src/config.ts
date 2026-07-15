@@ -17,3 +17,16 @@ export const COMMENTS = {
   giscusCategory: import.meta.env.PUBLIC_GISCUS_CATEGORY as string | undefined,
   giscusCategoryId: import.meta.env.PUBLIC_GISCUS_CATEGORY_ID as string | undefined
 };
+
+export const ADS = {
+  enabled: import.meta.env.PUBLIC_ADS_ENABLED === 'true',
+  provider: (import.meta.env.PUBLIC_AD_PROVIDER || 'adsense') as 'adsense' | 'custom',
+  adsenseClient: import.meta.env.PUBLIC_ADSENSE_CLIENT as string | undefined,
+  customHtml: import.meta.env.PUBLIC_AD_CUSTOM_HTML as string | undefined,
+  slots: {
+    articleBottom: import.meta.env.PUBLIC_ADSENSE_SLOT_ARTICLE_BOTTOM as string | undefined,
+    listBottom: import.meta.env.PUBLIC_ADSENSE_SLOT_LIST_BOTTOM as string | undefined,
+    tutorialTop: import.meta.env.PUBLIC_ADSENSE_SLOT_TUTORIAL_TOP as string | undefined,
+    tutorialBottom: import.meta.env.PUBLIC_ADSENSE_SLOT_TUTORIAL_BOTTOM as string | undefined
+  }
+};

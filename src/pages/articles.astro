@@ -1,5 +1,6 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
+import AdSlot from '../components/AdSlot.astro';
 import { getAllPosts } from '../lib/posts';
 
 const base = import.meta.env.BASE_URL.replace(/\/$/, '');
@@ -42,6 +43,8 @@ const posts = getAllPosts();
         </li>
       ))}
     </ol>
+
+    <AdSlot name="listBottom" label="文章列表广告" />
 
     <noscript><p class="meta">启用 JavaScript 后可在本页即时搜索；文章链接不受影响。</p></noscript>
   </section>
