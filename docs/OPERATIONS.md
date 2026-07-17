@@ -38,6 +38,19 @@
 
 以后接入 Google AdSense 时，填写 `PUBLIC_ADSENSE_CLIENT` 和对应广告位 Slot；如果接国内广告，可使用 `PUBLIC_AD_PROVIDER=custom` 与 `PUBLIC_AD_CUSTOM_HTML` 作为临时接入口。
 
+## 评论
+
+评论区使用 Giscus，把读者留言保存到 GitHub Discussions。它不需要服务器，也不会常驻占用你的电脑。
+
+评论默认关闭。启用时需要先在 GitHub 仓库开启 Discussions，然后安装 Giscus App，再把下面四个环境变量填完整：
+
+- `PUBLIC_GISCUS_REPO`
+- `PUBLIC_GISCUS_REPO_ID`
+- `PUBLIC_GISCUS_CATEGORY`
+- `PUBLIC_GISCUS_CATEGORY_ID`
+
+配置完整后重新发布一次网站，文章底部会出现“留言评论”。如果评论区没有出现，优先检查这四项是否有空值，以及 GitHub Actions 最新构建是否成功。
+
 ## 常见问题
 
 ### 博客没有立刻更新

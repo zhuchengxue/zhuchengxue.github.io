@@ -1,0 +1,39 @@
+---
+import { COMMENTS } from '../config';
+
+const commentsEnabled = Boolean(
+  COMMENTS.giscusRepo
+    && COMMENTS.giscusRepoId
+    && COMMENTS.giscusCategory
+    && COMMENTS.giscusCategoryId
+);
+---
+
+{commentsEnabled && (
+  <section class="comments" aria-label="评论">
+    <div class="comments-header">
+      <h2>留言评论</h2>
+      <p>欢迎留下反馈、补充或不同意见。评论由 GitHub Discussions 托管。</p>
+    </div>
+    <script
+      is:inline
+      src="https://giscus.app/client.js"
+      data-repo={COMMENTS.giscusRepo}
+      data-repo-id={COMMENTS.giscusRepoId}
+      data-category={COMMENTS.giscusCategory}
+      data-category-id={COMMENTS.giscusCategoryId}
+      data-mapping="pathname"
+      data-strict="0"
+      data-reactions-enabled="1"
+      data-emit-metadata="0"
+      data-input-position="top"
+      data-theme="preferred_color_scheme"
+      data-lang="zh-CN"
+      crossorigin="anonymous"
+      async
+    />
+    <noscript>
+      <p class="meta">启用 JavaScript 后可以查看和发表 GitHub 评论。</p>
+    </noscript>
+  </section>
+)}

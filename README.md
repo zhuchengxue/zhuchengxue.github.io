@@ -68,6 +68,18 @@ Git 仓库必须放在 Dropbox 之外。Dropbox 中旧的 `博客网站/` 目录
 - `PUBLIC_ADSENSE_SLOT_TUTORIAL_TOP` / `PUBLIC_ADSENSE_SLOT_TUTORIAL_BOTTOM`：教程页广告位。
 - `PUBLIC_AD_PROVIDER=custom` + `PUBLIC_AD_CUSTOM_HTML`：预留给国内广告代码；启用前确认代码来源可信。
 
+## 留言评论
+
+评论系统使用 Giscus，也就是把每篇文章的评论托管到 GitHub Discussions。成本为 0，不需要服务器，不占用本机资源。
+
+默认情况下评论关闭；等你准备启用时，做三件事：
+
+1. 在 GitHub 仓库打开 Discussions。
+2. 安装 Giscus GitHub App，并允许它访问 `zhuchengxue/zhuchengxue.github.io`。
+3. 到 Giscus 配置页生成参数，把 `PUBLIC_GISCUS_REPO_ID`、`PUBLIC_GISCUS_CATEGORY`、`PUBLIC_GISCUS_CATEGORY_ID` 填进 GitHub Pages 的环境变量。
+
+配置完整后，每篇文章底部会自动出现“留言评论”。没有配置完整时，页面不会加载 Giscus 脚本，也不会显示空白评论框。
+
 ## 维护与故障排查
 
 日常说明见 [运维手册](docs/OPERATIONS.md)，换电脑见 [迁移手册](docs/MIGRATION.md)。
