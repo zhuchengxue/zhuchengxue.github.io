@@ -42,14 +42,16 @@
 
 评论区使用 Giscus，把读者留言保存到 GitHub Discussions。它不需要服务器，也不会常驻占用你的电脑。
 
-评论默认关闭。启用时需要先在 GitHub 仓库开启 Discussions，然后安装 Giscus App，再把下面四个环境变量填完整：
+评论已启用，默认连接到 `zhuchengxue/zhuchengxue.github.io` 仓库的 `Announcements` 分类。读者需要登录 GitHub 才能留言；你可以在 GitHub Discussions 后台管理、删除或回复评论。
+
+下面四个环境变量只是覆盖项，平时不用配置：
 
 - `PUBLIC_GISCUS_REPO`
 - `PUBLIC_GISCUS_REPO_ID`
 - `PUBLIC_GISCUS_CATEGORY`
 - `PUBLIC_GISCUS_CATEGORY_ID`
 
-配置完整后重新发布一次网站，文章底部会出现“留言评论”。如果评论区没有出现，优先检查这四项是否有空值，以及 GitHub Actions 最新构建是否成功。
+如果评论区没有出现，优先检查 GitHub Actions 最新构建是否成功，以及 Giscus App 是否仍然安装在该仓库。
 
 ## 常见问题
 

@@ -72,13 +72,9 @@ Git 仓库必须放在 Dropbox 之外。Dropbox 中旧的 `博客网站/` 目录
 
 评论系统使用 Giscus，也就是把每篇文章的评论托管到 GitHub Discussions。成本为 0，不需要服务器，不占用本机资源。
 
-默认情况下评论关闭；等你准备启用时，做三件事：
+评论已启用，并使用仓库的 `Announcements` 分类。读者在文章底部登录 GitHub 后即可留言；你可以在 GitHub Discussions 里统一查看和管理评论。
 
-1. 在 GitHub 仓库打开 Discussions。
-2. 安装 Giscus GitHub App，并允许它访问 `zhuchengxue/zhuchengxue.github.io`。
-3. 到 Giscus 配置页生成参数，把 `PUBLIC_GISCUS_REPO_ID`、`PUBLIC_GISCUS_CATEGORY`、`PUBLIC_GISCUS_CATEGORY_ID` 填进 GitHub Pages 的环境变量。
-
-配置完整后，每篇文章底部会自动出现“留言评论”。没有配置完整时，页面不会加载 Giscus 脚本，也不会显示空白评论框。
+Giscus 的仓库 ID 和分类 ID 是公开配置，已写入网站默认配置。只有以后更换评论仓库或更换分类时，才需要覆盖 `PUBLIC_GISCUS_REPO`、`PUBLIC_GISCUS_REPO_ID`、`PUBLIC_GISCUS_CATEGORY`、`PUBLIC_GISCUS_CATEGORY_ID`。
 
 ## 维护与故障排查
 

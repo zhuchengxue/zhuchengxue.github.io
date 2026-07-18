@@ -11,11 +11,18 @@ export const ANALYTICS = {
   umamiWebsiteId: import.meta.env.PUBLIC_UMAMI_WEBSITE_ID as string | undefined
 };
 
+const DEFAULT_GISCUS = {
+  repo: 'zhuchengxue/zhuchengxue.github.io',
+  repoId: 'MDEwOlJlcG9zaXRvcnk5NDYxMzcxMg==',
+  category: 'Announcements',
+  categoryId: 'DIC_kwDOBaOw0M4DBYvi'
+};
+
 export const COMMENTS = {
-  giscusRepo: import.meta.env.PUBLIC_GISCUS_REPO as string | undefined,
-  giscusRepoId: import.meta.env.PUBLIC_GISCUS_REPO_ID as string | undefined,
-  giscusCategory: import.meta.env.PUBLIC_GISCUS_CATEGORY as string | undefined,
-  giscusCategoryId: import.meta.env.PUBLIC_GISCUS_CATEGORY_ID as string | undefined
+  giscusRepo: (import.meta.env.PUBLIC_GISCUS_REPO as string | undefined) || DEFAULT_GISCUS.repo,
+  giscusRepoId: (import.meta.env.PUBLIC_GISCUS_REPO_ID as string | undefined) || DEFAULT_GISCUS.repoId,
+  giscusCategory: (import.meta.env.PUBLIC_GISCUS_CATEGORY as string | undefined) || DEFAULT_GISCUS.category,
+  giscusCategoryId: (import.meta.env.PUBLIC_GISCUS_CATEGORY_ID as string | undefined) || DEFAULT_GISCUS.categoryId
 };
 
 export const ADS = {
