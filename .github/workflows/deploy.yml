@@ -19,7 +19,7 @@ jobs:
     runs-on: ubuntu-latest
     env:
       ASTRO_TELEMETRY_DISABLED: 1
-      SITE_URL: ${{ vars.SITE_URL }}
+      SITE_URL: https://xys.bot.cd
     steps:
       - name: Checkout repository
         uses: actions/checkout@v6

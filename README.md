@@ -80,7 +80,7 @@ Giscus 的仓库 ID 和分类 ID 是公开配置，已写入网站默认配置�
 
 日常说明见 [运维手册](docs/OPERATIONS.md)，换电脑见 [迁移手册](docs/MIGRATION.md)。
 
-- 网站：https://zhuchengxue.github.io
+- 网站：https://xys.bot.cd
 - 仓库：https://github.com/zhuchengxue/zhuchengxue.github.io
 - GitHub Actions：https://github.com/zhuchengxue/zhuchengxue.github.io/actions
 

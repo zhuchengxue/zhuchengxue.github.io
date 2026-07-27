@@ -38,6 +38,18 @@
 
 以后接入 Google AdSense 时，填写 `PUBLIC_ADSENSE_CLIENT` 和对应广告位 Slot；如果接国内广告，可使用 `PUBLIC_AD_PROVIDER=custom` 与 `PUBLIC_AD_CUSTOM_HTML` 作为临时接入口。
 
+## 域名
+
+博客主域名是 `https://xys.bot.cd`。仓库里的 `public/CNAME` 会在每次构建时告诉 GitHub Pages 使用这个域名。
+
+DNS 侧需要在域名服务商后台添加一条记录：
+
+- 类型：`CNAME`
+- 主机记录：`xys`
+- 指向：`zhuchengxue.github.io`
+
+如果服务商要求填写完整主机名，则主机记录填 `xys.bot.cd`。DNS 生效后，GitHub Pages 会自动签发 HTTPS 证书，通常需要几分钟到几十分钟。
+
 ## 评论
 
 评论区使用 Giscus，把读者留言保存到 GitHub Discussions。它不需要服务器，也不会常驻占用你的电脑。
